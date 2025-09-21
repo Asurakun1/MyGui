@@ -4,12 +4,11 @@ use windows::{
     Win32::Foundation::*,
     Win32::Graphics::Direct2D::Common::*,
     Win32::Graphics::Direct2D::*,
-    Win32::Graphics::DirectWrite::*,
     Win32::UI::WindowsAndMessaging::*,
 };
 
 use crate::window_manager::window::Window;
-use crate::window_manager::config::DISPLAY_TEXT;
+use crate::render::drawing_context::DrawingContext;
 
 /// The main window procedure.
 ///
@@ -81,28 +80,24 @@ pub extern "system" fn wndproc(hwnd: HWND, message: u32, wparam: WPARAM, lparam:
 /// Handles the `WM_PAINT` message.
 ///
 /// This function is responsible for drawing the content of the window.
-fn on_paint(window: &mut Window, hwnd: HWND) -> Result<()> {
-    if let Some(render_target) = &window.d2d_context.render_target {
+fn on_paint(window: &mut Window, _hwnd: HWND) -> Result<()> {
+    if let (Some(render_target), Some(brush), Some(text_format)) = (
+        &window.d2d_context.render_target,
+        &window.d2d_context.brush,
+        &window.d2d_context.text_format,
+    ) {
         unsafe {
             render_target.BeginDraw();
             let rt: &ID2D1RenderTarget = render_target;
             rt.Clear(Some(&D2D1_COLOR_F { r: 0.0, g: 0.0, b: 0.0, a: 1.0 }));
 
-            if let (Some(brush), Some(text_format)) = (&window.d2d_context.brush, &window.d2d_context.text_format) {
-                let mut rect = RECT::default();
-                GetClientRect(hwnd, &mut rect)?;
-                let layout_rect = D2D_RECT_F { left: 10.0, top: 10.0, right: (rect.right - rect.left) as f32, bottom: (rect.bottom - rect.top) as f32 };
+            let drawing_context = DrawingContext {
+                render_target,
+                brush,
+                text_format,
+            };
 
-                let text_utf16: Vec<u16> = DISPLAY_TEXT.encode_utf16().collect();
-                rt.DrawText(
-                    &text_utf16,
-                    text_format,
-                    &layout_rect,
-                    brush,
-                    D2D1_DRAW_TEXT_OPTIONS_NONE,
-                    DWRITE_MEASURING_MODE_NATURAL,
-                );
-            }
+            window.scene.draw_all(&drawing_context)?;
 
             render_target.EndDraw(None, None)?;
         }

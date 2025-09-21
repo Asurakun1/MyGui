@@ -8,12 +8,15 @@ use windows::{
 };
 
 use super::wndproc_utils::wndproc;
-use super::config::{WINDOW_WIDTH, WINDOW_HEIGHT};
+use super::config::{WINDOW_WIDTH, WINDOW_HEIGHT, DISPLAY_TEXT};
 use crate::render::direct2d_context::Direct2DContext;
+use crate::render::scene::Scene;
+use crate::render::objects::text_object::TextObject;
 
 pub struct Window {
     pub hwnd: HWND,
     pub d2d_context: Direct2DContext,
+    pub scene: Scene,
 }
 
 impl Window {
@@ -24,7 +27,11 @@ impl Window {
         let mut window = Box::new(Self {
             hwnd: HWND(std::ptr::null_mut()),
             d2d_context: Direct2DContext::new()?,
+            scene: Scene::new(),
         });
+
+        // Add a text object to the scene
+        window.scene.add_object(Box::new(TextObject::new(DISPLAY_TEXT, 10.0, 10.0)));
 
         let hwnd = unsafe {
             // The last parameter is a pointer to the `Window` instance. It will be received in `wndproc` on `WM_NCCREATE`.
