@@ -50,7 +50,7 @@ pub extern "system" fn wndproc<E: EventHandler + 'static>(
                         text_format,
                     };
 
-                    window.event_handler.on_paint(&drawing_context);
+                    window.event_handler.on_paint(&mut window.app, &drawing_context);
 
                     if let Err(e) = render_target.EndDraw(None, None) {
                         println!("EndDraw failed: {:?}", e);
@@ -62,7 +62,7 @@ pub extern "system" fn wndproc<E: EventHandler + 'static>(
         WM_SIZE => {
             let width = (lparam.0 & 0xFFFF) as i32;
             let height = ((lparam.0 >> 16) & 0xFFFF) as i32;
-            window.event_handler.on_resize(width, height);
+            window.event_handler.on_resize(&mut window.app, width, height);
             if let Some(render_target) = &window.d2d_context.render_target {
                 let new_size = D2D_SIZE_U { width: width as u32, height: height as u32 };
                 unsafe { render_target.Resize(&new_size).ok() };
@@ -70,7 +70,7 @@ pub extern "system" fn wndproc<E: EventHandler + 'static>(
             LRESULT(0)
         }
         WM_DESTROY => {
-            window.event_handler.on_destroy();
+            window.event_handler.on_destroy(&mut window.app);
             unsafe { PostQuitMessage(0) };
             LRESULT(0)
         }
@@ -82,7 +82,7 @@ pub extern "system" fn wndproc<E: EventHandler + 'static>(
             LRESULT(0)
         }
         _ => {
-            if let Some(result) = window.event_handler.handle_message(message, wparam, lparam) {
+            if let Some(result) = window.event_handler.handle_message(&mut window.app, message, wparam, lparam) {
                 return LRESULT(result);
             }
             unsafe { DefWindowProcW(hwnd, message, wparam, lparam) }

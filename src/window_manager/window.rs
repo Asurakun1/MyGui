@@ -11,15 +11,17 @@ use super::wndproc_utils::wndproc;
 use super::config::{WINDOW_WIDTH, WINDOW_HEIGHT};
 use super::event_handler::EventHandler;
 use crate::render::direct2d_context::Direct2DContext;
+use crate::app::App;
 
 pub struct Window<E: EventHandler> {
     pub hwnd: HWND,
     pub d2d_context: Direct2DContext,
     pub event_handler: E,
+    pub app: App,
 }
 
 impl<E: EventHandler + 'static> Window<E> {
-    pub fn new(title: &str, class_name: &str, event_handler: E) -> Result<Box<Self>> {
+    pub fn new(title: &str, class_name: &str, event_handler: E, app: App) -> Result<Box<Self>> {
         let instance = unsafe { GetModuleHandleW(None)? };
         Self::register_class(instance.into(), class_name)?;
 
@@ -27,6 +29,7 @@ impl<E: EventHandler + 'static> Window<E> {
             hwnd: HWND(std::ptr::null_mut()),
             d2d_context: Direct2DContext::new()?,
             event_handler,
+            app,
         });
 
         let hwnd = unsafe {

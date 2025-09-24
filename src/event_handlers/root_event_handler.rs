@@ -2,6 +2,7 @@
 use windows::Win32::Foundation::{LPARAM, WPARAM};
 
 use crate::{
+    app::App,
     render::drawing_context::DrawingContext,
     window_manager::event_handler::EventHandler,
 };
@@ -20,20 +21,35 @@ impl RootEventHandler {
     }
 }
 
+impl Default for RootEventHandler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl EventHandler for RootEventHandler {
-    fn on_paint(&mut self, drawing_context: &DrawingContext) {
-        self.render_event_handler.on_paint(drawing_context);
+    fn on_paint(&mut self, app: &mut App, drawing_context: &DrawingContext) {
+        self.render_event_handler.on_paint(app, drawing_context);
     }
 
-    fn on_destroy(&mut self) {
+    fn on_destroy(&mut self, app: &mut App) {
+        self.render_event_handler.on_destroy(app);
         println!("Window destroyed");
     }
 
-    fn on_resize(&mut self, width: i32, height: i32) {
+    fn on_resize(&mut self, app: &mut App, width: i32, height: i32) {
+        self.render_event_handler.on_resize(app, width, height);
         println!("Window resized to {}x{}", width, height);
     }
 
-    fn handle_message(&mut self, _msg: u32, _wparam: WPARAM, _lparam: LPARAM) -> Option<isize> {
-        None
+    fn handle_message(
+        &mut self,
+        app: &mut App,
+        msg: u32,
+        wparam: WPARAM,
+        lparam: LPARAM,
+    ) -> Option<isize> {
+        self.render_event_handler
+            .handle_message(app, msg, wparam, lparam)
     }
 }
