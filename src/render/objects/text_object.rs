@@ -9,13 +9,18 @@ use windows::{
 use crate::render::drawable::Drawable;
 use crate::render::drawing_context::DrawingContext;
 
+/// A drawable object that represents a piece of text.
 pub struct TextObject {
+    /// The text to be rendered.
     pub text: String,
+    /// The x-coordinate of the top-left corner of the text.
     pub x: f32,
+    /// The y-coordinate of the top-left corner of the text.
     pub y: f32,
 }
 
 impl TextObject {
+    /// Creates a new `TextObject`.
     pub fn new(text: &str, x: f32, y: f32) -> Self {
         Self {
             text: text.to_string(),
@@ -26,8 +31,12 @@ impl TextObject {
 }
 
 impl Drawable for TextObject {
+    /// Draws the text to the given `DrawingContext`.
     fn draw(&self, context: &DrawingContext) -> Result<()> {
-        let layout_rect = D2D_RECT_F { left: self.x, top: self.y, right: self.x + 1000.0, bottom: self.y + 1000.0 }; // Large enough rect for now
+        // TODO: The layout rectangle is currently hardcoded to a large size.
+        // For more complex scenarios, this should be calculated based on the
+        // actual size of the text.
+        let layout_rect = D2D_RECT_F { left: self.x, top: self.y, right: self.x + 1000.0, bottom: self.y + 1000.0 };
         let text_utf16: Vec<u16> = self.text.encode_utf16().collect();
 
         unsafe {
