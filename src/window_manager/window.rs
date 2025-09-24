@@ -13,13 +13,24 @@ use crate::render::direct2d_context::Direct2DContext;
 use crate::render::scene::Scene;
 use crate::render::objects::text_object::TextObject;
 
+/// Represents the main application window.
+///
+/// This struct encapsulates the window handle (`HWND`), the Direct2D context for rendering,
+/// and the scene containing objects to be drawn.
 pub struct Window {
     pub hwnd: HWND,
+    /// The Direct2D context for rendering.
     pub d2d_context: Direct2DContext,
+    /// The scene containing objects to be drawn.
     pub scene: Scene,
 }
 
 impl Window {
+    /// Creates a new `Window`.
+    ///
+    /// This function registers the window class, creates the window, and sets up the Direct2D context.
+    /// It returns a `Box<Window>` to ensure the `Window` instance has a stable memory location,
+    /// which is necessary for passing a pointer to it during window creation.
     pub fn new(title: &str, class_name: &str) -> Result<Box<Self>> {
         let instance = unsafe { GetModuleHandleW(None)? };
         Self::register_class(instance.into(), class_name)?;
@@ -61,6 +72,9 @@ impl Window {
         Ok(window)
     }
 
+    /// Registers the window class.
+    ///
+    /// This function is called by `new` to register the window class before creating the window.
     fn register_class(instance: HINSTANCE, class_name: &str) -> Result<()> {
         let class_name_hstring = HSTRING::from(class_name);
 
@@ -90,6 +104,10 @@ impl Window {
         Ok(())
     }
 
+    /// Runs the main message loop for the window.
+    ///
+    /// This function enters a loop that retrieves and dispatches messages for the window.
+    /// The loop continues until a `WM_QUIT` message is received.
     pub fn message_loop(&self) -> Result<()> {
         let mut message = MSG::default();
         // The main message loop.

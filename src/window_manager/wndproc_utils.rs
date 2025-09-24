@@ -10,9 +10,19 @@ use windows::{
 use crate::window_manager::window::Window;
 use crate::render::drawing_context::DrawingContext;
 
-/// The main window procedure.
+/// The main window procedure (`wndproc`).
 ///
-/// This function handles messages sent to the window.
+/// This function is the central message handler for the application window. It processes
+/// messages sent to the window, such as `WM_PAINT`, `WM_SIZE`, and `WM_DESTROY`.
+///
+/// # Safety
+///
+/// This function uses `unsafe` blocks to interact with the Win32 API, including:
+/// - Retrieving the `Window` instance pointer from the window's user data.
+/// - Dereferencing raw pointers to access the `Window` instance.
+/// - Calling various Win32 API functions.
+///
+/// The function is designed to be called by the Windows operating system.
 pub extern "system" fn wndproc(hwnd: HWND, message: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
     // Retrieve the `Window` instance from the window's user data.
     let window = unsafe {
@@ -77,9 +87,16 @@ pub extern "system" fn wndproc(hwnd: HWND, message: u32, wparam: WPARAM, lparam:
     }
 }
 
-/// Handles the `WM_PAINT` message.
+/// Handles the `WM_PAINT` message for the window.
 ///
-/// This function is responsible for drawing the content of the window.
+/// This function is called when the window's client area needs to be redrawn.
+/// It begins the drawing process, clears the background, and then iterates through
+/// the objects in the scene, calling their `draw` methods.
+///
+/// # Arguments
+///
+/// * `window` - A mutable reference to the `Window` instance.
+/// * `_hwnd` - The handle to the window. This parameter is currently unused.
 fn on_paint(window: &mut Window, _hwnd: HWND) -> Result<()> {
     if let (Some(render_target), Some(brush), Some(text_format)) = (
         &window.d2d_context.render_target,
