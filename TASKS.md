@@ -2,6 +2,11 @@
 
 ## To Do
 
+- [ ] Enhance Error Handling with `thiserror`
+- [ ] Abstract Input Handling
+- [ ] Decouple Rendering from `wndproc`
+- [ ] Improve `Drawable` Trait for Interactivity
+- [ ] Externalize Configuration
 - [x] Create an `EventHandler` trait to abstract window message handling.
 
 ## Completed
