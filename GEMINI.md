@@ -17,12 +17,17 @@ The project uses Cargo, Rust's package manager and build system.
 ## Development Conventions
 *   **Language:** Rust
 *   **Windows API Bindings:** Uses the `windows` crate for interacting with the Windows API.
-*   **Window Management:** Encapsulates window creation, registration, and message loop within a `Window` struct. The `Window` struct also owns the `Direct2DContext` and a `Scene`.
-*   **Drawing:** The rendering is implemented using Direct2D and DirectWrite, built upon a new drawing abstraction:
+*   **Application Architecture:** The project follows a centralized state management pattern.
+    *   **`App` Struct:** A central `App` struct (`src/app.rs`) owns all application state, including the `Scene` of drawable objects and configuration like the display text.
+    *   **`Window` Struct:** Encapsulates window creation and the message loop. It owns the `App` instance and the `RootEventHandler`.
+*   **Event Handling:** A modular, composable event handling system is used.
+    *   **`EventHandler` Trait:** Defines the interface for handling window messages. Methods receive a mutable reference to the `App` struct, allowing them to modify the central state.
+    *   **`RootEventHandler`:** The primary event handler that is passed to the `Window`. It composes multiple specialized event handlers.
+    *   **`RenderEventHandler`:** A stateless handler responsible only for drawing logic. It's called by the `RootEventHandler`.
+*   **Drawing:** The rendering is implemented using Direct2D and DirectWrite.
     *   **`Drawable` Trait:** Defines an interface for any object that can be drawn on the screen.
-    *   **`DrawingContext` Struct:** Bundles essential Direct2D drawing resources (`ID2D1RenderTarget`, `ID2D1SolidColorBrush`, `IDWriteTextFormat`) for easy passing to `Drawable` objects.
+    *   **`Scene` Struct:** Manages a collection of `Drawable` objects. It is owned by the `App` struct.
+    *   **`DrawingContext` Struct:** Bundles essential Direct2D drawing resources for easy passing to `Drawable` objects.
     *   **`TextObject`:** A concrete implementation of `Drawable` for rendering text.
-    *   **`Scene` Struct:** Manages a collection of `Drawable` objects. The `Window` holds an instance of `Scene`.
-    *   The `WM_PAINT` message is handled in the `wndproc` function.
-    *   Inside the `WM_PAINT` handler (`on_paint` function), a `DrawingContext` is created, and then `window.scene.draw_all()` is called to iterate through and draw all objects in the scene.
+    *   The `WM_PAINT` message is handled in the `wndproc` function, which calls the `on_paint` method on the `RootEventHandler`, passing it the `App` state and a `DrawingContext`. The handler then delegates to the `RenderEventHandler` to draw the scene from `app.scene`.
 *   **Unsafe Code:** Due to direct interaction with the Windows API, the project utilizes `unsafe` blocks for FFI (Foreign Function Interface) calls.
