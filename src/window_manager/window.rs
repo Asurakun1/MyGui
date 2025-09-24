@@ -8,33 +8,28 @@ use windows::{
 };
 
 use super::wndproc_utils::wndproc;
-use super::config::{WINDOW_WIDTH, WINDOW_HEIGHT, DISPLAY_TEXT};
+use super::config::{WINDOW_WIDTH, WINDOW_HEIGHT};
+use super::event_handler::EventHandler;
 use crate::render::direct2d_context::Direct2DContext;
-use crate::render::scene::Scene;
-use crate::render::objects::text_object::TextObject;
 
-pub struct Window {
+pub struct Window<E: EventHandler> {
     pub hwnd: HWND,
     pub d2d_context: Direct2DContext,
-    pub scene: Scene,
+    pub event_handler: E,
 }
 
-impl Window {
-    pub fn new(title: &str, class_name: &str) -> Result<Box<Self>> {
+impl<E: EventHandler + 'static> Window<E> {
+    pub fn new(title: &str, class_name: &str, event_handler: E) -> Result<Box<Self>> {
         let instance = unsafe { GetModuleHandleW(None)? };
         Self::register_class(instance.into(), class_name)?;
 
         let mut window = Box::new(Self {
             hwnd: HWND(std::ptr::null_mut()),
             d2d_context: Direct2DContext::new()?,
-            scene: Scene::new(),
+            event_handler,
         });
 
-        // Add a text object to the scene
-        window.scene.add_object(Box::new(TextObject::new(DISPLAY_TEXT, 10.0, 10.0)));
-
         let hwnd = unsafe {
-            // The last parameter is a pointer to the `Window` instance. It will be received in `wndproc` on `WM_NCCREATE`.
             CreateWindowExW(
                 WINDOW_EX_STYLE::default(),
                 &HSTRING::from(class_name),
@@ -54,9 +49,12 @@ impl Window {
         window.hwnd = hwnd;
         window.d2d_context.create_device_dependent_resources(hwnd)?;
 
-        // Show the window.
-        unsafe { let _ = ShowWindow(hwnd, SW_SHOW); };
-        unsafe { let _ = UpdateWindow(hwnd); };
+        unsafe {
+            let _ = ShowWindow(hwnd, SW_SHOW);
+        };
+        unsafe {
+            let _ = UpdateWindow(hwnd);
+        };
 
         Ok(window)
     }
@@ -67,7 +65,7 @@ impl Window {
         let wc = WNDCLASSEXW {
             cbSize: std::mem::size_of::<WNDCLASSEXW>() as u32,
             style: CS_HREDRAW | CS_VREDRAW,
-            lpfnWndProc: Some(wndproc),
+            lpfnWndProc: Some(wndproc::<E>),
             cbClsExtra: 0,
             // Make space for a pointer to the `Window` instance.
             cbWndExtra: std::mem::size_of::<*mut Self>() as i32,
