@@ -1,0 +1,35 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="MyGui: A Simple Windows GUI Framework"><title>MyGui - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../static.files/rustdoc-aa0817cf.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="MyGui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.90.0 (1159e78c4 2025-09-14)" data-channel="1.90.0" data-search-js="search-fa3e91e5.js" data-settings-js="settings-5514c975.js" ><script src="../static.files/storage-68b7e25d.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-eebb9057.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-044be391.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../MyGui/index.html">MyGui</a><span class="version">0.1.0</span></h2></div><div class="sidebar-elems"><ul class="block"><li><a id="all-types" href="all.html">All Items</a></li></ul><section id="rustdoc-toc"><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#mygui-a-simple-windows-gui-framework" title="MyGui: A Simple Windows GUI Framework">MyGui: A Simple Windows GUI Framework</a><ul><li><a href="#architecture" title="Architecture">Architecture</a></li><li><a href="#getting-started" title="Getting Started">Getting Started</a></li></ul></li></ul><h3><a href="#modules">Crate Items</a></h3><ul class="block"><li><a href="#modules" title="Modules">Modules</a></li></ul></section><div id="rustdoc-modnav"></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1>Crate <span>MyGui</span><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../src/MyGui/lib.rs.html#1-45">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="mygui-a-simple-windows-gui-framework"><a class="doc-anchor" href="#mygui-a-simple-windows-gui-framework">§</a>MyGui: A Simple Windows GUI Framework</h2>
+<p><code>MyGui</code> is a lightweight and modular framework for creating Windows GUI applications in Rust.
+It provides a simple and intuitive API for creating windows, handling events, and rendering 2D graphics.</p>
+<h3 id="architecture"><a class="doc-anchor" href="#architecture">§</a>Architecture</h3>
+<p>The framework is divided into the following modules:</p>
+<ul>
+<li><code>app</code>: Contains the central application state.</li>
+<li><code>event</code>: Handles all input and window events.</li>
+<li><code>render</code>: Manages all rendering and drawing logic.</li>
+<li><code>window</code>: Responsible for window creation and management.</li>
+</ul>
+<h3 id="getting-started"><a class="doc-anchor" href="#getting-started">§</a>Getting Started</h3>
+<p>To create a new <code>MyGui</code> application, you need to create a <code>Window</code> and an <code>App</code> instance.
+The <code>Window</code> is responsible for creating and managing the application window, while the <code>App</code>
+contains the central application state.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>MyGui::{
+    app::app::App,
+    event::root_event_handler::RootEventHandler,
+    window::{
+        config::{WINDOW_TITLE, WINDOW_CLASS_NAME},
+        window::Window,
+    },
+};
+<span class="kw">use </span>windows::core::Result;
+
+<span class="kw">fn </span>main() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="kw">let </span>app = App::new();
+    <span class="kw">let </span>event_handler = RootEventHandler::new();
+    <span class="kw">let </span>window = Window::new(WINDOW_TITLE, WINDOW_CLASS_NAME, event_handler, app)<span class="question-mark">?</span>;
+    <span class="kw">let </span>result = window.message_loop();
+    std::mem::forget(window);
+    result
+}</code></pre></div>
+</div></details><h2 id="modules" class="section-header">Modules<a href="#modules" class="anchor">§</a></h2><dl class="item-table"><dt><a class="mod" href="app/index.html" title="mod MyGui::app">app</a></dt><dt><a class="mod" href="event/index.html" title="mod MyGui::event">event</a></dt><dt><a class="mod" href="render/index.html" title="mod MyGui::render">render</a></dt><dd>Rendering Engine</dd><dt><a class="mod" href="window/index.html" title="mod MyGui::window">window</a></dt></dl></section></div></main></body></html>
