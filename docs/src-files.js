@@ -1,2 +1,0 @@
-createSrcSidebar('[["MyGui",["",[["app",[],["app.rs","mod.rs"]],["event",[],["event_handler.rs","key_id.rs","mod.rs","render_event_handler.rs","root_event_handler.rs"]],["render",[["objects",[],["mod.rs","text_object.rs"]]],["direct2d_context.rs","drawable.rs","drawing_context.rs","mod.rs","scene.rs"]],["window",[],["config.rs","mod.rs","window.rs","wndproc_utils.rs"]]],["lib.rs"]]]]');
-//{"start":19,"fragment_lengths":[366]}
