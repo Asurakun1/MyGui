@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["direct2d_context","drawable","drawing_context","objects","scene"]};

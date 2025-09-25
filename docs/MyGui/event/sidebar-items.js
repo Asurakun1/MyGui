@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["event_handler","key_id","render_event_handler","root_event_handler"]};
