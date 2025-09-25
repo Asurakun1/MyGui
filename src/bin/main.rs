@@ -21,14 +21,11 @@
 //! the message loop. The `Window` instance is intentionally "leaked" using `std::mem::forget`
 //! because its lifetime is managed by the Windows API through the `wndproc` callback.
 
+use MyGui::*;
+
 use windows::{
     core::*,
 };
-
-mod window;
-mod render;
-mod event;
-mod app;
 
 use window::{
     config::{WINDOW_TITLE, WINDOW_CLASS_NAME},

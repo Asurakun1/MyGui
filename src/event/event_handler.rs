@@ -1,6 +1,6 @@
 use windows::Win32::Foundation::{LPARAM, WPARAM};
 
-use crate::{app::App, render::drawing_context::DrawingContext};
+use crate::{app::app::App, render::drawing_context::DrawingContext};
 
 /// Defines the interface for handling window events.
 ///
@@ -10,8 +10,16 @@ use crate::{app::App, render::drawing_context::DrawingContext};
 ///
 /// Implementors of this trait can be composed to create more complex event
 /// handling logic (see `RootEventHandler`).
-use crate::window_manager::key_id::KeyId;
+use crate::event::key_id::KeyId;
 
+/// Defines the interface for handling window events.
+///
+/// This trait provides a structured way to respond to common window messages.
+/// An `EventHandler` is associated with a `Window` and its methods are called
+/// from the `wndproc` function when the corresponding messages are received.
+///
+/// Implementors of this trait can be composed to create more complex event
+/// handling logic (see `RootEventHandler`).
 pub trait EventHandler {
     /// Called when the window needs to be repainted (in response to `WM_PAINT`).
     fn on_paint(&mut self, app: &mut App, drawing_context: &DrawingContext);
