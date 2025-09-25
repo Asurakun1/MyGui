@@ -1,12 +1,22 @@
-/// The default title for the application window.
-pub const WINDOW_TITLE: &str = "Hello, Windows!";
-/// The default class name for the application window.
-pub const WINDOW_CLASS_NAME: &str = "window_class";
-/// The default width for the application window.
-pub const WINDOW_WIDTH: i32 = 800;
-/// The default height for the application window.
-pub const WINDOW_HEIGHT: i32 = 600;
-/// The default font size for the application.
-pub const FONT_SIZE: i32 = 18;
-/// The default font face name for the application.
-pub const FONT_FACE_NAME: &str = "MS Gothic";
+
+pub struct WindowConfig {
+    pub title: String,
+    pub class_name: String,
+    pub width: i32,
+    pub height: i32,
+    pub font_size: i32,
+    pub font_face_name: String,
+}
+
+impl Default for WindowConfig {
+    fn default() -> Self {
+        Self {
+            title: "Hello, Windows!".to_string(),
+            class_name: "window_class".to_string(),
+            width: 800,
+            height: 600,
+            font_size: 18,
+            font_face_name: "MS Gothic".to_string(),
+        }
+    }
+}

@@ -27,10 +27,7 @@ use windows::{
     core::*,
 };
 
-use window::{
-    config::{WINDOW_TITLE, WINDOW_CLASS_NAME},
-    window::Window,
-};
+use window::WindowBuilder;
 use event::root_event_handler::RootEventHandler;
 use app::app::App;
 
@@ -38,7 +35,7 @@ use app::app::App;
 fn main() -> Result<()> {
     let app = App::new();
     let event_handler = RootEventHandler::new();
-    let window = Window::new(WINDOW_TITLE, WINDOW_CLASS_NAME, event_handler, app)?;
+    let window = WindowBuilder::new().build(event_handler, app)?;
     let result = window.message_loop();
 
     // The `Window` is allocated on the heap, and a raw pointer to it is stored in the

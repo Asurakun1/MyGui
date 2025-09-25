@@ -10,7 +10,7 @@ use windows::{
 };
 
 use windows::core::HSTRING;
-use crate::window::config::{FONT_FACE_NAME, FONT_SIZE};
+
 
 /// Manages all Direct2D and DirectWrite resources.
 ///
@@ -34,7 +34,7 @@ pub struct Direct2DContext {
 
 impl Direct2DContext {
     /// Creates a new `Direct2DContext` and initializes device-independent resources.
-    pub fn new() -> Result<Self> {
+    pub fn new(font_face_name: &str, font_size: f32) -> Result<Self> {
         unsafe {
             CoInitializeEx(None, COINIT_APARTMENTTHREADED).ok()?;
         }
@@ -66,24 +66,24 @@ impl Direct2DContext {
             brush: None,
         };
 
-        context.create_device_independent_resources()?;
+        context.create_device_independent_resources(font_face_name, font_size)?;
 
         Ok(context)
     }
 
     /// Creates resources that are not tied to a specific rendering device.
     /// These resources can be created once and reused.
-    fn create_device_independent_resources(&mut self) -> Result<()> {
+    fn create_device_independent_resources(&mut self, font_face_name: &str, font_size: f32) -> Result<()> {
         // Create a DirectWrite text format object.
         // Unsafe: FFI call to DirectWrite. Assumes `dwrite_factory` is a valid pointer.
         let text_format = unsafe {
             self.dwrite_factory.CreateTextFormat(
-                &HSTRING::from(FONT_FACE_NAME),
+                &HSTRING::from(font_face_name),
                 None,
                 DWRITE_FONT_WEIGHT_NORMAL,
                 DWRITE_FONT_STYLE_NORMAL,
                 DWRITE_FONT_STRETCH_NORMAL,
-                FONT_SIZE as f32,
+                font_size,
                 &HSTRING::from("en-us"),
             )?
         };

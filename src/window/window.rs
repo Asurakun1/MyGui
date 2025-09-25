@@ -8,7 +8,8 @@ use windows::{
 };
 
 use super::wndproc_utils::wndproc;
-use super::config::{WINDOW_WIDTH, WINDOW_HEIGHT};
+use super::config::WindowConfig;
+
 use crate::event::event_handler::EventHandler;
 use crate::app::app::App;
 use crate::render::direct2d_context::Direct2DContext;
@@ -42,15 +43,15 @@ impl<E: EventHandler + 'static> Window<E> {
     /// However, its lifetime will be managed by the `wndproc` and the message loop,
     /// so the caller is expected to call `std::mem::forget` on the box to prevent
     /// premature deallocation.
-    pub fn new(title: &str, class_name: &str, event_handler: E, app: App) -> Result<Box<Self>> {
+    pub(super) fn new(config: &WindowConfig, event_handler: E, app: App) -> Result<Box<Self>> {
         let instance = unsafe { GetModuleHandleW(None)? };
-        Self::register_class(instance.into(), class_name)?;
+        Self::register_class(instance.into(), &config.class_name)?;
 
         // Allocate the Window struct on the heap. This is necessary because its lifetime
         // will be tied to the Win32 window handle, not the scope of this function.
         let mut window = Box::new(Self {
             hwnd: HWND(std::ptr::null_mut()),
-            d2d_context: Direct2DContext::new()?,
+            d2d_context: Direct2DContext::new(&config.font_face_name, config.font_size as f32)?,
             event_handler,
             app,
         });
@@ -61,13 +62,13 @@ impl<E: EventHandler + 'static> Window<E> {
         let hwnd = unsafe {
             CreateWindowExW(
                 WINDOW_EX_STYLE::default(),
-                &HSTRING::from(class_name),
-                &HSTRING::from(title),
+                &HSTRING::from(config.class_name.as_str()),
+                &HSTRING::from(config.title.as_str()),
                 WS_OVERLAPPEDWINDOW,
                 CW_USEDEFAULT,
                 CW_USEDEFAULT,
-                WINDOW_WIDTH,
-                WINDOW_HEIGHT,
+                config.width,
+                config.height,
                 None,
                 None,
                 Some(instance.into()),

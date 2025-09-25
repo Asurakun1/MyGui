@@ -4,15 +4,6 @@
 
 ---
 
-### Priority 1: Refactor Window Creation API
-- **Task**: Replace hardcoded configuration with a flexible `WindowBuilder` pattern.
-- **Goal**: Decouple window configuration from the core library code to empower users.
-- **Importance**: This is the most critical step toward creating a flexible and idiomatic library API. It moves the framework from a static example to a dynamic tool.
-- **Implementation**:
-  1.  Create a `WindowConfig` struct to hold parameters like `title`, `width`, `height`, and font settings.
-  2.  Implement a `WindowBuilder` that uses `WindowConfig` and the builder pattern to construct a `Window`.
-  3.  Deprecate and remove the `src/window/config.rs` file and hardcoded constants.
-
 ### Priority 2: Implement Composable Event Handling
 - **Task**: Make the `RootEventHandler` manage a collection of `EventHandler`s.
 - **Goal**: Allow library users to register their own custom event handlers without modifying the framework.
@@ -51,6 +42,15 @@
 ---
 
 ## Completed
+
+- [x] **Refactor Window Creation API**:
+  - **Task**: Replace hardcoded configuration with a flexible `WindowBuilder` pattern.
+  - **Goal**: Decouple window configuration from the core library code to empower users.
+  - **Importance**: This is the most critical step toward creating a flexible and idiomatic library API. It moves the framework from a static example to a dynamic tool.
+  - **Implementation**:
+    1.  Create a `WindowConfig` struct to hold parameters like `title`, `width`, `height`, and font settings.
+    2.  Implement a `WindowBuilder` that uses `WindowConfig` and the builder pattern to construct a `Window`.
+    3.  Deprecate and remove the `src/window/config.rs` file and hardcoded constants.
 
 - [x] **Decouple Rendering Logic from `wndproc`**:
   - **Goal**: Isolate all Direct2D drawing operations within the `RenderEventHandler` to enforce a clear separation of concerns.
