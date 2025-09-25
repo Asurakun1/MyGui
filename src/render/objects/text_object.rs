@@ -1,10 +1,8 @@
-
 use windows::{
     core::*,
-    Win32::Graphics::Direct2D::Common::*,
     Win32::Graphics::Direct2D::{D2D1_DRAW_TEXT_OPTIONS_NONE},
-    Win32::Graphics::DirectWrite::{DWRITE_MEASURING_MODE_NATURAL},
 };
+use windows_numerics::Vector2;
 
 use crate::render::drawable::Drawable;
 use crate::render::drawing_context::DrawingContext;
@@ -36,31 +34,30 @@ impl TextObject {
 impl Drawable for TextObject {
     /// Draws the text to the render target using the provided `DrawingContext`.
     fn draw(&self, context: &DrawingContext) -> Result<()> {
-        // Define the rectangle for the text layout.
-        // TODO: The layout rectangle is currently hardcoded to a large size.
-        // For more complex scenarios, this should be calculated based on the
-        // actual size of the text using IDWriteTextLayout.
-        let layout_rect = D2D_RECT_F { left: self.x, top: self.y, right: self.x + 1000.0, bottom: self.y + 1000.0 };
         let text_utf16: Vec<u16> = self.text.encode_utf16().collect();
 
-        // The `DrawText` method is an `unsafe` FFI call to the Direct2D API.
-        // Safety:
-        // - `context.render_target` is a valid `ID2D1HwndRenderTarget`.
-        // - `text_utf16` is a valid slice of UTF-16 code units.
-        // - `context.text_format` is a valid `IDWriteTextFormat`.
-        // - `layout_rect` is a valid `D2D_RECT_F`.
-        // - `context.brush` is a valid `ID2D1SolidColorBrush`.
-        // All pointers are valid and the function call is correct as per the WinAPI documentation.
-        unsafe {
-            context.render_target.DrawText(
+        let size = unsafe { context.render_target.GetSize() };
+
+        let text_layout = unsafe {
+            context.dwrite_factory.CreateTextLayout(
                 &text_utf16,
                 context.text_format,
-                &layout_rect,
+                size.width,
+                size.height,
+            )?
+        };
+
+        let origin = Vector2 { X: self.x, Y: self.y };
+
+        unsafe {
+            context.render_target.DrawTextLayout(
+                origin,
+                &text_layout,
                 context.brush,
                 D2D1_DRAW_TEXT_OPTIONS_NONE,
-                DWRITE_MEASURING_MODE_NATURAL,
             );
         }
+
         Ok(())
     }
 }

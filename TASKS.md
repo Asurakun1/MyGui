@@ -4,14 +4,6 @@
 
 ---
 
-### Priority 3: Correct Text Object Rendering
-- **Task**: Fix the hardcoded layout rectangle in `TextObject`.
-- **Goal**: Ensure text is always rendered correctly and efficiently, regardless of its size.
-- **Importance**: This is a correctness and performance issue. The current implementation is inefficient and can lead to visual bugs.
-- **Implementation**:
-  1.  Use `IDWriteFactory::CreateTextLayout` to get the precise metrics of the text.
-  2.  Use the resulting `IDWriteTextLayout` object and the `DrawTextLayout` method for rendering.
-
 ### Priority 4: Adhere to Rust Naming Conventions
 - **Task**: Rename the crate to follow Rust conventions.
 - **Goal**: Align the project with standard Rust practices.
@@ -33,6 +25,14 @@
 ---
 
 ## Completed
+
+- [x] **Correct Text Object Rendering**:
+  - **Task**: Fix the hardcoded layout rectangle in `TextObject`.
+  - **Goal**: Ensure text is always rendered correctly and efficiently, regardless of its size.
+  - **Importance**: This is a correctness and performance issue. The current implementation is inefficient and can lead to visual bugs.
+  - **Implementation**:
+    1.  Use `IDWriteFactory::CreateTextLayout` to get the precise metrics of the text.
+    2.  Use the resulting `IDWriteTextLayout` object and the `DrawTextLayout` method for rendering.
 
 - [x] **Implement Composable Event Handling**:
   - **Task**: Make the `RootEventHandler` manage a collection of `EventHandler`s.

@@ -70,6 +70,7 @@ pub extern "system" fn wndproc<E: EventHandler + 'static>(
                     render_target,
                     brush,
                     text_format,
+                    dwrite_factory: &window.d2d_context.dwrite_factory,
                 };
 
                 window
