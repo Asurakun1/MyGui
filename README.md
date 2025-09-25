@@ -1,3 +1,5 @@
+## You Probably Shouldn't Be Using This.
+
 # MyGui: A Retained-Mode GUI Framework for Windows
 
 **Note:** This project is a learning exercise in building a GUI framework from scratch using Rust and the raw Windows API. For production applications, consider using mature frameworks. 
