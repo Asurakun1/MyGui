@@ -1,3 +1,4 @@
+/// Represents a key on the keyboard.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum KeyId {
     // Letter keys
@@ -15,10 +16,12 @@ pub enum KeyId {
     // Other keys
     Space, Enter, Escape, Backspace, Tab, Shift, Control, Alt,
 
+    /// An unknown key with the given virtual key code.
     Unknown(u16),
 }
 
 impl KeyId {
+    /// Converts a virtual key code into a `KeyId`.
     pub fn from_vkey(vkey: u16) -> Self {
         const VK_A: u16 = 0x41;
         const VK_B: u16 = 0x42;

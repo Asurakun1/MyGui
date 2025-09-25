@@ -21,6 +21,15 @@ use crate::window::config::{FONT_FACE_NAME, FONT_SIZE};
 /// - **Device-dependent resources**: These resources (like `ID2D1HwndRenderTarget`
 ///   and brushes) are tied to a specific display device. They may need to be
 ///   recreated if the device is lost.
+/// Manages all Direct2D and DirectWrite resources.
+///
+/// This struct encapsulates the factories, render targets, and other resources
+/// required for drawing. It separates resource creation into two categories:
+/// - **Device-independent resources**: These resources (like `IDWriteTextFormat`)
+///   do not depend on the specific rendering device and can be created once.
+/// - **Device-dependent resources**: These resources (like `ID2D1HwndRenderTarget`
+///   and brushes) are tied to a specific display device. They may need to be
+///   recreated if the device is lost.
 pub struct Direct2DContext {
     // Device-independent resources
     pub d2d_factory: ID2D1Factory1,

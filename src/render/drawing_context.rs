@@ -9,6 +9,10 @@ use windows::{
 ///
 /// This struct bundles the necessary Direct2D resources for drawing, making it
 /// convenient to pass them to `Drawable` objects.
+/// A context for drawing operations.
+///
+/// This struct bundles the necessary Direct2D resources for drawing, making it
+/// convenient to pass them to `Drawable` objects.
 pub struct DrawingContext<'a> {
     /// The render target to draw to.
     pub render_target: &'a ID2D1RenderTarget,

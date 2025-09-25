@@ -13,6 +13,11 @@ use crate::event::event_handler::EventHandler;
 use crate::app::app::App;
 use crate::render::direct2d_context::Direct2DContext;
 
+/// Represents an application window.
+///
+/// This struct encapsulates the window handle (`HWND`) and all the resources
+/// required to manage the window. It also owns the application state (`App`)
+/// and the event handler (`EventHandler`).
 pub struct Window<E: EventHandler> {
     pub hwnd: HWND,
     pub d2d_context: Direct2DContext,
@@ -117,6 +122,7 @@ impl<E: EventHandler + 'static> Window<E> {
         Ok(())
     }
 
+    /// Starts the message loop for the window.
     pub fn message_loop(&self) -> Result<()> {
         let mut message = MSG::default();
         // The main message loop.
