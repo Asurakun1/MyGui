@@ -9,9 +9,9 @@ use windows::{
 
 use super::wndproc_utils::wndproc;
 use super::config::{WINDOW_WIDTH, WINDOW_HEIGHT};
-use super::event_handler::EventHandler;
+use crate::event::event_handler::EventHandler;
+use crate::app::app::App;
 use crate::render::direct2d_context::Direct2DContext;
-use crate::app::App;
 
 pub struct Window<E: EventHandler> {
     pub hwnd: HWND,

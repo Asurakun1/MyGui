@@ -25,17 +25,17 @@ use windows::{
     core::*,
 };
 
-mod window_manager;
+mod window;
 mod render;
-mod event_handlers;
+mod event;
 mod app;
 
-use window_manager::{
+use window::{
     config::{WINDOW_TITLE, WINDOW_CLASS_NAME},
     window::Window,
 };
-use event_handlers::root_event_handler::RootEventHandler;
-use app::App;
+use event::root_event_handler::RootEventHandler;
+use app::app::App;
 
 
 fn main() -> Result<()> {

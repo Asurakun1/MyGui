@@ -10,7 +10,7 @@ use windows::{
 };
 
 use windows::core::HSTRING;
-use crate::window_manager::config::{FONT_FACE_NAME, FONT_SIZE};
+use crate::window::config::{FONT_FACE_NAME, FONT_SIZE};
 
 /// Manages all Direct2D and DirectWrite resources.
 ///

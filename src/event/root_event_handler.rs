@@ -1,11 +1,7 @@
 
 use windows::Win32::Foundation::{LPARAM, WPARAM};
 
-use crate::{
-    app::App,
-    render::drawing_context::DrawingContext,
-    window_manager::event_handler::EventHandler,
-};
+use crate::{app::app::App, event::event_handler::EventHandler, render::drawing_context::DrawingContext};
 
 use super::render_event_handler::RenderEventHandler;
 
@@ -34,6 +30,8 @@ impl Default for RootEventHandler {
     }
 }
 
+use crate::event::key_id::KeyId;
+
 impl EventHandler for RootEventHandler {
     /// Delegates the `on_paint` event to the appropriate child handler.
     fn on_paint(&mut self, app: &mut App, drawing_context: &DrawingContext) {
@@ -50,6 +48,31 @@ impl EventHandler for RootEventHandler {
     fn on_resize(&mut self, app: &mut App, width: i32, height: i32) {
         self.render_event_handler.on_resize(app, width, height);
         println!("Window resized to {}x{}", width, height);
+    }
+
+    /// Delegates mouse move events.
+    fn on_mouse_move(&mut self, app: &mut App, x: i32, y: i32) {
+        self.render_event_handler.on_mouse_move(app, x, y);
+    }
+
+    /// Delegates left mouse button down events.
+    fn on_lbutton_down(&mut self, app: &mut App, x: i32, y: i32) {
+        self.render_event_handler.on_lbutton_down(app, x, y);
+    }
+
+    /// Delegates left mouse button up events.
+    fn on_lbutton_up(&mut self, app: &mut App, x: i32, y: i32) {
+        self.render_event_handler.on_lbutton_up(app, x, y);
+    }
+
+    /// Delegates key down events.
+    fn on_key_down(&mut self, app: &mut App, key: KeyId) {
+        self.render_event_handler.on_key_down(app, key);
+    }
+
+    /// Delegates key up events.
+    fn on_key_up(&mut self, app: &mut App, key: KeyId) {
+        self.render_event_handler.on_key_up(app, key);
     }
 
     /// Delegates general message handling.
