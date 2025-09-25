@@ -2,6 +2,10 @@
 name = "MyGui"
 version = "0.1.0"
 edition = "2024"
+description = "A simple GUI application for Windows using the Rust 'windows' crate. For learning purposes only. You should not use this crate."
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/Asurakun1/MyGui"
+homepage = "https://github.com/Asurakun1/MyGui"
 
 [dependencies]
 thiserror = "2.0.16"
