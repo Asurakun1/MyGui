@@ -4,15 +4,6 @@
 
 ---
 
-### Priority 2: Implement Composable Event Handling
-- **Task**: Make the `RootEventHandler` manage a collection of `EventHandler`s.
-- **Goal**: Allow library users to register their own custom event handlers without modifying the framework.
-- **Importance**: This enhances modularity and makes the framework truly extensible, allowing for a clean separation of concerns for different UI features.
-- **Implementation**:
-  1.  Change `RootEventHandler` to hold a `Vec<Box<dyn EventHandler>>`.
-  2.  Provide a public `add_handler` method for users to register their own handlers.
-  3.  Update the `EventHandler` methods on `RootEventHandler` to iterate and delegate calls to all registered handlers.
-
 ### Priority 3: Correct Text Object Rendering
 - **Task**: Fix the hardcoded layout rectangle in `TextObject`.
 - **Goal**: Ensure text is always rendered correctly and efficiently, regardless of its size.
@@ -42,6 +33,15 @@
 ---
 
 ## Completed
+
+- [x] **Implement Composable Event Handling**:
+  - **Task**: Make the `RootEventHandler` manage a collection of `EventHandler`s.
+  - **Goal**: Allow library users to register their own custom event handlers without modifying the framework.
+  - **Importance**: This enhances modularity and makes the framework truly extensible, allowing for a clean separation of concerns for different UI features.
+  - **Implementation**:
+    1.  Change `RootEventHandler` to hold a `Vec<Box<dyn EventHandler>>`.
+    2.  Provide a public `add_handler` method for users to register their own handlers.
+    3.  Update the `EventHandler` methods on `RootEventHandler` to iterate and delegate calls to all registered handlers.
 
 - [x] **Refactor Window Creation API**:
   - **Task**: Replace hardcoded configuration with a flexible `WindowBuilder` pattern.

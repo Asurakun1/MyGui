@@ -29,12 +29,14 @@ use windows::{
 
 use window::WindowBuilder;
 use event::root_event_handler::RootEventHandler;
+use event::render_event_handler::RenderEventHandler;
 use app::app::App;
 
 
 fn main() -> Result<()> {
     let app = App::new();
-    let event_handler = RootEventHandler::new();
+    let mut event_handler = RootEventHandler::new();
+    event_handler.add_handler(Box::new(RenderEventHandler::new()));
     let window = WindowBuilder::new().build(event_handler, app)?;
     let result = window.message_loop();
 

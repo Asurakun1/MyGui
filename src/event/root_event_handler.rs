@@ -3,7 +3,7 @@ use windows::Win32::Foundation::{LPARAM, WPARAM};
 
 use crate::{app::app::App, event::event_handler::EventHandler, render::drawing_context::DrawingContext};
 
-use super::render_event_handler::RenderEventHandler;
+
 
 /// The primary event handler that composes and delegates to other, more specialized handlers.
 ///
@@ -12,15 +12,16 @@ use super::render_event_handler::RenderEventHandler;
 /// a clean separation of concerns, where different aspects of event handling (e.g., rendering,
 /// input) can be managed by separate structs.
 pub struct RootEventHandler {
-    render_event_handler: RenderEventHandler,
+    handlers: Vec<Box<dyn EventHandler>>,
 }
 
 impl RootEventHandler {
-    /// Creates a new `RootEventHandler` and initializes its child handlers.
     pub fn new() -> Self {
-        Self {
-            render_event_handler: RenderEventHandler::new(),
-        }
+        Self { handlers: Vec::new() }
+    }
+
+    pub fn add_handler(&mut self, handler: Box<dyn EventHandler>) {
+        self.handlers.push(handler);
     }
 }
 
@@ -33,49 +34,54 @@ impl Default for RootEventHandler {
 use crate::event::key_id::KeyId;
 
 impl EventHandler for RootEventHandler {
-    /// Delegates the `on_paint` event to the appropriate child handler.
     fn on_paint(&mut self, app: &mut App, drawing_context: &DrawingContext) {
-        self.render_event_handler.on_paint(app, drawing_context);
+        for handler in &mut self.handlers {
+            handler.on_paint(app, drawing_context);
+        }
     }
 
-    /// Delegates the `on_destroy` event.
     fn on_destroy(&mut self, app: &mut App) {
-        self.render_event_handler.on_destroy(app);
-        println!("Window destroyed");
+        for handler in &mut self.handlers {
+            handler.on_destroy(app);
+        }
     }
 
-    /// Delegates the `on_resize` event.
     fn on_resize(&mut self, app: &mut App, width: i32, height: i32) {
-        self.render_event_handler.on_resize(app, width, height);
-        println!("Window resized to {}x{}", width, height);
+        for handler in &mut self.handlers {
+            handler.on_resize(app, width, height);
+        }
     }
 
-    /// Delegates mouse move events.
     fn on_mouse_move(&mut self, app: &mut App, x: i32, y: i32) {
-        self.render_event_handler.on_mouse_move(app, x, y);
+        for handler in &mut self.handlers {
+            handler.on_mouse_move(app, x, y);
+        }
     }
 
-    /// Delegates left mouse button down events.
     fn on_lbutton_down(&mut self, app: &mut App, x: i32, y: i32) {
-        self.render_event_handler.on_lbutton_down(app, x, y);
+        for handler in &mut self.handlers {
+            handler.on_lbutton_down(app, x, y);
+        }
     }
 
-    /// Delegates left mouse button up events.
     fn on_lbutton_up(&mut self, app: &mut App, x: i32, y: i32) {
-        self.render_event_handler.on_lbutton_up(app, x, y);
+        for handler in &mut self.handlers {
+            handler.on_lbutton_up(app, x, y);
+        }
     }
 
-    /// Delegates key down events.
     fn on_key_down(&mut self, app: &mut App, key: KeyId) {
-        self.render_event_handler.on_key_down(app, key);
+        for handler in &mut self.handlers {
+            handler.on_key_down(app, key);
+        }
     }
 
-    /// Delegates key up events.
     fn on_key_up(&mut self, app: &mut App, key: KeyId) {
-        self.render_event_handler.on_key_up(app, key);
+        for handler in &mut self.handlers {
+            handler.on_key_up(app, key);
+        }
     }
 
-    /// Delegates general message handling.
     fn handle_message(
         &mut self,
         app: &mut App,
@@ -83,7 +89,8 @@ impl EventHandler for RootEventHandler {
         wparam: WPARAM,
         lparam: LPARAM,
     ) -> Option<isize> {
-        self.render_event_handler
-            .handle_message(app, msg, wparam, lparam)
+        self.handlers
+            .iter_mut()
+            .find_map(|handler| handler.handle_message(app, msg, wparam, lparam))
     }
 }
