@@ -4,62 +4,53 @@
 
 ---
 
-### Most Important
+### Priority 1: Refactor Window Creation API
+- **Task**: Replace hardcoded configuration with a flexible `WindowBuilder` pattern.
+- **Goal**: Decouple window configuration from the core library code to empower users.
+- **Importance**: This is the most critical step toward creating a flexible and idiomatic library API. It moves the framework from a static example to a dynamic tool.
+- **Implementation**:
+  1.  Create a `WindowConfig` struct to hold parameters like `title`, `width`, `height`, and font settings.
+  2.  Implement a `WindowBuilder` that uses `WindowConfig` and the builder pattern to construct a `Window`.
+  3.  Deprecate and remove the `src/window/config.rs` file and hardcoded constants.
 
-## Completed
+### Priority 2: Implement Composable Event Handling
+- **Task**: Make the `RootEventHandler` manage a collection of `EventHandler`s.
+- **Goal**: Allow library users to register their own custom event handlers without modifying the framework.
+- **Importance**: This enhances modularity and makes the framework truly extensible, allowing for a clean separation of concerns for different UI features.
+- **Implementation**:
+  1.  Change `RootEventHandler` to hold a `Vec<Box<dyn EventHandler>>`.
+  2.  Provide a public `add_handler` method for users to register their own handlers.
+  3.  Update the `EventHandler` methods on `RootEventHandler` to iterate and delegate calls to all registered handlers.
 
-- [x] **Decouple Rendering Logic from `wndproc`**:
-  - **Goal**: Isolate all Direct2D drawing operations within the `RenderEventHandler` to enforce a clear separation of concerns.
-  - **Importance**: Enhances modularity and readability by ensuring `wndproc` acts purely as a message dispatcher. This centralizes rendering logic, making the rendering pipeline easier to manage, debug, and extend.
-  - **Implementation**:
-    - Move the `BeginDraw`, `Clear`, and `EndDraw` calls from `wndproc` into the `on_paint` method of `RenderEventHandler`.
-    - The `wndproc`'s `WM_PAINT` handler should be simplified to a single call to `event_handler.on_paint()`.
+### Priority 3: Correct Text Object Rendering
+- **Task**: Fix the hardcoded layout rectangle in `TextObject`.
+- **Goal**: Ensure text is always rendered correctly and efficiently, regardless of its size.
+- **Importance**: This is a correctness and performance issue. The current implementation is inefficient and can lead to visual bugs.
+- **Implementation**:
+  1.  Use `IDWriteFactory::CreateTextLayout` to get the precise metrics of the text.
+  2.  Use the resulting `IDWriteTextLayout` object and the `DrawTextLayout` method for rendering.
 
-## Completed
+### Priority 4: Adhere to Rust Naming Conventions
+- **Task**: Rename the crate to follow Rust conventions.
+- **Goal**: Align the project with standard Rust practices.
+- **Importance**: While not affecting functionality, this is crucial for creating a professional library that other Rust developers will find familiar and easy to work with.
+- **Implementation**:
+  1.  In `Cargo.toml`, rename the package from `MyGui` to `my_gui`.
+  2.  Update `use` statements if necessary (e.g., `use my_gui::*`).
 
-- [x] **Abstract Input Handling for Modularity**:
-  - **Goal**: Decouple raw input message processing from application logic to create a more modular and extensible input system.
-  - **Importance**: Improves code organization and readability by separating the "what" (e.g., `WM_LBUTTONDOWN`) from the "how" (the application's response). This makes it easier to add new input sources or modify behavior.
-  - **Implementation**:
-    - Extend the `EventHandler` trait with specific, high-level input methods (e.g., `on_mouse_down(button, x, y)`, `on_key_press(key)`).
-    - Update `wndproc` to parse raw `WPARAM` and `LPARAM` values from input messages (`WM_MOUSEMOVE`, `WM_KEYDOWN`, etc.).
-    - Translate the raw data into structured input events and dispatch them to the new `EventHandler` methods.
-
-- [ ] **Enhance Error Handling with `thiserror`**:
-  - **Goal**: Improve debugging and maintainability by replacing generic `windows::core::Result` with specific, descriptive error types.
-  - **Importance**: Promotes readable and robust code by providing clear, context-rich error information, which is crucial for diagnosing issues in a complex GUI application.
-  - **Implementation**:
-    - Define a top-level `AppError` enum using `thiserror`.
-    - Create specific error variants for distinct failure domains, such as `WindowCreation`, `Direct2D`, and `ResourceLoading`.
-    - Refactor existing `Result` return types to use the new `AppError`, propagating errors with `?` for cleaner code.
-
-- [ ] **Improve `Drawable` Trait for Interactivity**:
-  - **Goal**: Evolve the `Drawable` trait from a simple rendering interface into a fully interactive component model.
-  - **Importance**: Lays the foundation for a true UI framework where components are self-contained and can manage their own state and behavior in response to user input.
-  - **Implementation**:
-    - Add methods to the `Drawable` trait for handling events, such as `handle_mouse_event(&mut self, event: &MouseEvent)` and `handle_keyboard_event(&mut self, event: &KeyEvent)`.
-    - Implement a mechanism in the `Scene` or a new `UIManager` to perform hit-testing (checking if an event occurs within an object's bounds) and dispatch events to the appropriate `Drawable` objects.
-
-### Least Important
-
-- [ ] **Externalize Configuration for Flexibility**:
-  - **Goal**: Move hardcoded configuration values into an external file to allow for easy customization without recompiling.
-  - **Importance**: Promotes flexibility and maintainability. A clean separation between code and configuration is a core principle of readable and well-structured applications.
-  - **Implementation**:
-    - Create a `Config` struct with fields for window size, font settings, etc., and derive `serde::Deserialize`.
-    - Use a library like `toml` or `serde_json` to read a configuration file (e.g., `config.toml`) at startup.
-    - Pass the loaded `Config` struct to the relevant parts of the application during initialization.
+### Priority 5: Comprehensive Documentation Pass
+- **Task**: Review and enhance all public-facing documentation.
+- **Goal**: Provide clear, comprehensive documentation for library users.
+- **Importance**: Good documentation is essential for library adoption and usability. This should be done after API-breaking changes are complete.
+- **Implementation**:
+  1.  Update all module-level and item-level documentation to reflect the new architecture (e.g., `WindowBuilder`).
+  2.  Add `# Errors` sections to public functions that return a `Result`.
+  3.  Add or update `# Safety` comments for any public `unsafe` functions.
+  4.  Update the main `lib.rs` example to showcase the new, idiomatic way of using the library.
 
 ---
 
-- [x] **Create an `EventHandler` trait to abstract window message handling.**
-
 ## Completed
-
-### 1. Core Project Setup
-- **Initialized a new Rust project** using Cargo.
-- **Configured project metadata** in `Cargo.toml`, including name, version, and edition.
-- **Added core dependencies**, including the `windows` crate for Windows API bindings and `thiserror` for improved error handling.
 
 - [x] **Decouple Rendering Logic from `wndproc`**:
   - **Goal**: Isolate all Direct2D drawing operations within the `RenderEventHandler` to enforce a clear separation of concerns.
@@ -68,30 +59,17 @@
     - Move the `BeginDraw`, `Clear`, and `EndDraw` calls from `wndproc` into the `on_paint` method of `RenderEventHandler`.
     - The `wndproc`'s `WM_PAINT` handler should be simplified to a single call to `event_handler.on_paint()`.
 
-### 2. Window Management System
-- **Implemented a `Window` struct** to encapsulate all window-related logic and resources.
-- **Handled Window Class Registration** by defining and registering a `WNDCLASSEXW` structure.
-- **Managed Window Creation** using `CreateWindowExW` and established a connection between the Win32 window handle (`HWND`) and the Rust `Window` instance.
-- **Created a standard Windows message loop** (`GetMessageW`, `TranslateMessage`, `DispatchMessageW`) to process events.
-- **Implemented the main window procedure (`wndproc`)** to handle essential messages like `WM_PAINT` and `WM_DESTROY`.
+- [x] **Abstract Input Handling for Modularity** (Partially Complete):
+  - **Goal**: Decouple raw input message processing from application logic.
+  - **Importance**: Improves code organization by separating raw OS messages from high-level framework events.
+  - **Implementation**:
+    - Extended the `EventHandler` trait with specific input methods (`on_mouse_move`, `on_key_down`, etc.).
+    - `wndproc` now parses raw `WPARAM` and `LPARAM` and dispatches to the `EventHandler`.
 
-### 3. Direct2D Rendering Engine
-- **Initialized COM and created Direct2D and DirectWrite factories** to serve as the foundation for the rendering engine.
-- **Established a `Direct2DContext` struct** to manage the lifetime of core rendering resources.
-- **Separated device-dependent resources** (like the render target and brushes) from **device-independent resources** (like text formats) for robust handling of rendering contexts.
-- **Implemented `ID2D1HwndRenderTarget`** to enable hardware-accelerated drawing directly to a window.
-- **Created a solid color brush** for drawing text and shapes.
-- **Configured `IDWriteTextFormat`** to control the font, size, and style of rendered text.
+- [x] **Create an `EventHandler` trait to abstract window message handling.**
 
-### 4. Rendering Abstraction Layer
-- **Designed a `Drawable` trait** to define a common interface for any object that can be drawn on the screen.
-- **Created a `Scene` struct** to act as a container for a collection of `Drawable` objects.
-- **Implemented a `draw_all` method** in the `Scene` to iterate through and render all objects.
-- **Developed a `DrawingContext` struct** to pass necessary rendering resources (like the render target and brush) to `Drawable` objects during the draw call.
-- **Built a concrete `TextObject`** that implements the `Drawable` trait to render a string of text at a specified position.
-
-### 5. Application Integration
-- **Instantiated the `Window` and `Scene`** in the application's entry point (`main.rs`).
-- **Populated the scene** with a `TextObject` to be displayed.
-- **Tied the rendering logic to the `WM_PAINT` message**, ensuring the scene is redrawn whenever the window needs to be repainted.
-- **Ensured proper resource cleanup** and lifetime management, using techniques like `std::mem::forget` to work with the Windows API's ownership model.
+- [x] **Core Project Setup & Refactoring**:
+  - Initialized a Rust project and added core dependencies.
+  - Implemented `Window` management, Direct2D rendering engine, and a rendering abstraction layer (`Drawable`, `Scene`).
+  - Refactored the project into a standard library and binary structure.
+  - Removed redundant files and directories (`src/bin`, `src/window_manager`).

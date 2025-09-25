@@ -13,10 +13,6 @@ use crate::render::drawing_context::DrawingContext;
 ///
 /// This struct holds the text string and its position, and it implements the `Drawable`
 /// trait to render itself using Direct2D and DirectWrite.
-/// A `Drawable` object that represents a piece of text.
-///
-/// This struct holds the text string and its position, and it implements the `Drawable`
-/// trait to render itself using Direct2D and DirectWrite.
 pub struct TextObject {
     /// The text to be rendered.
     pub text: String,

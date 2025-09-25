@@ -1,22 +1,41 @@
-**You probably shouldn't be using this.**
+# MyGui: A Retained-Mode GUI Framework for Windows
 
-# MyGui Framework
+**Note:** This project is a learning exercise in building a GUI framework from scratch using Rust and the raw Windows API. For production applications, consider using mature frameworks. 
 
 ## Goal
-This project aims to create a custom framework and set of abstractions over the raw Windows API (via the `windows` Rust crate). The primary goal is to build a foundational layer for Windows GUI applications, exploring direct interaction with the operating system's graphical capabilities.
 
-**Note:** For most production-ready applications, it is generally recommended to use well-established and mature GUI frameworks (e.g., WinUI, WPF, Electron, Qt, GTK, or web-based solutions) that already exist and provide extensive features, community support, and stability. This project is primarily for learning, experimentation, and understanding the underlying mechanisms.
+This project aims to create a simple, modular, and idiomatic Rust framework over the raw Windows API. It provides a foundational layer for building lightweight GUI applications, focusing on a clean architecture and a flexible API.
+
+## Core Concepts
+
+MyGui is built on a **retained-mode rendering** model. This means:
+
+1.  **You define a scene:** You tell the framework *what* to draw by building a `Scene` populated with `Drawable` objects (like text, shapes, etc.).
+2.  **The framework handles rendering:** The framework "retains" this scene graph and is responsible for automatically redrawing it whenever the window needs to be repainted (e.g., when it's resized or uncovered). 
+
+This contrasts with immediate-mode rendering, where the application must manually issue draw calls every single frame.
 
 ## Current Features
--   **Direct2D Rendering:** Utilizes Direct2D and DirectWrite for hardware-accelerated 2D graphics and text rendering.
--   **Drawing Abstraction:** Implements a basic drawing abstraction layer including:
-    -   `Drawable` trait for defining objects that can be rendered.
-    -   `DrawingContext` to bundle Direct2D resources for drawing operations.
-    -   `TextObject` as a concrete `Drawable` implementation for rendering text.
-    -   `Scene` to manage collections of `Drawable` objects, acting as a canvas for each window.
--   **Window Management:** Basic window creation, message loop handling, and proper lifetime management of window-related resources.
+
+-   **Windowing:** A high-level abstraction over Win32 window creation, class registration, and the message loop.
+-   **Retained-Mode Rendering:** A hardware-accelerated rendering pipeline using Direct2D and DirectWrite.
+-   **Scene Graph:** A `Scene` object that manages a collection of `Drawable` trait objects.
+-   **Extensible Event System:** A trait-based `EventHandler` system allows for a clean separation of application logic from window messages.
+-   **Basic Text Rendering:** A `TextObject` for drawing text to the screen.
+
+## Roadmap (Upcoming Features)
+
+I am actively working on evolving this project into a more flexible and powerful library. Key priorities include:
+
+-   **Flexible Window Configuration:** Introducing a `WindowBuilder` to allow for easy and idiomatic configuration of window properties (size, title, etc.).
+-   **Composable Event System:** Allowing multiple `EventHandler`s to be registered, enabling better code organization for complex applications.
+-   **Advanced Text Rendering:** Implementing proper text layout and measurement using `IDWriteTextLayout` for correct and efficient text rendering.
+-   **Adherence to Rust Conventions:** Aligning the project with standard community practices (e.g., crate naming).
+
+For a detailed list of tasks, see [TASKS.md](TASKS.md).
 
 ## Building and Running
+
 This project uses Cargo, Rust's package manager and build system.
 
 *   **Build:** To compile the project, navigate to the project root directory and run:
@@ -27,4 +46,3 @@ This project uses Cargo, Rust's package manager and build system.
     ```bash
     cargo run
     ```
-    This will open a new window titled "Hello, Windows!" displaying text rendered via Direct2D.
