@@ -1,6 +1,6 @@
 use crate::event::event_handler::EventHandler;
 use crate::event::key_id::KeyId;
-use crate::window::window::Window;
+use crate::window::Window;
 use windows::{
     Win32::Foundation::*,
     Win32::Graphics::Direct2D::Common::*,

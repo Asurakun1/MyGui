@@ -1,7 +1,7 @@
-use crate::app::app::App;
+use crate::app::App;
 use crate::event::event_handler::EventHandler;
 use super::config::WindowConfig;
-use super::window::Window;
+use super::Window;
 use windows::core::Result;
 
 /// A builder for creating and configuring a `Window`.

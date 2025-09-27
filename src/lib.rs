@@ -18,11 +18,7 @@
 //! create a `Window`. You also need to create an `App` instance and an event handler.
 //!
 //! ```rust,no_run
-//! use my_gui::{
-//!     app::app::App,
-//!     event::root_event_handler::RootEventHandler,
-//!     window::WindowBuilder,
-//! };
+//! use my_gui::{app::App, event::root_event_handler::RootEventHandler, window::WindowBuilder};
 //! use windows::core::Result;
 //!
 //! fn main() -> Result<()> {

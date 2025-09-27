@@ -30,7 +30,7 @@ use windows::{
 use window::WindowBuilder;
 use event::root_event_handler::RootEventHandler;
 use event::render_event_handler::RenderEventHandler;
-use app::app::App;
+use app::App;
 
 
 fn main() -> Result<()> {

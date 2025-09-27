@@ -1,6 +1,4 @@
-use windows::Win32::Foundation::{LPARAM, WPARAM};
-
-use crate::{app::app::App, event::event_handler::EventHandler, render::drawing_context::DrawingContext};
+use crate::{app::App, event::event_handler::EventHandler, render::drawing_context::DrawingContext};
 
 /// An event handler that is responsible for rendering the application's scene.
 ///
@@ -22,8 +20,6 @@ impl Default for RenderEventHandler {
 }
 
 use windows::Win32::Graphics::Direct2D::{Common::D2D1_COLOR_F, ID2D1RenderTarget};
-
-use crate::event::key_id::KeyId;
 
 impl EventHandler for RenderEventHandler {
     /// Handles the `WM_PAINT` message by clearing the render target and drawing the scene.
@@ -47,31 +43,5 @@ impl EventHandler for RenderEventHandler {
                 println!("EndDraw failed: {:?}", e);
             }
         }
-    }
-
-    /// This handler does not need to respond to `WM_DESTROY`.
-    fn on_destroy(&mut self, _app: &mut App) {}
-
-    /// This handler does not need to respond to `WM_SIZE`.
-    fn on_resize(&mut self, _app: &mut App, _width: i32, _height: i32) {}
-
-    /// This handler does not process mouse movement.
-    fn on_mouse_move(&mut self, _app: &mut App, _x: i32, _y: i32) {}
-
-    /// This handler does not process left mouse button down events.
-    fn on_lbutton_down(&mut self, _app: &mut App, _x: i32, _y: i32) {}
-
-    /// This handler does not process left mouse button up events.
-    fn on_lbutton_up(&mut self, _app: &mut App, _x: i32, _y: i32) {}
-
-    /// This handler does not process key down events.
-    fn on_key_down(&mut self, _app: &mut App, _key: KeyId) {}
-
-    /// This handler does not process key up events.
-    fn on_key_up(&mut self, _app: &mut App, _key: KeyId) {}
-
-    /// This handler does not process any other window messages.
-    fn handle_message(&mut self, _app: &mut App, _msg: u32, _wparam: WPARAM, _lparam: LPARAM) -> Option<isize> {
-        None
     }
 }
