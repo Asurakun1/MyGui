@@ -4,19 +4,17 @@
 
 ---
 
-### Priority 5: Comprehensive Documentation Pass
-- **Task**: Review and enhance all public-facing documentation.
-- **Goal**: Provide clear, comprehensive documentation for library users.
-- **Importance**: Good documentation is essential for library adoption and usability. This should be done after API-breaking changes are complete.
-- **Implementation`:
-  1.  Update all module-level and item-level documentation to reflect the new architecture (e.g., `WindowBuilder`).
-  2.  Add `# Errors` sections to public functions that return a `Result`.
-  3.  Add or update `# Safety` comments for any public `unsafe` functions.
-  4.  Update the main `lib.rs` example to showcase the new, idiomatic way of using the library.
-
----
-
 ## Completed
+
+- [x] **Comprehensive Documentation Pass**:
+  - **Task**: Review and enhance all public-facing documentation.
+  - **Goal**: Provide clear, comprehensive documentation for library users.
+  - **Importance**: Good documentation is essential for library adoption and usability. This should be done after API-breaking changes are complete.
+  - **Implementation`:
+    1.  Update all module-level and item-level documentation to reflect the new architecture (e.g., `WindowBuilder`).
+    2.  Add `# Errors` sections to public functions that return a `Result`.
+    3.  Add or update `# Safety` comments for any public `unsafe` functions.
+    4.  Update the main `lib.rs` example to showcase the new, idiomatic way of using the library.
 
 - [x] **Adhere to Rust Naming Conventions**:
   - **Task**: Rename the crate to follow Rust conventions.

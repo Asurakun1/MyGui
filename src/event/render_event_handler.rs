@@ -3,6 +3,9 @@ use windows::Win32::Foundation::{LPARAM, WPARAM};
 use crate::{app::app::App, event::event_handler::EventHandler, render::drawing_context::DrawingContext};
 
 /// An event handler that is responsible for rendering the application's scene.
+///
+/// This handler implements the `on_paint` method to draw the contents of the
+/// `App`'s `Scene` to the window.
 pub struct RenderEventHandler;
 
 impl RenderEventHandler {
@@ -23,7 +26,13 @@ use windows::Win32::Graphics::Direct2D::{Common::D2D1_COLOR_F, ID2D1RenderTarget
 use crate::event::key_id::KeyId;
 
 impl EventHandler for RenderEventHandler {
-    /// Handles the `WM_PAINT` message and renders the scene.
+    /// Handles the `WM_PAINT` message by clearing the render target and drawing the scene.
+    ///
+    /// # Safety
+    ///
+    /// This method contains `unsafe` blocks for calling Direct2D methods.
+    /// The caller must ensure that the `drawing_context` contains valid Direct2D
+    /// resources.
     fn on_paint(&mut self, app: &mut App, drawing_context: &DrawingContext) {
         unsafe {
             drawing_context.render_target.BeginDraw();
@@ -40,28 +49,28 @@ impl EventHandler for RenderEventHandler {
         }
     }
 
-    /// Handles the `WM_DESTROY` message.
+    /// This handler does not need to respond to `WM_DESTROY`.
     fn on_destroy(&mut self, _app: &mut App) {}
 
-    /// Handles the `WM_SIZE` message.
+    /// This handler does not need to respond to `WM_SIZE`.
     fn on_resize(&mut self, _app: &mut App, _width: i32, _height: i32) {}
 
-    /// Handles mouse move events.
+    /// This handler does not process mouse movement.
     fn on_mouse_move(&mut self, _app: &mut App, _x: i32, _y: i32) {}
 
-    /// Handles left mouse button down events.
+    /// This handler does not process left mouse button down events.
     fn on_lbutton_down(&mut self, _app: &mut App, _x: i32, _y: i32) {}
 
-    /// Handles left mouse button up events.
+    /// This handler does not process left mouse button up events.
     fn on_lbutton_up(&mut self, _app: &mut App, _x: i32, _y: i32) {}
 
-    /// Handles key down events.
+    /// This handler does not process key down events.
     fn on_key_down(&mut self, _app: &mut App, _key: KeyId) {}
 
-    /// Handles key up events.
+    /// This handler does not process key up events.
     fn on_key_up(&mut self, _app: &mut App, _key: KeyId) {}
 
-    /// Handles any other window messages.
+    /// This handler does not process any other window messages.
     fn handle_message(&mut self, _app: &mut App, _msg: u32, _wparam: WPARAM, _lparam: LPARAM) -> Option<isize> {
         None
     }

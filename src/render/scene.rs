@@ -1,4 +1,3 @@
-
 use windows::core::Result;
 
 use crate::render::drawable::Drawable;
@@ -35,6 +34,10 @@ impl Scene {
     ///
     /// This method iterates through all the `Drawable` objects in the scene and calls
     /// their respective `draw` methods, passing the drawing context to each.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if any of the `draw` calls fail.
     pub fn draw_all(&self, context: &DrawingContext) -> Result<()> {
         for object in &self.objects {
             object.draw(context)?;

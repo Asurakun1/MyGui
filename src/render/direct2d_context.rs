@@ -1,4 +1,3 @@
-
 use windows::{
     core::*,
     Win32::Foundation::*,
@@ -10,7 +9,6 @@ use windows::{
 };
 
 use windows::core::HSTRING;
-
 
 /// Manages all Direct2D and DirectWrite resources.
 ///
@@ -34,6 +32,17 @@ pub struct Direct2DContext {
 
 impl Direct2DContext {
     /// Creates a new `Direct2DContext` and initializes device-independent resources.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if it fails to initialize COM, create the
+    /// Direct2D or DirectWrite factories, or create the device-independent resources.
+    ///
+    /// # Safety
+    ///
+    /// This function contains `unsafe` blocks for initializing COM and creating the
+    /// Direct2D and DirectWrite factories. The caller must ensure that it is safe
+    /// to initialize COM and create these factories.
     pub fn new(font_face_name: &str, font_size: f32) -> Result<Self> {
         unsafe {
             CoInitializeEx(None, COINIT_APARTMENTTHREADED).ok()?;
@@ -72,10 +81,12 @@ impl Direct2DContext {
     }
 
     /// Creates resources that are not tied to a specific rendering device.
-    /// These resources can be created once and reused.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if it fails to create the `IDWriteTextFormat`.
     fn create_device_independent_resources(&mut self, font_face_name: &str, font_size: f32) -> Result<()> {
         // Create a DirectWrite text format object.
-        // Unsafe: FFI call to DirectWrite. Assumes `dwrite_factory` is a valid pointer.
         let text_format = unsafe {
             self.dwrite_factory.CreateTextFormat(
                 &HSTRING::from(font_face_name),
@@ -92,12 +103,19 @@ impl Direct2DContext {
     }
 
     /// Creates resources that are tied to a specific rendering device (the `HWND`).
-    /// These resources need to be recreated if the device becomes invalid,
-    /// for example, when the window is resized.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if it fails to get the client rect, create
+    /// the render target, or create the brush.
+    ///
+    /// # Safety
+    ///
+    /// This function contains `unsafe` blocks for getting the client rect and creating
+    /// the render target and brush. The caller must ensure that the `hwnd` is a
+    /// valid window handle.
     pub fn create_device_dependent_resources(&mut self, hwnd: HWND) -> Result<()> {
-        // Get the size of the window's client area.
         let mut rect = RECT::default();
-        // Unsafe: FFI call to GetClientRect. Assumes `hwnd` is a valid window handle.
         unsafe { GetClientRect(hwnd, &mut rect)? };
 
         let render_target_properties = D2D1_RENDER_TARGET_PROPERTIES::default();
@@ -111,9 +129,6 @@ impl Direct2DContext {
             presentOptions: D2D1_PRESENT_OPTIONS_NONE,
         };
 
-        // Create a Direct2D render target that can draw to the specified window.
-        // Unsafe: FFI call to Direct2D. Assumes `d2d_factory` is a valid pointer
-        // and the properties structs are correctly initialized.
         let render_target = unsafe {
             let factory = self.d2d_factory.cast::<ID2D1Factory>()?;
             factory.CreateHwndRenderTarget(
@@ -122,8 +137,6 @@ impl Direct2DContext {
             )?
         };
 
-        // Create a solid color brush for drawing.
-        // Unsafe: FFI call to Direct2D. Assumes the render target is valid.
         let brush = unsafe {
             let rt: &ID2D1RenderTarget = &render_target;
             rt.CreateSolidColorBrush(&D2D1_COLOR_F { r: 1.0, g: 1.0, b: 1.0, a: 1.0 }, None)?

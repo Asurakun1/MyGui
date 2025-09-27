@@ -1,14 +1,24 @@
-
+/// Configuration for a window.
+///
+/// This struct holds all the settings for a window, such as its title, size,
+/// and font.
 pub struct WindowConfig {
+    /// The title of the window.
     pub title: String,
+    /// The name of the window class.
     pub class_name: String,
+    /// The width of the window.
     pub width: i32,
+    /// The height of the window.
     pub height: i32,
+    /// The font size for the window.
     pub font_size: i32,
+    /// The font face name for the window.
     pub font_face_name: String,
 }
 
 impl Default for WindowConfig {
+    /// Creates a new `WindowConfig` with default settings.
     fn default() -> Self {
         Self {
             title: "Hello, Windows!".to_string(),

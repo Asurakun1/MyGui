@@ -6,12 +6,6 @@ use crate::render::{objects::text_object::TextObject, scene::Scene};
 /// such as the objects to be rendered and other application-specific data. It is
 /// owned by the `Window` and passed mutably to event handlers, allowing them to
 /// inspect and modify the state in response to events.
-/// Represents the central state of the application.
-///
-/// This struct holds all the data that defines the application's current state,
-/// such as the objects to be rendered and other application-specific data. It is
-/// owned by the `Window` and passed mutably to event handlers, allowing them to
-/// inspect and modify the state in response to events.
 pub struct App {
     /// The scene containing all drawable objects.
     pub scene: Scene,
@@ -20,9 +14,9 @@ pub struct App {
 }
 
 impl App {
-    /// Creates a new `App` instance with default state.
+    /// Creates a new `App` instance with a default scene.
     ///
-    /// This initializes the application with a sample scene containing a text object.
+    /// This initializes the application with a sample scene containing a `TextObject`.
     pub fn new() -> Self {
         let display_text = "日本語ハローワールドテスト。".to_string();
         let mut scene = Scene::new();

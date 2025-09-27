@@ -14,25 +14,23 @@
 //!
 //! ## Getting Started
 //!
-//! To create a new `my_gui` application, you need to create a `Window` and an `App` instance.
-//! The `Window` is responsible for creating and managing the application window, while the `App`
-//! contains the central application state.
+//! To create a new `my_gui` application, you use the `WindowBuilder` to configure and
+//! create a `Window`. You also need to create an `App` instance and an event handler.
 //!
 //! ```rust,no_run
 //! use my_gui::{
 //!     app::app::App,
 //!     event::root_event_handler::RootEventHandler,
-//!     window::{
-//!         config::{WINDOW_TITLE, WINDOW_CLASS_NAME},
-//!         window::Window,
-//!     },
+//!     window::WindowBuilder,
 //! };
 //! use windows::core::Result;
 //!
 //! fn main() -> Result<()> {
 //!     let app = App::new();
 //!     let event_handler = RootEventHandler::new();
-//!     let window = Window::new(WINDOW_TITLE, WINDOW_CLASS_NAME, event_handler, app)?;
+//!     let window = WindowBuilder::new()
+//!         .with_title("My App")
+//!         .build(event_handler, app)?;
 //!     let result = window.message_loop();
 //!     std::mem::forget(window);
 //!     result
