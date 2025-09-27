@@ -1,5 +1,5 @@
 [package]
-name = "MyGui"
+name = "my_gui"
 version = "0.1.1"
 edition = "2024"
 description = "A simple GUI application for Windows using the Rust 'windows' crate. For learning purposes only. You should not use this crate."

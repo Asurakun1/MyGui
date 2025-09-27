@@ -1,4 +1,4 @@
-//! # MyGui Framework
+//! # my_gui Framework
 //!
 //! This project is a custom GUI framework for Windows built using the `windows` crate.
 //! It serves as a learning exercise to understand the fundamentals of Windows GUI programming,
@@ -21,7 +21,7 @@
 //! the message loop. The `Window` instance is intentionally "leaked" using `std::mem::forget`
 //! because its lifetime is managed by the Windows API through the `wndproc` callback.
 
-use MyGui::*;
+use my_gui::*;
 
 use windows::{
     core::*,

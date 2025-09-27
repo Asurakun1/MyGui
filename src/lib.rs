@@ -1,6 +1,6 @@
-//! # MyGui: A Simple Windows GUI Framework
+//! # my_gui: A Simple Windows GUI Framework
 //!
-//! `MyGui` is a lightweight and modular framework for creating Windows GUI applications in Rust.
+//! `my_gui` is a lightweight and modular framework for creating Windows GUI applications in Rust.
 //! It provides a simple and intuitive API for creating windows, handling events, and rendering 2D graphics.
 //!
 //! ## Architecture
@@ -14,12 +14,12 @@
 //!
 //! ## Getting Started
 //!
-//! To create a new `MyGui` application, you need to create a `Window` and an `App` instance.
+//! To create a new `my_gui` application, you need to create a `Window` and an `App` instance.
 //! The `Window` is responsible for creating and managing the application window, while the `App`
 //! contains the central application state.
 //!
 //! ```rust,no_run
-//! use MyGui::{
+//! use my_gui::{
 //!     app::app::App,
 //!     event::root_event_handler::RootEventHandler,
 //!     window::{

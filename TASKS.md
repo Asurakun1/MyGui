@@ -4,19 +4,11 @@
 
 ---
 
-### Priority 4: Adhere to Rust Naming Conventions
-- **Task**: Rename the crate to follow Rust conventions.
-- **Goal**: Align the project with standard Rust practices.
-- **Importance**: While not affecting functionality, this is crucial for creating a professional library that other Rust developers will find familiar and easy to work with.
-- **Implementation**:
-  1.  In `Cargo.toml`, rename the package from `MyGui` to `my_gui`.
-  2.  Update `use` statements if necessary (e.g., `use my_gui::*`).
-
 ### Priority 5: Comprehensive Documentation Pass
 - **Task**: Review and enhance all public-facing documentation.
 - **Goal**: Provide clear, comprehensive documentation for library users.
 - **Importance**: Good documentation is essential for library adoption and usability. This should be done after API-breaking changes are complete.
-- **Implementation**:
+- **Implementation`:
   1.  Update all module-level and item-level documentation to reflect the new architecture (e.g., `WindowBuilder`).
   2.  Add `# Errors` sections to public functions that return a `Result`.
   3.  Add or update `# Safety` comments for any public `unsafe` functions.
@@ -26,13 +18,16 @@
 
 ## Completed
 
+- [x] **Adhere to Rust Naming Conventions**:
+  - **Task**: Rename the crate to follow Rust conventions.
+  - **Goal**: Align the project with standard Rust practices.
+  - **Importance**: While not affecting functionality, this is crucial for creating a professional library that other Rust developers will find familiar and easy to work with.
+  - **Implementation`:
+    1.  In `Cargo.toml`, rename the package from `MyGui` to `my_gui`.
+    2.  Update `use` statements if necessary (e.g., `use my_gui::*`).
+
 - [x] **Correct Text Object Rendering**:
   - **Task**: Fix the hardcoded layout rectangle in `TextObject`.
-  - **Goal**: Ensure text is always rendered correctly and efficiently, regardless of its size.
-  - **Importance**: This is a correctness and performance issue. The current implementation is inefficient and can lead to visual bugs.
-  - **Implementation**:
-    1.  Use `IDWriteFactory::CreateTextLayout` to get the precise metrics of the text.
-    2.  Use the resulting `IDWriteTextLayout` object and the `DrawTextLayout` method for rendering.
 
 - [x] **Implement Composable Event Handling**:
   - **Task**: Make the `RootEventHandler` manage a collection of `EventHandler`s.
