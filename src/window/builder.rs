@@ -19,6 +19,16 @@ impl WindowBuilder {
         }
     }
 
+    /// Creates a new `WindowBuilder` with the given configuration.
+    pub fn with_config(config: WindowConfig) -> Self {
+        Self { config }
+    }
+
+    /// Creates a new `WindowBuilder` from the given configuration.
+    pub fn from_config(config: WindowConfig) -> Self {
+        Self::with_config(config)
+    }
+
     /// Sets the title of the window.
     pub fn with_title(mut self, title: &str) -> Self {
         self.config.title = title.to_string();

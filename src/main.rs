@@ -27,7 +27,10 @@ use windows::{
     core::*,
 };
 
-use window::WindowBuilder;
+use window::{
+    WindowBuilder,
+    config::WindowConfig,
+};
 use event::root_event_handler::RootEventHandler;
 use event::render_event_handler::RenderEventHandler;
 use app::App;
@@ -37,7 +40,13 @@ fn main() -> Result<()> {
     let app = App::new();
     let mut event_handler = RootEventHandler::new();
     event_handler.add_handler(Box::new(RenderEventHandler::new()));
-    let window = WindowBuilder::new().build(event_handler, app)?;
+
+    let config = WindowConfig {
+        title: "My Custom Window".to_string(),
+        ..Default::default()
+    };
+
+    let window = WindowBuilder::from_config(config).build(event_handler, app)?;
     let result = window.message_loop();
 
     // The `Window` is allocated on the heap, and a raw pointer to it is stored in the
