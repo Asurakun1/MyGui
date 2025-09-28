@@ -14,10 +14,40 @@ pub struct Scene {
     objects: Vec<Box<dyn Drawable>>,
 }
 
-impl Default for Scene {
-    fn default() -> Self {
+impl Scene {
+    /// Creates a new, empty `Scene`.
+    pub fn new() -> Self {
         Self {
             objects: Vec::new(),
         }
+    }
+
+    /// Adds a `Drawable` object to the scene.
+    ///
+    /// The object is moved onto the heap and stored as a trait object (`Box<dyn Drawable>`),
+    /// allowing the scene to manage objects of different concrete types.
+    pub fn add_object(&mut self, object: Box<dyn Drawable>) {
+        self.objects.push(object);
+    }
+
+    /// Draws all objects in the scene using the provided `DrawingContext`.
+    ///
+    /// This method iterates through all the `Drawable` objects in the scene and calls
+    /// their respective `draw` methods, passing the drawing context to each.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if any of the `draw` calls fail.
+    pub fn draw_all(&self, context: &DrawingContext) -> Result<()> {
+        for object in &self.objects {
+            object.draw(context)?;
+        }
+        Ok(())
+    }
+}
+
+impl Default for Scene {
+    fn default() -> Self {
+        Self::new()
     }
 }

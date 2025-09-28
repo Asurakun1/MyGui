@@ -14,11 +14,11 @@ use my_gui::{
 
 fn main() -> Result<()> {
     // Create the application state.
-    let app = App::default();
+    let app = App::new();
 
     // Create the event handlers.
-    let mut event_handler = RootEventHandler::default();
-    event_handler.add_handler(Box::new(RenderEventHandler::default()));
+    let mut event_handler = RootEventHandler::new();
+    event_handler.add_handler(Box::new(RenderEventHandler::new()));
 
     // Create the window configuration.
     let config = WindowConfig {
@@ -32,13 +32,11 @@ fn main() -> Result<()> {
     let window = WindowBuilder::from_config(config).build(event_handler, app)?;
 
     // Run the application.
-    if let Err(e) = window.run() {
-        println!("Error: {:?}", e);
-    }
+    let result = window.run();
 
     // The window is intentionally "leaked" using `std::mem::forget` because its
     // lifetime is managed by the Windows API.
     std::mem::forget(window);
 
-    Ok(())
+    result
 }

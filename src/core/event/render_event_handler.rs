@@ -7,9 +7,16 @@ use super::event_handler::EventHandler;
 /// `App`'s `Scene` to the window.
 pub struct RenderEventHandler;
 
+impl RenderEventHandler {
+    /// Creates a new `RenderEventHandler`.
+    pub fn new() -> Self {
+        Self
+    }
+}
+
 impl Default for RenderEventHandler {
     fn default() -> Self {
-        Self
+        Self::new()
     }
 }
 
