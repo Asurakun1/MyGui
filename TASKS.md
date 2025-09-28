@@ -2,6 +2,52 @@
 
 ## To Do
 
+- [ ] **Decouple Application State from the Library**:
+  - **Task**: Make the library generic over the application state.
+  - **Goal**: Allow users to define their own application state struct, rather than being forced to use the library's `App` struct.
+  - **Importance**: This is a critical step in making the library truly generic and reusable. It allows the library to be used in a wide variety of applications, each with its own unique state.
+  - **Implementation**:
+    1.  Make the `Window` and `EventHandler` traits generic over a user-defined state type (e.g., `<T>`).
+    2.  The `Window` will own an instance of this generic state `T`.
+    3.  The `EventHandler` methods will receive a mutable reference to the state `&mut T`.
+    4.  Remove the `app` module from the library and update the `hello_world` example to define its own `App` struct.
+
+- [ ] **Restructure Project for Better Organization**:
+  - **Task**: Reorganize the project structure to better separate high-level abstractions from low-level implementation details.
+  - **Goal**: Improve maintainability, navigation, and clarity of the codebase.
+  - **Importance**: As the library grows, a well-organized structure is crucial for keeping the code manageable and easy to understand.
+  - **Implementation**:
+    1.  Create a new module (e.g., `src/core/platform` or `src/core/win32`) to house low-level, platform-specific code.
+    2.  Move modules that directly interact with the Win32 API (like `direct2d_context.rs` and `wndproc_utils.rs`) into this new module.
+    3.  Ensure that the public API of the `core` module exposes the safe, high-level abstractions, while hiding the low-level details.
+
+- [ ] **Abstract Unsafe Drawing Operations**:
+  - **Task**: Create safe abstractions for Direct2D drawing primitives.
+  - **Goal**: Provide a safe and easy-to-use API for drawing basic shapes, eliminating the need for `unsafe` blocks in user code.
+  - **Importance**: This will make the framework safer, more ergonomic, and more accessible to developers who are not familiar with the intricacies of the Win32 API.
+  - **Implementation**:
+    1.  Create new structs for basic shapes (e.g., `Rectangle`, `Circle`, `Line`) that implement the `Drawable` trait.
+    2.  The `draw` method for these structs will contain the `unsafe` Direct2D calls, providing a safe wrapper around them.
+    3.  Consider creating a higher-level "canvas" or "surface" abstraction for more complex, constraint-based layouts.
+
+- [ ] **Enhance Event Handling System**:
+  - **Task**: Improve mouse and keyboard input handling to be more modular and extensible.
+  - **Goal**: Provide a robust and flexible event system that allows for advanced user interactions.
+  - **Importance**: This will make the framework more powerful and easier to use for creating complex UIs.
+  - **Implementation**:
+    1.  **Mouse Input**: Refactor mouse input handling, a new module. This should include tracking button state (down, up, held), mouse position, and possibly drag-and-drop operations.
+    2.  **Key Combinations**: Implement a system for handling key combinations (e.g., `Ctrl+S`). This should be modular, allowing users to define their own key combiners and shortcuts.
+    3.  **Modifier Keys**: Track the state of modifier keys (`Shift`, `Ctrl`, `Alt`) in the `App` struct or a dedicated input state struct.
+
+- [ ] **Regenerate Comprehensive Documentation**:
+    - **Task**: Update all documentation to reflect the new architecture.
+    - **Goal**: Ensure that the documentation is accurate, comprehensive, and easy to understand.
+    - **Importance**: Good documentation is essential for library adoption and usability. This should be done after all other major refactoring tasks are complete.
+    - **Implementation**:
+        1.  Review and update all module-level and item-level documentation.
+        2.  Update the main `lib.rs` example to showcase the new, idiomatic way of using the library.
+        3.  Ensure that all public APIs are clearly documented.
+
 ---
 
 ## Completed

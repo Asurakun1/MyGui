@@ -25,8 +25,12 @@ impl App {
     /// This initializes the application with a sample scene containing a `TextObject`.
     pub fn new() -> Self {
         let display_text = "日本語ハローワールドテスト。".to_string();
+
+        let test_text = "This is a test...".to_string();
+
         let mut scene = Scene::new();
         scene.add_object(Box::new(TextObject::new(&display_text, 10.0, 10.0)));
+        scene.add_object(Box::new(TextObject::new(&test_text, 100.0, 100.0)));
         Self {
             scene,
             display_text,
