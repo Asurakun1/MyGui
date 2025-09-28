@@ -8,17 +8,17 @@ The project uses Cargo, Rust's package manager and build system.
     ```bash
     cargo build
     ```
-*   **Run:** To build and run the executable, use:
-    ```bash
-    cargo run
-    ```
-    This will open a new window titled "Hello, Windows!" with the specified text and styling.
-
+    *   **Run:** To build and run the example, use:
+        ```bash
+        cargo run --example hello_world
+        ```
+    This will open a new window titled "Hello, World!" with the specified text and styling.
 ## Development Conventions
 *   **Language:** Rust
-*   **Project Structure:** The project is a Cargo workspace with a library (`MyGui`) and a binary that consumes it.
+*   **Project Structure:** The project is a Cargo workspace with a library (`MyGui`) and examples.
     *   `src/lib.rs`: The main library file, which exports the public API.
-    *   `src/main.rs`: The entry point for the executable.
+    *   `src/core`: Contains the core modules for windowing, event handling, and rendering.
+    *   `examples`: Contains example applications that demonstrate how to use the library.
 *   **Windows API Bindings:** Uses the `windows` crate for interacting with the Windows API.
 *   **Application Architecture:** The project follows a centralized state management pattern.
     *   **`App` Struct:** A central `App` struct (`src/app.rs`) owns all application state, including the `Scene` of drawable objects and configuration like the display text.
