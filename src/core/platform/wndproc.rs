@@ -1,6 +1,6 @@
 use crate::core::event::event_handler::EventHandler;
 use crate::core::event::key_id::KeyId;
-use crate::core::window::Window;
+use crate::core::platform::win32_window::Win32Window;
 use crate::core::event::message::Message;
 use windows::{
     Win32::Foundation::*,
@@ -35,11 +35,11 @@ pub extern "system" fn wndproc<T: 'static, E: EventHandler<T> + 'static>(
     let window = unsafe {
         if message == WM_NCCREATE {
             let createstruct = lparam.0 as *const CREATESTRUCTW;
-            let window = (*createstruct).lpCreateParams as *mut Window<T, E>;
+            let window = (*createstruct).lpCreateParams as *mut Win32Window<T, E>;
             SetWindowLongPtrW(hwnd, GWLP_USERDATA, window as _);
             window
         } else {
-            GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut Window<T, E>
+            GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut Win32Window<T, E>
         }
     };
 
@@ -120,7 +120,7 @@ pub extern "system" fn wndproc<T: 'static, E: EventHandler<T> + 'static>(
         WM_NCDESTROY => {
             let ptr = unsafe { SetWindowLongPtrW(hwnd, GWLP_USERDATA, 0) };
             if ptr != 0 {
-                let _ = unsafe { Box::from_raw(ptr as *mut Window<T, E>) };
+                let _ = unsafe { Box::from_raw(ptr as *mut Win32Window<T, E>) };
             }
             LRESULT(0)
         }

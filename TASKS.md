@@ -2,6 +2,15 @@
 
 ## To Do
 
+- [ ] **Implement Conditional Compilation for Platform Backends**:
+  - **Task**: Refactor the `WindowBuilder` to use conditional compilation (`#[cfg]`) to select the appropriate platform-specific window backend.
+  - **Goal**: To create a seamless cross-platform experience for the library user, where the correct backend is chosen automatically at compile time.
+  - **Importance**: This is the standard Rust pattern for supporting multiple platforms and is essential for the library's future portability.
+  - **Implementation**:
+    1.  Modify the `WindowBuilder::build` method to use `#[cfg(target_os = "...")]` attributes.
+    2.  For now, it will have one block for `target_os = "windows"` that creates the `Win32Window`.
+    3.  Add a fallback block for unsupported operating systems that panics or returns an error.
+
 - [ ] **Abstract Unsafe Drawing Operations**:
   - **Task**: Create safe abstractions for Direct2D drawing primitives.
   - **Goal**: Provide a safe and easy-to-use API for drawing basic shapes, eliminating the need for `unsafe` blocks in user code.
@@ -32,6 +41,15 @@
 ---
 
 ## Completed
+
+- [x] **Abstract Platform-Specific Window Creation**:
+  - **Task**: Make the core `Window` struct platform-agnostic.
+  - **Goal**: To abstract the underlying window creation and management logic, isolating all platform-specific code in the `platform` module.
+  - **Importance**: This is a key step towards making the library portable to other platforms (e.g., Linux, macOS) and further isolates `unsafe` code.
+  - **Implementation**:
+    1.  Moved the Win32-specific window creation logic into a new `Win32Window` struct in the `platform` module.
+    2.  Simplified the `core::window` module to be a high-level module for window configuration and building.
+    3.  Updated the `WindowBuilder` to create the `Win32Window` implementation.
 
 - [x] **Restructure Project for Better Organization**:
   - **Task**: Reorganize the project structure to better separate high-level abstractions from low-level implementation details.

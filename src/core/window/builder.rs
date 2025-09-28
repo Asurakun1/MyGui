@@ -1,7 +1,6 @@
-
 use crate::core::event::event_handler::EventHandler;
+use crate::core::platform::win32_window::Win32Window;
 use crate::core::window::config::WindowConfig;
-use super::Window;
 use windows::core::Result;
 
 /// A builder for creating and configuring a `Window`.
@@ -68,8 +67,8 @@ impl WindowBuilder {
         &self,
         event_handler: E,
         app: T,
-    ) -> Result<Box<Window<T, E>>> {
-        Window::new(&self.config, event_handler, app)
+    ) -> Result<Box<Win32Window<T, E>>> {
+        Win32Window::new(&self.config, event_handler, app)
     }
 }
 
