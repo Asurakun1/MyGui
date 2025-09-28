@@ -2,23 +2,15 @@
 //!
 //! This is a simple example of how to use the `my_gui` framework to create a
 //! "Hello, World!" application.
+use windows::core::*;
 
-use my_gui::*;
-
-use windows::{
-    core::*,
-};
-
-use crate::core::{
-    window::{
-        WindowBuilder,
-        config::WindowConfig,
+use my_gui::{
+    app::App,
+    core::{
+        event::{render_event_handler::RenderEventHandler, root_event_handler::RootEventHandler},
+        window::{WindowBuilder, config::WindowConfig},
     },
-    event::root_event_handler::RootEventHandler,
-    event::render_event_handler::RenderEventHandler,
 };
-use app::App;
-
 
 fn main() -> Result<()> {
     // Create the application state.
@@ -38,7 +30,7 @@ fn main() -> Result<()> {
 
     // Create the window.
     let window = WindowBuilder::from_config(config).build(event_handler, app)?;
-    
+
     // Run the application.
     let result = window.run();
 
