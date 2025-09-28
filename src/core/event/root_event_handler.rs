@@ -14,24 +14,9 @@ pub struct RootEventHandler {
     handlers: Vec<Box<dyn EventHandler>>,
 }
 
-impl RootEventHandler {
-    /// Creates a new, empty `RootEventHandler`.
-    pub fn new() -> Self {
-        Self { handlers: Vec::new() }
-    }
-
-    /// Adds a new `EventHandler` to the collection.
-    ///
-    /// The provided handler will be boxed and added to the list of handlers to which
-    /// this `RootEventHandler` delegates.
-    pub fn add_handler(&mut self, handler: Box<dyn EventHandler>) {
-        self.handlers.push(handler);
-    }
-}
-
 impl Default for RootEventHandler {
     fn default() -> Self {
-        Self::new()
+        Self { handlers: Vec::new() }
     }
 }
 

@@ -19,23 +19,14 @@ pub struct App {
     pub display_text: String,
 }
 
-impl App {
-    /// Creates a new `App` instance with a default scene.
-    ///
-    /// This initializes the application with a sample scene containing a `TextObject`.
-    pub fn new() -> Self {
+impl Default for App {
+    fn default() -> Self {
         let display_text = "日本語ハローワールドテスト。".to_string();
-        let mut scene = Scene::new();
+        let mut scene = Scene::default();
         scene.add_object(Box::new(TextObject::new(&display_text, 10.0, 10.0)));
         Self {
             scene,
             display_text,
         }
-    }
-}
-
-impl Default for App {
-    fn default() -> Self {
-        Self::new()
     }
 }
