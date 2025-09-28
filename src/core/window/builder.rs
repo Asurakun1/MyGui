@@ -1,7 +1,8 @@
 use crate::core::event::event_handler::EventHandler;
-use crate::core::platform::win32_window::Win32Window;
+use crate::core::platform::window_backend::WindowBackend;
 use crate::core::window::config::WindowConfig;
 use windows::core::Result;
+
 
 /// A builder for creating and configuring a `Window`.
 ///
@@ -67,8 +68,18 @@ impl WindowBuilder {
         &self,
         event_handler: E,
         app: T,
-    ) -> Result<Box<Win32Window<T, E>>> {
-        Win32Window::new(&self.config, event_handler, app)
+    ) -> Result<Box<dyn WindowBackend<T, E>>> {
+        #[cfg(target_os = "windows")]
+        {
+            use crate::core::platform::win32_window::Win32Window;
+            let backend = Win32Window::new(&self.config, event_handler, app)?;
+            Ok(backend)
+        }
+
+        #[cfg(not(target_os = "windows"))]
+        {
+            panic!("Unsupported operating system");
+        }
     }
 }
 

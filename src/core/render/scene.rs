@@ -33,10 +33,11 @@ impl Scene {
 
     /// Adds a `Drawable` object to the scene.
     ///
-    /// The object is moved onto the heap and stored as a trait object (`Box<dyn Drawable>`),
-    /// allowing the scene to manage objects of different concrete types.
-    pub fn add_object(&mut self, object: Box<dyn Drawable>) {
-        self.objects.push(object);
+    /// This method is generic over any type that implements the `Drawable` trait.
+    /// It automatically boxes the object and adds it to the scene's collection of
+    /// trait objects.
+    pub fn add_object<T: Drawable + 'static>(&mut self, object: T) {
+        self.objects.push(Box::new(object));
     }
 
     /// Draws all objects in the scene using the provided `DrawingContext`.

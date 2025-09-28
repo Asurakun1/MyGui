@@ -2,15 +2,6 @@
 
 ## To Do
 
-- [ ] **Implement Conditional Compilation for Platform Backends**:
-  - **Task**: Refactor the `WindowBuilder` to use conditional compilation (`#[cfg]`) to select the appropriate platform-specific window backend.
-  - **Goal**: To create a seamless cross-platform experience for the library user, where the correct backend is chosen automatically at compile time.
-  - **Importance**: This is the standard Rust pattern for supporting multiple platforms and is essential for the library's future portability.
-  - **Implementation**:
-    1.  Modify the `WindowBuilder::build` method to use `#[cfg(target_os = "...")]` attributes.
-    2.  For now, it will have one block for `target_os = "windows"` that creates the `Win32Window`.
-    3.  Add a fallback block for unsupported operating systems that panics or returns an error.
-
 - [ ] **Abstract Unsafe Drawing Operations**:
   - **Task**: Create safe abstractions for Direct2D drawing primitives.
   - **Goal**: Provide a safe and easy-to-use API for drawing basic shapes, eliminating the need for `unsafe` blocks in user code.
@@ -41,6 +32,15 @@
 ---
 
 ## Completed
+
+- [x] **Implement Conditional Compilation for Platform Backends**:
+  - **Task**: Refactor the `WindowBuilder` to use conditional compilation (`#[cfg]`) to select the appropriate platform-specific window backend.
+  - **Goal**: To create a seamless cross-platform experience for the library user, where the correct backend is chosen automatically at compile time.
+  - **Importance**: This is the standard Rust pattern for supporting multiple platforms and is essential for the library's future portability.
+  - **Implementation**:
+    1.  Modified the `WindowBuilder::build` method to use `#[cfg(target_os = "...")]` attributes.
+    2.  For now, it has one block for `target_os = "windows"` that creates the `Win32Window`.
+    3.  Added a fallback block for unsupported operating systems that panics.
 
 - [x] **Abstract Platform-Specific Window Creation**:
   - **Task**: Make the core `Window` struct platform-agnostic.
