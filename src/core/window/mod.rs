@@ -1,3 +1,18 @@
+//! # Windowing
+//!
+//! This module provides abstractions for creating and managing windows.
+//!
+//! The main components are:
+//! - `Window`: Represents a window and manages its resources.
+//! - `WindowBuilder`: A builder for creating and configuring windows.
+//! - `WindowConfig`: A struct that holds window configuration.
+//! - `wndproc_utils`: Contains the window procedure for handling window messages.
+
+pub mod builder;
+pub mod config;
+pub mod wndproc_utils;
+
+pub use builder::WindowBuilder;
 
 use windows::{
     core::*,
@@ -7,11 +22,12 @@ use windows::{
     Win32::UI::WindowsAndMessaging::*,
 };
 
-use super::wndproc_utils::wndproc;
-use super::config::{WINDOW_WIDTH, WINDOW_HEIGHT};
-use crate::event::event_handler::EventHandler;
-use crate::app::app::App;
-use crate::render::direct2d_context::Direct2DContext;
+use self::wndproc_utils::wndproc;
+use crate::core::window::config::WindowConfig;
+
+use crate::core::event::event_handler::EventHandler;
+use crate::app::App;
+use crate::core::render::direct2d_context::Direct2DContext;
 
 /// Represents an application window.
 ///
@@ -42,42 +58,45 @@ impl<E: EventHandler + 'static> Window<E> {
     /// However, its lifetime will be managed by the `wndproc` and the message loop,
     /// so the caller is expected to call `std::mem::forget` on the box to prevent
     /// premature deallocation.
-    pub fn new(title: &str, class_name: &str, event_handler: E, app: App) -> Result<Box<Self>> {
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if it fails to get the module handle,
+    /// register the window class, create the window, or create the Direct2D resources.
+    ///
+    /// # Safety
+    ///
+    /// This function contains `unsafe` blocks for getting the module handle, creating
+    /// the window, and showing and updating the window. The caller must ensure that
+    /// it is safe to perform these operations.
+    pub(super) fn new(config: &WindowConfig, event_handler: E, app: App) -> Result<Box<Self>> {
         let instance = unsafe { GetModuleHandleW(None)? };
-        Self::register_class(instance.into(), class_name)?;
+        Self::register_class(instance.into(), &config.class_name)?;
 
-        // Allocate the Window struct on the heap. This is necessary because its lifetime
-        // will be tied to the Win32 window handle, not the scope of this function.
         let mut window = Box::new(Self {
             hwnd: HWND(std::ptr::null_mut()),
-            d2d_context: Direct2DContext::new()?,
+            d2d_context: Direct2DContext::new(&config.font_face_name, config.font_size as f32)?,
             event_handler,
             app,
         });
 
-        // The `CreateWindowExW` function will send a `WM_NCCREATE` message before it returns.
-        // Our `wndproc` handles this message by storing the pointer to our `window` box
-        // in the window's user data area (`GWLP_USERDATA`).
         let hwnd = unsafe {
             CreateWindowExW(
                 WINDOW_EX_STYLE::default(),
-                &HSTRING::from(class_name),
-                &HSTRING::from(title),
+                &HSTRING::from(config.class_name.as_str()),
+                &HSTRING::from(config.title.as_str()),
                 WS_OVERLAPPEDWINDOW,
                 CW_USEDEFAULT,
                 CW_USEDEFAULT,
-                WINDOW_WIDTH,
-                WINDOW_HEIGHT,
+                config.width,
+                config.height,
                 None,
                 None,
                 Some(instance.into()),
-                // Pass a pointer to the heap-allocated `Window` struct.
-                // This will be received by `wndproc` as the `lParam` of the `WM_NCCREATE` message.
                 Some(window.as_mut() as *mut _ as *mut _),
-            )
-        }?;
+            )?
+        };
 
-        // Now that the Win32 window is created, store its handle in our struct.
         window.hwnd = hwnd;
         window.d2d_context.create_device_dependent_resources(hwnd)?;
 
@@ -91,6 +110,18 @@ impl<E: EventHandler + 'static> Window<E> {
         Ok(window)
     }
 
+    /// Registers the window class.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if it fails to load the icon or cursor,
+    /// or if it fails to register the window class.
+    ///
+    /// # Safety
+    ///
+    /// This function contains `unsafe` blocks for loading the icon and cursor and
+    /// registering the window class. The caller must ensure that it is safe to
+    /// perform these operations.
     fn register_class(instance: HINSTANCE, class_name: &str) -> Result<()> {
         let class_name_hstring = HSTRING::from(class_name);
 
@@ -99,9 +130,6 @@ impl<E: EventHandler + 'static> Window<E> {
             style: CS_HREDRAW | CS_VREDRAW,
             lpfnWndProc: Some(wndproc::<E>),
             cbClsExtra: 0,
-            // Allocate extra memory for the window instance. This is used to store a pointer
-            // to our heap-allocated `Window` struct. The pointer is set in `wndproc` during
-            // `WM_NCCREATE` and retrieved later to access the `Window`'s state.
             cbWndExtra: std::mem::size_of::<*mut Self>() as i32,
             hInstance: instance,
             hIcon: unsafe { LoadIconW(None, IDI_APPLICATION)? },
@@ -112,7 +140,6 @@ impl<E: EventHandler + 'static> Window<E> {
             hIconSm: unsafe { LoadIconW(None, IDI_APPLICATION)? },
         };
 
-        // Register the window class.
         unsafe {
             if RegisterClassExW(&wc) == 0 {
                 return Err(Error::from_hresult(HRESULT::from_win32(GetLastError().0)));
@@ -122,10 +149,20 @@ impl<E: EventHandler + 'static> Window<E> {
         Ok(())
     }
 
-    /// Starts the message loop for the window.
-    pub fn message_loop(&self) -> Result<()> {
+    /// Runs the application by starting the message loop.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if it fails to get a message from the
+    /// message queue.
+    ///
+    /// # Safety
+    ///
+    /// This function contains `unsafe` blocks for getting, translating, and
+    /// dispatching messages. The caller must ensure that it is safe to perform
+    /// these operations.
+    pub fn run(&self) -> Result<()> {
         let mut message = MSG::default();
-        // The main message loop.
         while unsafe { GetMessageW(&mut message, None, 0, 0) }.into() {
             unsafe { let _ = TranslateMessage(&message); };
             unsafe { DispatchMessageW(&message) };

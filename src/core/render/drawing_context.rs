@@ -2,7 +2,7 @@
 use windows::{
     Win32::Graphics::Direct2D::ID2D1RenderTarget,
     Win32::Graphics::Direct2D::ID2D1SolidColorBrush,
-    Win32::Graphics::DirectWrite::IDWriteTextFormat,
+    Win32::Graphics::DirectWrite::{IDWriteFactory, IDWriteTextFormat},
 };
 
 /// A context for drawing operations.
@@ -16,4 +16,6 @@ pub struct DrawingContext<'a> {
     pub brush: &'a ID2D1SolidColorBrush,
     /// The text format to use for drawing text.
     pub text_format: &'a IDWriteTextFormat,
+    // The DirectWrite factory for creating text layouts.
+    pub dwrite_factory: &'a IDWriteFactory,
 }

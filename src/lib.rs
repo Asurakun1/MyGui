@@ -1,6 +1,6 @@
-//! # MyGui: A Simple Windows GUI Framework
+//! # my_gui: A Simple Windows GUI Framework
 //!
-//! `MyGui` is a lightweight and modular framework for creating Windows GUI applications in Rust.
+//! `my_gui` is a lightweight and modular framework for creating Windows GUI applications in Rust.
 //! It provides a simple and intuitive API for creating windows, handling events, and rendering 2D graphics.
 //!
 //! ## Architecture
@@ -8,38 +8,36 @@
 //! The framework is divided into the following modules:
 //!
 //! - `app`: Contains the central application state.
-//! - `event`: Handles all input and window events.
-//! - `render`: Manages all rendering and drawing logic.
-//! - `window`: Responsible for window creation and management.
+//! - `core`: Encapsulates window creation, events, and rendering.
 //!
 //! ## Getting Started
 //!
-//! To create a new `MyGui` application, you need to create a `Window` and an `App` instance.
-//! The `Window` is responsible for creating and managing the application window, while the `App`
-//! contains the central application state.
+//! To create a new `my_gui` application, you use the `WindowBuilder` to configure and
+//! create a `Window`. You also need to create an `App` instance and an event handler.
 //!
 //! ```rust,no_run
-//! use MyGui::{
-//!     app::app::App,
-//!     event::root_event_handler::RootEventHandler,
-//!     window::{
-//!         config::{WINDOW_TITLE, WINDOW_CLASS_NAME},
-//!         window::Window,
-//!     },
+//! use my_gui::{
+//!     app::App,
+//!     core::event::root_event_handler::RootEventHandler,
+//!     core::window::{WindowBuilder, config::WindowConfig},
 //! };
 //! use windows::core::Result;
 //!
 //! fn main() -> Result<()> {
 //!     let app = App::new();
 //!     let event_handler = RootEventHandler::new();
-//!     let window = Window::new(WINDOW_TITLE, WINDOW_CLASS_NAME, event_handler, app)?;
-//!     let result = window.message_loop();
+//!     let config = WindowConfig {
+//!         title: "My Gui App".to_string(),
+//!         ..Default::default()
+//!     };
+//!     let window = WindowBuilder::from_config(config)
+//!         .build(event_handler, app)?;
+//!     let result = window.run();
 //!     std::mem::forget(window);
 //!     result
 //! }
 //! ```
 
 pub mod app;
-pub mod event;
-pub mod render;
-pub mod window;
+#[cfg(windows)]
+pub mod core;

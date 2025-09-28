@@ -1,5 +1,5 @@
 [package]
-name = "MyGui"
+name = "my_gui"
 version = "0.1.1"
 edition = "2024"
 description = "A simple GUI application for Windows using the Rust 'windows' crate. For learning purposes only. You should not use this crate."
@@ -9,4 +9,5 @@ homepage = "https://github.com/Asurakun1/MyGui"
 
 [dependencies]
 thiserror = "2.0.16"
+windows-numerics = "0.3.0"
 windows = { version = "0.62.0", features = ["Win32_Foundation", "Win32_Graphics_Gdi", "Win32_System_LibraryLoader", "Win32_UI_WindowsAndMessaging", "Win32_Graphics_Direct2D", "Win32_Graphics_DirectWrite", "Win32_Graphics_Dxgi_Common", "Win32_System_Com", "Win32_Graphics_Direct2D_Common", "Win32_System_SystemServices", "Win32_UI_Input", "Win32_UI_Input_KeyboardAndMouse"] }
