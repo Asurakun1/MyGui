@@ -1,5 +1,4 @@
-use windows::Win32::Foundation::{LPARAM, WPARAM};
-
+use crate::core::event::message::Message;
 use crate::core::render::drawing_context::DrawingContext;
 use super::event_handler::EventHandler;
 use super::key_id::KeyId;
@@ -92,18 +91,14 @@ impl<T> EventHandler<T> for RootEventHandler<T> {
         }
     }
 
+
+
     /// Delegates the `handle_message` call to all registered handlers.
     ///
     /// It returns the result from the first handler that returns `Some`.
-    fn handle_message(
-        &mut self,
-        app: &mut T,
-        msg: u32,
-        wparam: WPARAM,
-        lparam: LPARAM,
-    ) -> Option<isize> {
+    fn handle_message(&mut self, app: &mut T, message: Message) -> Option<isize> {
         self.handlers
             .iter_mut()
-            .find_map(|handler| handler.handle_message(app, msg, wparam, lparam))
+            .find_map(|handler| handler.handle_message(app, message))
     }
 }

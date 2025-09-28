@@ -10,7 +10,7 @@
 
 pub mod builder;
 pub mod config;
-pub mod wndproc_utils;
+
 
 pub use builder::WindowBuilder;
 
@@ -22,11 +22,11 @@ use windows::{
     Win32::UI::WindowsAndMessaging::*,
 };
 
-use self::wndproc_utils::wndproc;
+use crate::core::platform::wndproc::wndproc;
 use crate::core::window::config::WindowConfig;
 
 use crate::core::event::event_handler::EventHandler;
-use crate::core::render::direct2d_context::Direct2DContext;
+use crate::core::platform::direct2d_context::Direct2DContext;
 
 /// Represents an application window.
 ///

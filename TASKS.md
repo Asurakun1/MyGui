@@ -2,25 +2,6 @@
 
 ## To Do
 
-- [ ] **Decouple Application State from the Library**:
-  - **Task**: Make the library generic over the application state.
-  - **Goal**: Allow users to define their own application state struct, rather than being forced to use the library's `App` struct.
-  - **Importance**: This is a critical step in making the library truly generic and reusable. It allows the library to be used in a wide variety of applications, each with its own unique state.
-  - **Implementation**:
-    1.  Make the `Window` and `EventHandler` traits generic over a user-defined state type (e.g., `<T>`).
-    2.  The `Window` will own an instance of this generic state `T`.
-    3.  The `EventHandler` methods will receive a mutable reference to the state `&mut T`.
-    4.  Remove the `app` module from the library and update the `hello_world` example to define its own `App` struct.
-
-- [ ] **Restructure Project for Better Organization**:
-  - **Task**: Reorganize the project structure to better separate high-level abstractions from low-level implementation details.
-  - **Goal**: Improve maintainability, navigation, and clarity of the codebase.
-  - **Importance**: As the library grows, a well-organized structure is crucial for keeping the code manageable and easy to understand.
-  - **Implementation**:
-    1.  Create a new module (e.g., `src/core/platform` or `src/core/win32`) to house low-level, platform-specific code.
-    2.  Move modules that directly interact with the Win32 API (like `direct2d_context.rs` and `wndproc_utils.rs`) into this new module.
-    3.  Ensure that the public API of the `core` module exposes the safe, high-level abstractions, while hiding the low-level details.
-
 - [ ] **Abstract Unsafe Drawing Operations**:
   - **Task**: Create safe abstractions for Direct2D drawing primitives.
   - **Goal**: Provide a safe and easy-to-use API for drawing basic shapes, eliminating the need for `unsafe` blocks in user code.
@@ -51,6 +32,25 @@
 ---
 
 ## Completed
+
+- [x] **Restructure Project for Better Organization**:
+  - **Task**: Reorganize the project structure to better separate high-level abstractions from low-level implementation details.
+  - **Goal**: Improve maintainability, navigation, and clarity of the codebase.
+  - **Importance**: As the library grows, a well-organized structure is crucial for keeping the code manageable and easy to understand.
+  - **Implementation**:
+    1.  Created a new module `src/core/platform` to house low-level, platform-specific code.
+    2.  Moved `direct2d_context.rs` and `wndproc.rs` into this new module.
+    3.  Abstracted raw window message parameters into a platform-agnostic `Message` struct.
+
+- [x] **Decouple Application State from the Library**:
+  - **Task**: Make the library generic over the application state.
+  - **Goal**: Allow users to define their own application state struct, rather than being forced to use the library's `App` struct.
+  - **Importance**: This is a critical step in making the library truly generic and reusable. It allows the library to be used in a wide variety of applications, each with its own unique state.
+  - **Implementation**:
+    1.  Made the `Window` and `EventHandler` traits generic over a user-defined state type (e.g., `<T>`).
+    2.  The `Window` now owns an instance of this generic state `T`.
+    3.  The `EventHandler` methods now receive a mutable reference to the state `&mut T`.
+    4.  Removed the `app` module from the library and updated the `hello_world` example to define its own `App` struct.
 
 - [x] **Comprehensive Documentation Pass**:
   - **Task**: Review and enhance all public-facing documentation.

@@ -1,5 +1,4 @@
-use windows::Win32::Foundation::{LPARAM, WPARAM};
-
+use crate::core::event::message::Message;
 use crate::core::render::drawing_context::DrawingContext;
 use super::key_id::KeyId;
 
@@ -36,12 +35,14 @@ pub trait EventHandler<T> {
     /// Called when a non-system key is released.
     fn on_key_up(&mut self, _app: &mut T, _key: KeyId) {}
 
+
+
     /// A catch-all method for handling any other window messages.
     ///
     /// If this method handles the message, it should return `Some(result)`.
     /// If it does not handle the message, it should return `None`, allowing
     /// for further processing or default handling by `DefWindowProcW`.
-    fn handle_message(&mut self, _app: &mut T, _msg: u32, _wparam: WPARAM, _lparam: LPARAM) -> Option<isize> {
+    fn handle_message(&mut self, _app: &mut T, _message: Message) -> Option<isize> {
         None
     }
 }

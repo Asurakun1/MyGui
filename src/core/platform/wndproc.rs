@@ -1,6 +1,7 @@
 use crate::core::event::event_handler::EventHandler;
 use crate::core::event::key_id::KeyId;
 use crate::core::window::Window;
+use crate::core::event::message::Message;
 use windows::{
     Win32::Foundation::*,
     Win32::Graphics::Direct2D::Common::*,
@@ -124,11 +125,12 @@ pub extern "system" fn wndproc<T: 'static, E: EventHandler<T> + 'static>(
             LRESULT(0)
         }
         _ => {
-            if let Some(result) =
-                window
-                    .event_handler
-                    .handle_message(&mut window.app, message, wparam, lparam)
-            {
+            let message_struct = Message {
+                id: message,
+                w_param: wparam.0,
+                l_param: lparam.0,
+            };
+            if let Some(result) = window.event_handler.handle_message(&mut window.app, message_struct) {
                 return LRESULT(result);
             }
             unsafe { DefWindowProcW(hwnd, message, wparam, lparam) }
