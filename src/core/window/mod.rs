@@ -26,7 +26,6 @@ use self::wndproc_utils::wndproc;
 use crate::core::window::config::WindowConfig;
 
 use crate::core::event::event_handler::EventHandler;
-use crate::app::App;
 use crate::core::render::direct2d_context::Direct2DContext;
 
 /// Represents an application window.
@@ -34,14 +33,14 @@ use crate::core::render::direct2d_context::Direct2DContext;
 /// This struct encapsulates the window handle (`HWND`) and all the resources
 /// required to manage the window. It also owns the application state (`App`)
 /// and the event handler (`EventHandler`).
-pub struct Window<E: EventHandler> {
+pub struct Window<T, E: EventHandler<T>> {
     pub hwnd: HWND,
     pub d2d_context: Direct2DContext,
     pub event_handler: E,
-    pub app: App,
+    pub app: T,
 }
 
-impl<E: EventHandler + 'static> Window<E> {
+impl<T: 'static, E: EventHandler<T> + 'static> Window<T, E> {
     /// Creates a new application window.
     ///
     /// This function orchestrates the entire window setup process:
@@ -69,7 +68,7 @@ impl<E: EventHandler + 'static> Window<E> {
     /// This function contains `unsafe` blocks for getting the module handle, creating
     /// the window, and showing and updating the window. The caller must ensure that
     /// it is safe to perform these operations.
-    pub(super) fn new(config: &WindowConfig, event_handler: E, app: App) -> Result<Box<Self>> {
+    pub(super) fn new(config: &WindowConfig, event_handler: E, app: T) -> Result<Box<Self>> {
         let instance = unsafe { GetModuleHandleW(None)? };
         Self::register_class(instance.into(), &config.class_name)?;
 
@@ -128,7 +127,7 @@ impl<E: EventHandler + 'static> Window<E> {
         let wc = WNDCLASSEXW {
             cbSize: std::mem::size_of::<WNDCLASSEXW>() as u32,
             style: CS_HREDRAW | CS_VREDRAW,
-            lpfnWndProc: Some(wndproc::<E>),
+            lpfnWndProc: Some(wndproc::<T, E>),
             cbClsExtra: 0,
             cbWndExtra: std::mem::size_of::<*mut Self>() as i32,
             hInstance: instance,

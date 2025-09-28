@@ -20,17 +20,16 @@ The project uses Cargo, Rust's package manager and build system.
     *   `src/core`: Contains the core modules for windowing, event handling, and rendering.
     *   `examples`: Contains example applications that demonstrate how to use the library.
 *   **Windows API Bindings:** Uses the `windows` crate for interacting with the Windows API.
-*   **Application Architecture:** The project follows a centralized state management pattern.
-    *   **`App` Struct:** A central `App` struct (`src/app.rs`) owns all application state, including the `Scene` of drawable objects and configuration like the display text.
-    *   **`Window` Struct:** Encapsulates window creation and the message loop. It owns the `App` instance and the `RootEventHandler`.
+*   **Application Architecture:** The project is being refactored to use a generic, user-defined state management pattern.
+    *   **User-Defined State:** The library will be generic over a state type `T`. The user is responsible for defining a struct that holds all their application's state.
+    *   **`Window` Struct:** Encapsulates window creation and the message loop. It will own an instance of the user-defined state `T` and the `RootEventHandler`.
 *   **Event Handling:** A modular, composable event handling system is used.
-    *   **`EventHandler` Trait:** Defines the interface for handling window messages. Methods receive a mutable reference to the `App` struct, allowing them to modify the central state.
+    *   **`EventHandler` Trait:** Defines the interface for handling window messages. Methods will receive a mutable reference to the user-defined state `T`, allowing them to modify the state.
     *   **`RootEventHandler`:** The primary event handler that is passed to the `Window`. It composes multiple specialized event handlers.
-    *   **`RenderEventHandler`:** A stateless handler responsible only for drawing logic. It's called by the `RootEventHandler`.
+    *   **Future Enhancements**: The event system will be enhanced to support advanced mouse input, modifier keys, and user-defined key combinations.
 *   **Drawing:** The rendering is implemented using Direct2D and DirectWrite.
     *   **`Drawable` Trait:** Defines an interface for any object that can be drawn on the screen.
-    *   **`Scene` Struct:** Manages a collection of `Drawable` objects. It is owned by the `App` struct.
-    *   **`DrawingContext` Struct:** Bundles essential Direct2D drawing resources for easy passing to `Drawable` objects.
-    *   **`TextObject`:** A concrete implementation of `Drawable` for rendering text.
-    *   The `WM_PAINT` message is handled in the `wndproc` function, which calls the `on_paint` method on the `RootEventHandler`, passing it the `App` state and a `DrawingContext`. The handler then delegates to the `RenderEventHandler` to draw the scene from `app.scene`.
-*   **Unsafe Code:** Due to direct interaction with the Windows API, the project utilizes `unsafe` blocks for FFI (Foreign Function Interface) calls.
+    *   **`Scene` Struct:** Manages a collection of `Drawable` objects. It is intended to be part of the user-defined state.
+    *   **Drawing Primitives**: The library will provide safe, high-level abstractions for drawing basic shapes (e.g., `Rectangle`, `Circle`), encapsulating the `unsafe` Direct2D calls.
+    *   `WM_PAINT` is handled by the `on_paint` method of the `EventHandler` trait.
+*   **Unsafe Code:** Due to direct interaction with the Windows API, the project utilizes `unsafe` blocks for FFI (Foreign Function Interface) calls. A key goal of the project is to provide safe, high-level abstractions over this `unsafe` code.

@@ -38,6 +38,6 @@
 //! }
 //! ```
 
-pub mod app;
+
 #[cfg(windows)]
 pub mod core;

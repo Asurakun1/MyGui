@@ -3,6 +3,15 @@ use windows::core::Result;
 use crate::core::render::drawable::Drawable;
 use crate::core::render::drawing_context::DrawingContext;
 
+/// A trait for types that contain a `Scene`.
+///
+/// This trait provides a standard way for the rendering system to access the
+/// `Scene` from the application state.
+pub trait HasScene {
+    /// Returns a reference to the `Scene`.
+    fn scene(&self) -> &Scene;
+}
+
 /// Represents a scene containing a collection of `Drawable` objects.
 ///
 /// The `Scene` is the main container for everything that needs to be rendered

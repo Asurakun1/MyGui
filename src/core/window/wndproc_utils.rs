@@ -25,7 +25,7 @@ use crate::core::render::drawing_context::DrawingContext;
 /// The pointer is set on creation and is valid until `WM_NCDESTROY`, at which point
 /// it is retrieved, converted back into a `Box`, and dropped by Rust, ensuring
 /// proper cleanup.
-pub extern "system" fn wndproc<E: EventHandler + 'static>(
+pub extern "system" fn wndproc<T: 'static, E: EventHandler<T> + 'static>(
     hwnd: HWND,
     message: u32,
     wparam: WPARAM,
@@ -34,11 +34,11 @@ pub extern "system" fn wndproc<E: EventHandler + 'static>(
     let window = unsafe {
         if message == WM_NCCREATE {
             let createstruct = lparam.0 as *const CREATESTRUCTW;
-            let window = (*createstruct).lpCreateParams as *mut Window<E>;
+            let window = (*createstruct).lpCreateParams as *mut Window<T, E>;
             SetWindowLongPtrW(hwnd, GWLP_USERDATA, window as _);
             window
         } else {
-            GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut Window<E>
+            GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut Window<T, E>
         }
     };
 
@@ -119,7 +119,7 @@ pub extern "system" fn wndproc<E: EventHandler + 'static>(
         WM_NCDESTROY => {
             let ptr = unsafe { SetWindowLongPtrW(hwnd, GWLP_USERDATA, 0) };
             if ptr != 0 {
-                let _ = unsafe { Box::from_raw(ptr as *mut Window<E>) };
+                let _ = unsafe { Box::from_raw(ptr as *mut Window<T, E>) };
             }
             LRESULT(0)
         }

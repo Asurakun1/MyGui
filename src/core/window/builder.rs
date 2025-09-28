@@ -1,4 +1,4 @@
-use crate::app::App;
+
 use crate::core::event::event_handler::EventHandler;
 use crate::core::window::config::WindowConfig;
 use super::Window;
@@ -64,7 +64,11 @@ impl WindowBuilder {
     /// # Errors
     ///
     /// This function will return an error if it fails to create the window.
-    pub fn build<E: EventHandler + 'static>(&self, event_handler: E, app: App) -> Result<Box<Window<E>>> {
+    pub fn build<T: 'static, E: EventHandler<T> + 'static>(
+        &self,
+        event_handler: E,
+        app: T,
+    ) -> Result<Box<Window<T, E>>> {
         Window::new(&self.config, event_handler, app)
     }
 }
