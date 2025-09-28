@@ -1,7 +1,7 @@
 use windows::core::Result;
 
-use crate::render::drawable::Drawable;
-use crate::render::drawing_context::DrawingContext;
+use crate::core::render::drawable::Drawable;
+use crate::core::render::drawing_context::DrawingContext;
 
 /// Represents a scene containing a collection of `Drawable` objects.
 ///

@@ -1,7 +1,7 @@
 use windows::Win32::Foundation::{LPARAM, WPARAM};
 
-use crate::{app::App, render::drawing_context::DrawingContext};
-use crate::event::key_id::KeyId;
+use crate::{app::App, core::render::drawing_context::DrawingContext};
+use super::key_id::KeyId;
 
 /// Defines the interface for handling window events.
 ///

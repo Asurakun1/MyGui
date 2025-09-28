@@ -8,9 +8,7 @@
 //! The framework is divided into the following modules:
 //!
 //! - `app`: Contains the central application state.
-//! - `event`: Handles all input and window events.
-//! - `render`: Manages all rendering and drawing logic.
-//! - `window`: Responsible for window creation and management.
+//! - `core`: Encapsulates window creation, events, and rendering.
 //!
 //! ## Getting Started
 //!
@@ -18,22 +16,28 @@
 //! create a `Window`. You also need to create an `App` instance and an event handler.
 //!
 //! ```rust,no_run
-//! use my_gui::{app::App, event::root_event_handler::RootEventHandler, window::WindowBuilder};
+//! use my_gui::{
+//!     app::App,
+//!     core::event::root_event_handler::RootEventHandler,
+//!     core::window::{WindowBuilder, config::WindowConfig},
+//! };
 //! use windows::core::Result;
 //!
 //! fn main() -> Result<()> {
 //!     let app = App::new();
 //!     let event_handler = RootEventHandler::new();
-//!     let window = WindowBuilder::new()
-//!         .with_title("My App")
+//!     let config = WindowConfig {
+//!         title: "My Gui App".to_string(),
+//!         ..Default::default()
+//!     };
+//!     let window = WindowBuilder::from_config(config)
 //!         .build(event_handler, app)?;
-//!     let result = window.message_loop();
+//!     let result = window.run();
 //!     std::mem::forget(window);
 //!     result
 //! }
 //! ```
 
 pub mod app;
-pub mod event;
-pub mod render;
-pub mod window;
+#[cfg(windows)]
+pub mod core;

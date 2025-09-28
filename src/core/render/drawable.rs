@@ -1,5 +1,5 @@
 
-use crate::render::drawing_context::DrawingContext;
+use crate::core::render::drawing_context::DrawingContext;
 use windows::core::Result;
 
 /// A trait for objects that can be drawn to a `DrawingContext`.

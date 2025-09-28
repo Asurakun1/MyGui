@@ -1,6 +1,6 @@
 use crate::app::App;
-use crate::event::event_handler::EventHandler;
-use super::config::WindowConfig;
+use crate::core::event::event_handler::EventHandler;
+use crate::core::window::config::WindowConfig;
 use super::Window;
 use windows::core::Result;
 

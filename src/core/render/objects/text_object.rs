@@ -1,8 +1,8 @@
 use windows::{core::*, Win32::Graphics::Direct2D::D2D1_DRAW_TEXT_OPTIONS_NONE};
 use windows_numerics::Vector2;
 
-use crate::render::drawable::Drawable;
-use crate::render::drawing_context::DrawingContext;
+use crate::core::render::drawable::Drawable;
+use crate::core::render::drawing_context::DrawingContext;
 
 /// A `Drawable` object that represents a piece of text.
 ///

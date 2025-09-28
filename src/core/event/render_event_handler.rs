@@ -1,4 +1,5 @@
-use crate::{app::App, event::event_handler::EventHandler, render::drawing_context::DrawingContext};
+use crate::{app::App, core::render::drawing_context::DrawingContext};
+use super::event_handler::EventHandler;
 
 /// An event handler that is responsible for rendering the application's scene.
 ///

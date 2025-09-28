@@ -1,7 +1,8 @@
 use windows::Win32::Foundation::{LPARAM, WPARAM};
 
-use crate::{app::App, event::event_handler::EventHandler, render::drawing_context::DrawingContext};
-use crate::event::key_id::KeyId;
+use crate::{app::App, core::render::drawing_context::DrawingContext};
+use super::event_handler::EventHandler;
+use super::key_id::KeyId;
 
 /// The primary event handler that composes and delegates to other, more specialized handlers.
 ///

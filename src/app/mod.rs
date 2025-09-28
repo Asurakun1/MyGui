@@ -4,7 +4,7 @@
 //! drawable objects and other application-wide data. The `App` struct is the
 //! primary container for this state.
 
-use crate::render::{objects::text_object::TextObject, scene::Scene};
+use crate::core::render::{objects::text_object::TextObject, scene::Scene};
 
 /// Represents the central state of the application.
 ///

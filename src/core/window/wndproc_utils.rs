@@ -1,12 +1,12 @@
-use crate::event::event_handler::EventHandler;
-use crate::event::key_id::KeyId;
-use crate::window::Window;
+use crate::core::event::event_handler::EventHandler;
+use crate::core::event::key_id::KeyId;
+use crate::core::window::Window;
 use windows::{
     Win32::Foundation::*,
     Win32::Graphics::Direct2D::Common::*,
     Win32::UI::WindowsAndMessaging::*,
 };
-use crate::render::drawing_context::DrawingContext;
+use crate::core::render::drawing_context::DrawingContext;
 
 /// The main window procedure (`wndproc`) for the application.
 ///

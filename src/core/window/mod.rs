@@ -23,11 +23,11 @@ use windows::{
 };
 
 use self::wndproc_utils::wndproc;
-use self::config::WindowConfig;
+use crate::core::window::config::WindowConfig;
 
-use crate::event::event_handler::EventHandler;
+use crate::core::event::event_handler::EventHandler;
 use crate::app::App;
-use crate::render::direct2d_context::Direct2DContext;
+use crate::core::render::direct2d_context::Direct2DContext;
 
 /// Represents an application window.
 ///
@@ -149,7 +149,7 @@ impl<E: EventHandler + 'static> Window<E> {
         Ok(())
     }
 
-    /// Starts the message loop for the window.
+    /// Runs the application by starting the message loop.
     ///
     /// # Errors
     ///
@@ -161,7 +161,7 @@ impl<E: EventHandler + 'static> Window<E> {
     /// This function contains `unsafe` blocks for getting, translating, and
     /// dispatching messages. The caller must ensure that it is safe to perform
     /// these operations.
-    pub fn message_loop(&self) -> Result<()> {
+    pub fn run(&self) -> Result<()> {
         let mut message = MSG::default();
         while unsafe { GetMessageW(&mut message, None, 0, 0) }.into() {
             unsafe { let _ = TranslateMessage(&message); };
