@@ -1,6 +1,5 @@
-use windows::Win32::Graphics::Direct2D::Common::D2D_RECT_F;
 use crate::core::render::drawable::Drawable;
-use crate::core::render::drawing_context::DrawingContext;
+use crate::core::backend::renderer::Renderer; // Use the Renderer trait
 use windows::core::Result;
 
 /// A `Drawable` object that represents a rectangle.
@@ -19,25 +18,14 @@ impl Rectangle {
 }
 
 impl Drawable for Rectangle {
-    /// Draws the rectangle to the render target using the provided `DrawingContext`.
+    /// Draws the rectangle to the render target using the provided `Renderer`.
     ///
     /// # Safety
     ///
     /// This function contains an `unsafe` block for calling the Direct2D `FillRectangle`
-    /// method. The caller must ensure that the `drawing_context` contains valid
+    /// method. The caller must ensure that the `renderer` contains valid
     /// Direct2D resources.
-    fn draw(&self, context: &DrawingContext) -> Result<()> {
-        let rect = D2D_RECT_F {
-            left: self.x,
-            top: self.y,
-            right: self.x + self.width,
-            bottom: self.y + self.height,
-        };
-
-        unsafe {
-            context.render_target.FillRectangle(&rect, context.brush);
-        }
-
-        Ok(())
+    fn draw(&self, renderer: &mut dyn Renderer) -> Result<()> {
+        renderer.draw_rectangle(self)
     }
 }

@@ -1,5 +1,5 @@
+use crate::core::backend::renderer::Renderer;
 use crate::core::event::message::Message;
-use crate::core::render::drawing_context::DrawingContext;
 use super::event_handler::EventHandler;
 use super::key_id::KeyId;
 
@@ -36,9 +36,9 @@ impl<T> Default for RootEventHandler<T> {
 
 impl<T> EventHandler<T> for RootEventHandler<T> {
     /// Delegates the `on_paint` call to all registered handlers.
-    fn on_paint(&mut self, app: &mut T, drawing_context: &DrawingContext) {
+    fn on_paint(&mut self, app: &mut T, renderer: &mut dyn Renderer) {
         for handler in &mut self.handlers {
-            handler.on_paint(app, drawing_context);
+            handler.on_paint(app, renderer);
         }
     }
 
@@ -95,7 +95,7 @@ impl<T> EventHandler<T> for RootEventHandler<T> {
 
     /// Delegates the `handle_message` call to all registered handlers.
     ///
-    /// It returns the result from the first handler that returns `Some`.
+    /// It returns the result from the first handler that returns `Some` or `None` if no handler returns `Some`.
     fn handle_message(&mut self, app: &mut T, message: Message) -> Option<isize> {
         self.handlers
             .iter_mut()

@@ -6,6 +6,7 @@ use windows::core::*;
 
 
 use my_gui::core::{
+    backend::renderer::RendererConfig, // Import RendererConfig
     event::{render_event_handler::RenderEventHandler, root_event_handler::RootEventHandler},
     render::{
         objects::{primitives::{ellipse::Ellipse, line::Line, rectangle::Rectangle}, text_object::TextObject},
@@ -55,6 +56,7 @@ fn main() -> Result<()> {
         title: "Hello, World!".to_string(),
         width: 900,
         height: 600,
+        renderer_config: RendererConfig::Direct2D, // Specify the renderer
         ..Default::default()
     };
 

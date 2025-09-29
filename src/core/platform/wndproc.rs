@@ -1,13 +1,12 @@
 use crate::core::event::event_handler::EventHandler;
 use crate::core::event::key_id::KeyId;
-use crate::core::platform::win32_window::Win32Window;
 use crate::core::event::message::Message;
+use crate::core::platform::win32_window::Win32Window;
+use crate::core::types::Size; // Use the generic Size struct
 use windows::{
-    Win32::Foundation::*,
-    Win32::Graphics::Direct2D::Common::*,
-    Win32::UI::WindowsAndMessaging::*,
+    Win32::Foundation::*, Win32::UI::WindowsAndMessaging::*,
+
 };
-use crate::core::render::drawing_context::DrawingContext;
 
 /// The main window procedure (`wndproc`) for the application.
 ///
@@ -51,36 +50,28 @@ pub extern "system" fn wndproc<T: 'static, E: EventHandler<T> + 'static>(
 
     match message {
         WM_PAINT => {
-            if let (Some(render_target), Some(brush), Some(text_format)) = (
-                &window.d2d_context.render_target,
-                &window.d2d_context.brush,
-                &window.d2d_context.text_format,
-            ) {
-                let drawing_context = DrawingContext {
-                    render_target,
-                    brush,
-                    text_format,
-                    dwrite_factory: &window.d2d_context.dwrite_factory,
-                };
-
-                window
-                    .event_handler
-                    .on_paint(&mut window.app, &drawing_context);
+            // Check if the render target needs to be recreated
+            if window.renderer.get_render_target_size().is_none() {
+                if let Err(e) = window.renderer.create_device_dependent_resources(hwnd) {
+                    println!("Failed to recreate device dependent resources: {:?}", e);
+                }
             }
+
+            window
+                .event_handler
+                .on_paint(&mut window.app, &mut *window.renderer);
             LRESULT(0)
         }
         WM_SIZE => {
-            let width = (lparam.0 & 0xFFFF) as i32;
-            let height = ((lparam.0 >> 16) & 0xFFFF) as i32;
+            let width = (lparam.0 & 0xFFFF) as u32;
+            let height = ((lparam.0 >> 16) & 0xFFFF) as u32;
             window
                 .event_handler
-                .on_resize(&mut window.app, width, height);
-            if let Some(render_target) = &window.d2d_context.render_target {
-                let new_size = D2D_SIZE_U {
-                    width: width as u32,
-                    height: height as u32,
-                };
-                unsafe { render_target.Resize(&new_size).ok() };
+                .on_resize(&mut window.app, width as i32, height as i32);
+            // Resize the renderer's render target
+            let new_size = Size::new(width, height);
+            if let Err(e) = window.renderer.resize_render_target(new_size) {
+                println!("Failed to resize render target: {:?}", e);
             }
             LRESULT(0)
         }
@@ -130,7 +121,10 @@ pub extern "system" fn wndproc<T: 'static, E: EventHandler<T> + 'static>(
                 w_param: wparam.0,
                 l_param: lparam.0,
             };
-            if let Some(result) = window.event_handler.handle_message(&mut window.app, message_struct) {
+            if let Some(result) = window
+                .event_handler
+                .handle_message(&mut window.app, message_struct)
+            {
                 return LRESULT(result);
             }
             unsafe { DefWindowProcW(hwnd, message, wparam, lparam) }

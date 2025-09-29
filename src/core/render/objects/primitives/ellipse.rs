@@ -1,7 +1,6 @@
 use crate::core::render::drawable::Drawable;
-use crate::core::render::drawing_context::DrawingContext;
+use crate::core::backend::renderer::Renderer; // Use the Renderer trait
 use windows::core::Result;
-use windows::Win32::Graphics::Direct2D::D2D1_ELLIPSE;
 use windows_numerics::Vector2;
 
 /// A `Drawable` object that represents an ellipse.
@@ -23,24 +22,14 @@ impl Ellipse {
 }
 
 impl Drawable for Ellipse {
-    /// Draws the ellipse to the render target using the provided `DrawingContext`.
+    /// Draws the ellipse to the render target using the provided `Renderer`.
     ///
     /// # Safety
     ///
     /// This function contains an `unsafe` block for calling the Direct2D `FillEllipse`
-    /// method. The caller must ensure that the `drawing_context` contains valid
+    /// method. The caller must ensure that the `renderer` contains valid
     /// Direct2D resources.
-    fn draw(&self, context: &DrawingContext) -> Result<()> {
-        let ellipse = D2D1_ELLIPSE {
-            point: self.center.into(),
-            radiusX: self.radius_x,
-            radiusY: self.radius_y,
-        };
-
-        unsafe {
-            context.render_target.FillEllipse(&ellipse, context.brush);
-        }
-
-        Ok(())
+    fn draw(&self, renderer: &mut dyn Renderer) -> Result<()> {
+        renderer.draw_ellipse(self)
     }
 }

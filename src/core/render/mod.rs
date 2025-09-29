@@ -17,7 +17,7 @@
 //!   trait, such as `TextObject`.
 
 
-pub mod drawing_context;
+
 pub mod drawable;
 pub mod objects;
 pub mod scene;

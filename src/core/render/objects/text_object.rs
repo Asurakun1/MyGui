@@ -1,8 +1,7 @@
-use windows::{core::*, Win32::Graphics::Direct2D::D2D1_DRAW_TEXT_OPTIONS_NONE};
-use windows_numerics::Vector2;
+use windows::core::*;
 
 use crate::core::render::drawable::Drawable;
-use crate::core::render::drawing_context::DrawingContext;
+use crate::core::backend::renderer::Renderer; // Use the Renderer trait
 
 /// A `Drawable` object that represents a piece of text.
 ///
@@ -29,7 +28,7 @@ impl TextObject {
 }
 
 impl Drawable for TextObject {
-    /// Draws the text to the render target using the provided `DrawingContext`.
+    /// Draws the text to the render target using the provided `Renderer`.
     ///
     /// # Errors
     ///
@@ -38,33 +37,9 @@ impl Drawable for TextObject {
     /// # Safety
     ///
     /// This function contains `unsafe` blocks for creating the text layout and drawing
-    /// the text. The caller must ensure that the `drawing_context` contains valid
+    /// the text. The caller must ensure that the `renderer` contains valid
     /// Direct2D and DirectWrite resources.
-    fn draw(&self, context: &DrawingContext) -> Result<()> {
-        let text_utf16: Vec<u16> = self.text.encode_utf16().collect();
-
-        let size = unsafe { context.render_target.GetSize() };
-
-        let text_layout = unsafe {
-            context.dwrite_factory.CreateTextLayout(
-                &text_utf16,
-                context.text_format,
-                size.width,
-                size.height,
-            )?
-        };
-
-        let origin = Vector2 { X: self.x, Y: self.y };
-
-        unsafe {
-            context.render_target.DrawTextLayout(
-                origin,
-                &text_layout,
-                context.brush,
-                D2D1_DRAW_TEXT_OPTIONS_NONE,
-            );
-        }
-
-        Ok(())
+    fn draw(&self, renderer: &mut dyn Renderer) -> Result<()> {
+        renderer.draw_text(self)
     }
 }

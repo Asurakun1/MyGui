@@ -1,5 +1,5 @@
+use crate::core::backend::renderer::Renderer;
 use crate::core::event::message::Message;
-use crate::core::render::drawing_context::DrawingContext;
 use super::key_id::KeyId;
 
 /// Defines the interface for handling window events.
@@ -12,7 +12,7 @@ use super::key_id::KeyId;
 /// handling logic (see `RootEventHandler`).
 pub trait EventHandler<T> {
     /// Called when the window needs to be repainted (in response to `WM_PAINT`).
-    fn on_paint(&mut self, _app: &mut T, _drawing_context: &DrawingContext) {}
+    fn on_paint(&mut self, _app: &mut T, _renderer: &mut dyn Renderer) {}
 
     /// Called when the window is being destroyed (in response to `WM_DESTROY`).
     fn on_destroy(&mut self, _app: &mut T) {}

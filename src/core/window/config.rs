@@ -1,3 +1,5 @@
+use crate::core::backend::renderer::RendererConfig; // Import RendererConfig
+
 /// Configuration for a window.
 ///
 /// This struct holds all the settings for a window, such as its title, size,
@@ -15,6 +17,8 @@ pub struct WindowConfig {
     pub font_size: i32,
     /// The font face name for the window.
     pub font_face_name: String,
+    /// The renderer configuration for the window.
+    pub renderer_config: RendererConfig, // New field
 }
 
 impl Default for WindowConfig {
@@ -27,6 +31,7 @@ impl Default for WindowConfig {
             height: 600,
             font_size: 18,
             font_face_name: "MS Gothic".to_string(),
+            renderer_config: RendererConfig::Direct2D, // Default to Direct2D
         }
     }
 }

@@ -1,8 +1,9 @@
 use crate::core::event::event_handler::EventHandler;
-use crate::core::platform::direct2d_context::Direct2DContext;
 use crate::core::platform::window_backend::WindowBackend;
 use crate::core::platform::wndproc::wndproc;
 use crate::core::window::config::WindowConfig;
+use crate::core::backend::renderer::{Renderer, RendererConfig}; // Use the Renderer trait and RendererConfig
+use crate::core::backend::direct2d_renderer::Direct2DRenderer; // Use the Direct2DRenderer concrete type
 use windows::{
     core::*,
     Win32::Foundation::{GetLastError, *},
@@ -14,7 +15,7 @@ use windows::{
 /// The Win32 implementation of the `WindowBackend` trait.
 pub struct Win32Window<T, E: EventHandler<T>> {
     pub hwnd: HWND,
-    pub d2d_context: Direct2DContext,
+    pub renderer: Box<dyn Renderer>, // Now owns a Box<dyn Renderer>
     pub event_handler: E,
     pub app: T,
 }
@@ -25,9 +26,15 @@ impl<T: 'static, E: EventHandler<T> + 'static> Win32Window<T, E> {
         let instance = unsafe { GetModuleHandleW(None)? };
         Self::register_class(instance.into(), &config.class_name)?;
 
+        // Create a temporary renderer for the initial Box::new, will be replaced later
+        let temp_renderer: Box<dyn Renderer> = match config.renderer_config {
+            RendererConfig::Direct2D => Box::new(Direct2DRenderer::new(HWND(std::ptr::null_mut()), &config.font_face_name, config.font_size as f32)?),
+            // Add other renderer types here
+        };
+
         let mut window = Box::new(Self {
             hwnd: HWND(std::ptr::null_mut()),
-            d2d_context: Direct2DContext::new(&config.font_face_name, config.font_size as f32)?,
+            renderer: temp_renderer,
             event_handler,
             app,
         });
@@ -50,7 +57,12 @@ impl<T: 'static, E: EventHandler<T> + 'static> Win32Window<T, E> {
         };
 
         window.hwnd = hwnd;
-        window.d2d_context.create_device_dependent_resources(hwnd)?;
+        // Create the actual renderer based on configuration
+        window.renderer = match config.renderer_config {
+            RendererConfig::Direct2D => Box::new(Direct2DRenderer::new(hwnd, &config.font_face_name, config.font_size as f32)?),
+            // Add other renderer types here
+        };
+        window.renderer.create_device_dependent_resources(hwnd)?;
 
         unsafe {
             let _ = ShowWindow(hwnd, SW_SHOW);

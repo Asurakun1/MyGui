@@ -1,5 +1,5 @@
 use crate::core::render::drawable::Drawable;
-use crate::core::render::drawing_context::DrawingContext;
+use crate::core::backend::renderer::Renderer; // Use the Renderer trait
 use windows::core::Result;
 use windows_numerics::Vector2;
 
@@ -27,24 +27,14 @@ impl Line {
 }
 
 impl Drawable for Line {
-    /// Draws the line to the render target using the provided `DrawingContext`.
+    /// Draws the line to the render target using the provided `Renderer`.
     ///
     /// # Safety
     ///
     /// This function contains an `unsafe` block for calling the Direct2D `DrawLine`
-    /// method. The caller must ensure that the `drawing_context` contains valid
+    /// method. The caller must ensure that the `renderer` contains valid
     /// Direct2D resources.
-    fn draw(&self, context: &DrawingContext) -> Result<()> {
-        unsafe {
-            context.render_target.DrawLine(
-                self.p0,
-                self.p1,
-                context.brush,
-                self.stroke_width,
-                None,
-            );
-        }
-
-        Ok(())
+    fn draw(&self, renderer: &mut dyn Renderer) -> Result<()> {
+        renderer.draw_line(self)
     }
 }

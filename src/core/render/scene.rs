@@ -1,7 +1,7 @@
 use windows::core::Result;
 
 use crate::core::render::drawable::Drawable;
-use crate::core::render::drawing_context::DrawingContext;
+use crate::core::backend::renderer::Renderer; // Use the Renderer trait
 
 /// A trait for types that contain a `Scene`.
 ///
@@ -40,17 +40,17 @@ impl Scene {
         self.objects.push(Box::new(object));
     }
 
-    /// Draws all objects in the scene using the provided `DrawingContext`.
+    /// Draws all objects in the scene using the provided `Renderer`.
     ///
     /// This method iterates through all the `Drawable` objects in the scene and calls
-    /// their respective `draw` methods, passing the drawing context to each.
+    /// their respective `draw` methods, passing the renderer to each.
     ///
     /// # Errors
     ///
     /// This function will return an error if any of the `draw` calls fail.
-    pub fn draw_all(&self, context: &DrawingContext) -> Result<()> {
+    pub fn draw_all(&self, renderer: &mut dyn Renderer) -> Result<()> {
         for object in &self.objects {
-            object.draw(context)?;
+            object.draw(renderer)?;
         }
         Ok(())
     }
