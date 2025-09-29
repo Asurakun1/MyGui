@@ -1,9 +1,7 @@
+use anyhow::Result;
 use crate::core::event::event_handler::EventHandler;
-use crate::core::platform::window_backend::WindowBackend;
 use crate::core::window::config::WindowConfig;
-use windows::core::Result;
-
-
+use crate::core::platform::window_backend::WindowBackend;
 /// A builder for creating and configuring a `Window`.
 ///
 /// This struct provides a fluent interface for setting window properties.

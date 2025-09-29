@@ -1,5 +1,3 @@
-use windows::core::Result;
-
 use crate::core::render::drawable::Drawable;
 use crate::core::backend::renderer::Renderer; // Use the Renderer trait
 
@@ -48,7 +46,7 @@ impl Scene {
     /// # Errors
     ///
     /// This function will return an error if any of the `draw` calls fail.
-    pub fn draw_all(&self, renderer: &mut dyn Renderer) -> Result<()> {
+    pub fn draw_all(&self, renderer: &mut dyn Renderer) -> anyhow::Result<()> {
         for object in &self.objects {
             object.draw(renderer)?;
         }

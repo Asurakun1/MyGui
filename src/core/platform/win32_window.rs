@@ -22,7 +22,7 @@ pub struct Win32Window<T, E: EventHandler<T>> {
 
 impl<T: 'static, E: EventHandler<T> + 'static> Win32Window<T, E> {
     /// Creates a new Win32 window.
-    pub fn new(config: &WindowConfig, event_handler: E, app: T) -> Result<Box<Self>> {
+    pub fn new(config: &WindowConfig, event_handler: E, app: T) -> anyhow::Result<Box<Self>> {
         let instance = unsafe { GetModuleHandleW(None)? };
         Self::register_class(instance.into(), &config.class_name)?;
 
@@ -74,7 +74,7 @@ impl<T: 'static, E: EventHandler<T> + 'static> Win32Window<T, E> {
         Ok(window)
     }
 
-    fn register_class(instance: HINSTANCE, class_name: &str) -> Result<()> {
+    fn register_class(instance: HINSTANCE, class_name: &str) -> anyhow::Result<()> {
         let class_name_hstring = HSTRING::from(class_name);
 
         let wc = WNDCLASSEXW {
@@ -94,7 +94,7 @@ impl<T: 'static, E: EventHandler<T> + 'static> Win32Window<T, E> {
 
         unsafe {
             if RegisterClassExW(&wc) == 0 {
-                return Err(Error::from_hresult(HRESULT::from_win32(GetLastError().0)));
+                return Err(Error::from_hresult(HRESULT::from_win32(GetLastError().0)).into());
             }
         }
 
@@ -103,7 +103,7 @@ impl<T: 'static, E: EventHandler<T> + 'static> Win32Window<T, E> {
 }
 
 impl<T, E: EventHandler<T>> WindowBackend<T, E> for Win32Window<T, E> {
-    fn run(&self) -> Result<()> {
+    fn run(&self) -> anyhow::Result<()> {
         let mut message = MSG::default();
         while unsafe { GetMessageW(&mut message, None, 0, 0) }.into() {
             unsafe {

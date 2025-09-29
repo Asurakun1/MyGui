@@ -1,4 +1,4 @@
-use windows::core::*;
+use anyhow::Result; // Explicitly use anyhow::Result
 
 use crate::core::render::drawable::Drawable;
 use crate::core::backend::renderer::Renderer; // Use the Renderer trait

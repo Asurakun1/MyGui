@@ -21,7 +21,7 @@
 //!     core::event::root_event_handler::RootEventHandler,
 //!     core::window::{WindowBuilder, config::WindowConfig},
 //! };
-//! use windows::core::Result;
+//! use anyhow::Result; // Use anyhow::Result
 //!
 //! fn main() -> Result<()> {
 //!     let app = App::new();

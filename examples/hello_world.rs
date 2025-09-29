@@ -1,9 +1,8 @@
 //! # MyGui Hello World
-//!
+//! 
 //! This is a simple example of how to use the `my_gui` framework to create a
 //! "Hello, World!" application.
-use windows::core::*;
-
+use anyhow::Result; // Use anyhow::Result
 
 use my_gui::core::{
     backend::renderer::RendererConfig, // Import RendererConfig
@@ -46,7 +45,7 @@ impl App {
     }
 }
 
-fn main() -> Result<()> {
+fn main() -> Result<()> { // Now returns anyhow::Result
     let app = App::new();
 
     let mut event_handler: RootEventHandler<App> = RootEventHandler::new();

@@ -1,6 +1,5 @@
 use crate::core::render::drawable::Drawable;
 use crate::core::backend::renderer::Renderer; // Use the Renderer trait
-use windows::core::Result;
 
 /// A `Drawable` object that represents a rectangle.
 pub struct Rectangle {
@@ -25,7 +24,7 @@ impl Drawable for Rectangle {
     /// This function contains an `unsafe` block for calling the Direct2D `FillRectangle`
     /// method. The caller must ensure that the `renderer` contains valid
     /// Direct2D resources.
-    fn draw(&self, renderer: &mut dyn Renderer) -> Result<()> {
+    fn draw(&self, renderer: &mut dyn Renderer) -> anyhow::Result<()> {
         renderer.draw_rectangle(self)
     }
 }

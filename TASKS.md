@@ -1,18 +1,4 @@
-# Tasks
-
 ## To Do
-
-- [ ] **Implement Swappable Graphical Backend**:
-  - **Task**: Abstract the entire rendering pipeline behind a platform-agnostic `Renderer` trait.
-  - **Goal**: To allow different graphical APIs (Direct2D, OpenGL, Vulkan) to be swapped out, enabling true cross-platform rendering.
-  - **Importance**: Crucial for the library's long-term portability and for isolating all graphics API-specific code.
-  - **Implementation**:
-    1.  Define a `Renderer` trait with methods for basic drawing operations (e.g., `clear`, `draw_rectangle`, `draw_ellipse`, `draw_line`, `draw_text`).
-    2.  Create a `Direct2DRenderer` struct (in `src/core/platform`) that implements the `Renderer` trait, encapsulating all Direct2D calls.
-    3.  Refactor `RenderEventHandler` to hold a `Box<dyn Renderer>`.
-    4.  Modify the `Drawable` trait's `draw` method to accept `&mut dyn Renderer`.
-    5.  Update all existing `Drawable` implementations (`Rectangle`, `Ellipse`, `TextObject`) to use the `Renderer` trait methods.
-    6.  The `DrawingContext` will likely be absorbed into the `Direct2DRenderer` implementation.
 
 - [ ] **Abstract Unsafe Drawing Operations**:
   - **Task**: Create safe abstractions for Direct2D drawing primitives.

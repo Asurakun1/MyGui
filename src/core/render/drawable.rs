@@ -1,6 +1,5 @@
 
-use crate::core::backend::renderer::Renderer;
-use windows::core::Result;
+use crate::core::backend::renderer::Renderer; // Use the Renderer trait
 
 /// A trait for objects that can be drawn to a `Renderer`.
 ///
@@ -13,5 +12,5 @@ pub trait Drawable {
     /// # Arguments
     ///
     /// * `renderer` - The `Renderer` to draw to.
-    fn draw(&self, renderer: &mut dyn Renderer) -> Result<()>;
+    fn draw(&self, renderer: &mut dyn Renderer) -> anyhow::Result<()>;
 }
