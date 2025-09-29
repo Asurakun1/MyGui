@@ -52,9 +52,9 @@ pub extern "system" fn wndproc<T: 'static, E: EventHandler<T> + 'static>(
         WM_PAINT => {
             // Check if the render target needs to be recreated
             if window.renderer.get_render_target_size().is_none() {
-                if let Err(e) = window.renderer.create_device_dependent_resources(hwnd) {
+                window.renderer.create_device_dependent_resources(hwnd).unwrap_or_else(|e| {
                     println!("Failed to recreate device dependent resources: {:?}", e);
-                }
+                });
             }
 
             window
