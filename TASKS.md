@@ -28,6 +28,27 @@
         2.  Update the main `lib.rs` example to showcase the new, idiomatic way of using the library.
         3.  Ensure that all public APIs are clearly documented.
 
+- [ ] **Update README.md**:
+    - **Task**: Update the `README.md` to reflect the latest features and roadmap.
+    - **Goal**: To ensure the main project page provides an accurate overview for visitors.
+    - **Importance**: This is the first document most people will see. It should be up-to-date with the project's current state and future plans.
+    - **Implementation**:
+        1.  Review the "Current Features" and "Roadmap" sections.
+        2.  Update them to match the completed and remaining tasks.
+        3.  This should be done after all other tasks are complete.
+
+---
+
+## Future Discussion
+
+- **Layout System**:
+  - **Idea**: Introduce a layout system to manage the positioning and sizing of UI elements automatically, instead of relying on hardcoded coordinates.
+  - **Discussion Points**:
+    - Should we use a container-based model (e.g., `VBox`, `HBox`, `Grid`)?
+    - How should the layout system interact with the `Scene` and `Drawable` objects?
+    - How will it handle window resizing and dynamic content?
+    - This is a larger architectural feature to be considered after the current to-do items are completed.
+
 ---
 
 ## Completed

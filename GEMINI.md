@@ -18,6 +18,11 @@ The project uses Cargo, Rust's package manager and build system.
 *   **Project Structure:** The project is a Cargo workspace with a library (`MyGui`) and examples.
     *   `src/lib.rs`: The main library file, which exports the public API.
     *   `src/core`: Contains the core modules for windowing, event handling, and rendering.
+        *   `window/`: Manages window creation (`WindowBuilder`) and configuration (`WindowConfig`).
+        *   `event/`: Defines the event handling system, including the `EventHandler` and `RootEventHandler` traits, and event types like `KeyboardEvent`.
+        *   `render/`: Contains the `Drawable` trait, the `Scene` graph, and drawing primitives (`Rectangle`, `Ellipse`, `Line`, `TextObject`).
+        *   `platform/`: Holds platform-specific code, currently with a `win32` implementation for window creation and message handling (`wndproc`).
+        *   `backend/`: Abstracts the rendering engine with a `Renderer` trait and provides a `Direct2DRenderer` implementation.
     *   `examples`: Contains example applications that demonstrate how to use the library.
 *   **Windows API Bindings:** Uses the `windows` crate for interacting with the Windows API.
 *   **Error Handling:** Uses `anyhow::Result` for all fallible operations, providing a consistent and ergonomic error handling mechanism.
@@ -27,7 +32,8 @@ The project uses Cargo, Rust's package manager and build system.
 *   **Event Handling:** A modular, composable event handling system is used.
     *   **`EventHandler` Trait:** Defines the interface for handling window messages. Methods will receive a mutable reference to the user-defined state `T` and a mutable reference to the `Renderer` trait object, allowing them to modify the state and perform drawing operations.
     *   **`RootEventHandler`:** The primary event handler that is passed to the `Window`. It composes multiple specialized event handlers.
-    *   **Future Enhancements**: The event system will be enhanced to support advanced mouse input, modifier keys, and user-defined key combinations.
+    *   **Current Implementation**: The system currently handles `KeyDown` and `KeyUp` events and tracks the state of modifier keys (`Shift`, `Ctrl`, `Alt`) via the `ModifierKeyHandler` and `InputState` struct.
+    *   **Future Enhancements**: The event system will be enhanced to support advanced mouse input and user-defined key combinations.
 *   **Drawing:** The rendering is implemented using a platform-agnostic `Renderer` trait.
     *   **`Renderer` Trait:** Defines the interface for all drawing operations, abstracting away the underlying graphics API (e.g., Direct2D, OpenGL). It also includes methods for managing device-dependent resources (creation, release, resizing).
     *   **`Direct2DRenderer`:** A concrete implementation of the `Renderer` trait for Direct2D.
