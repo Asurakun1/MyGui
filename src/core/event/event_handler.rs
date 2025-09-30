@@ -1,6 +1,5 @@
 use crate::core::backend::renderer::Renderer;
-use crate::core::event::message::Message;
-use super::key_id::KeyId;
+use crate::core::event::Event;
 
 /// Defines the interface for handling window events.
 ///
@@ -11,38 +10,6 @@ use super::key_id::KeyId;
 /// Implementors of this trait can be composed to create more complex event
 /// handling logic (see `RootEventHandler`).
 pub trait EventHandler<T> {
-    /// Called when the window needs to be repainted (in response to `WM_PAINT`).
-    fn on_paint(&mut self, _app: &mut T, _renderer: &mut dyn Renderer) {}
-
-    /// Called when the window is being destroyed (in response to `WM_DESTROY`).
-    fn on_destroy(&mut self, _app: &mut T) {}
-
-    /// Called when the window is resized (in response to `WM_SIZE`).
-    fn on_resize(&mut self, _app: &mut T, _width: i32, _height: i32) {}
-
-    /// Called when the mouse moves over the window client area.
-    fn on_mouse_move(&mut self, _app: &mut T, _x: i32, _y: i32) {}
-
-    /// Called when the left mouse button is pressed.
-    fn on_lbutton_down(&mut self, _app: &mut T, _x: i32, _y: i32) {}
-
-    /// Called when the left mouse button is released.
-    fn on_lbutton_up(&mut self, _app: &mut T, _x: i32, _y: i32) {}
-
-    /// Called when a non-system key is pressed.
-    fn on_key_down(&mut self, _app: &mut T, _key: KeyId) {}
-
-    /// Called when a non-system key is released.
-    fn on_key_up(&mut self, _app: &mut T, _key: KeyId) {}
-
-
-
-    /// A catch-all method for handling any other window messages.
-    ///
-    /// If this method handles the message, it should return `Some(result)`.
-    /// If it does not handle the message, it should return `None`, allowing
-    /// for further processing or default handling by `DefWindowProcW`.
-    fn handle_message(&mut self, _app: &mut T, _message: Message) -> Option<isize> {
-        None
-    }
+    /// Called when a new event is received.
+    fn on_event(&mut self, _app: &mut T, _event: &Event, _renderer: &mut dyn Renderer) {}
 }

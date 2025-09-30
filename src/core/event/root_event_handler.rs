@@ -1,7 +1,6 @@
 use crate::core::backend::renderer::Renderer;
-use crate::core::event::message::Message;
+use crate::core::event::Event;
 use super::event_handler::EventHandler;
-use super::key_id::KeyId;
 
 /// The primary event handler that composes and delegates to other, more specialized handlers.
 ///
@@ -35,70 +34,10 @@ impl<T> Default for RootEventHandler<T> {
 }
 
 impl<T> EventHandler<T> for RootEventHandler<T> {
-    /// Delegates the `on_paint` call to all registered handlers.
-    fn on_paint(&mut self, app: &mut T, renderer: &mut dyn Renderer) {
+    /// Delegates the `on_event` call to all registered handlers.
+    fn on_event(&mut self, app: &mut T, event: &Event, renderer: &mut dyn Renderer) {
         for handler in &mut self.handlers {
-            handler.on_paint(app, renderer);
+            handler.on_event(app, event, renderer);
         }
-    }
-
-    /// Delegates the `on_destroy` call to all registered handlers.
-    fn on_destroy(&mut self, app: &mut T) {
-        for handler in &mut self.handlers {
-            handler.on_destroy(app);
-        }
-    }
-
-    /// Delegates the `on_resize` call to all registered handlers.
-    fn on_resize(&mut self, app: &mut T, width: i32, height: i32) {
-        for handler in &mut self.handlers {
-            handler.on_resize(app, width, height);
-        }
-    }
-
-    /// Delegates the `on_mouse_move` call to all registered handlers.
-    fn on_mouse_move(&mut self, app: &mut T, x: i32, y: i32) {
-        for handler in &mut self.handlers {
-            handler.on_mouse_move(app, x, y);
-        }
-    }
-
-    /// Delegates the `on_lbutton_down` call to all registered handlers.
-    fn on_lbutton_down(&mut self, app: &mut T, x: i32, y: i32) {
-        for handler in &mut self.handlers {
-            handler.on_lbutton_down(app, x, y);
-        }
-    }
-
-    /// Delegates the `on_lbutton_up` call to all registered handlers.
-    fn on_lbutton_up(&mut self, app: &mut T, x: i32, y: i32) {
-        for handler in &mut self.handlers {
-            handler.on_lbutton_up(app, x, y);
-        }
-    }
-
-    /// Delegates the `on_key_down` call to all registered handlers.
-    fn on_key_down(&mut self, app: &mut T, key: KeyId) {
-        for handler in &mut self.handlers {
-            handler.on_key_down(app, key);
-        }
-    }
-
-    /// Delegates the `on_key_up` call to all registered handlers.
-    fn on_key_up(&mut self, app: &mut T, key: KeyId) {
-        for handler in &mut self.handlers {
-            handler.on_key_up(app, key);
-        }
-    }
-
-
-
-    /// Delegates the `handle_message` call to all registered handlers.
-    ///
-    /// It returns the result from the first handler that returns `Some` or `None` if no handler returns `Some`.
-    fn handle_message(&mut self, app: &mut T, message: Message) -> Option<isize> {
-        self.handlers
-            .iter_mut()
-            .find_map(|handler| handler.handle_message(app, message))
     }
 }

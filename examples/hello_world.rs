@@ -1,28 +1,50 @@
 //! # MyGui Hello World
-//! 
+//!
 //! This is a simple example of how to use the `my_gui` framework to create a
 //! "Hello, World!" application.
 use anyhow::Result; // Use anyhow::Result
 
 use my_gui::core::{
+    backend::renderer::Renderer,
     backend::renderer::RendererConfig, // Import RendererConfig
-    event::{render_event_handler::RenderEventHandler, root_event_handler::RootEventHandler},
+    event::{
+        Event, KeyboardEvent,
+        event_handler::EventHandler,
+        input_state::{HasInputState, InputState},
+        modifier_key_handler::ModifierKeyHandler,
+        render_event_handler::RenderEventHandler,
+        root_event_handler::RootEventHandler,
+    },
     render::{
-        objects::{primitives::{ellipse::Ellipse, line::Line, rectangle::Rectangle}, text_object::TextObject},
+        objects::{
+            primitives::{ellipse::Ellipse, line::Line, rectangle::Rectangle},
+            text_object::TextObject,
+        },
         scene::{HasScene, Scene},
     },
-    window::{config::WindowConfig, WindowBuilder},
+    window::{WindowBuilder, config::WindowConfig},
 };
 
 // 1. Define the application state.
 pub struct App {
     pub scene: Scene,
     pub display_text: String,
+    pub input_state: InputState,
 }
 
 impl HasScene for App {
     fn scene(&self) -> &Scene {
         &self.scene
+    }
+}
+
+impl HasInputState for App {
+    fn input_state(&self) -> &InputState {
+        &self.input_state
+    }
+
+    fn input_state_mut(&mut self) -> &mut InputState {
+        &mut self.input_state
     }
 }
 
@@ -41,15 +63,36 @@ impl App {
         Self {
             scene,
             display_text,
+            input_state: InputState::default(),
         }
     }
 }
 
-fn main() -> Result<()> { // Now returns anyhow::Result
+// 2. Define a custom event handler to print key events.
+struct CustomEventHandler;
+
+impl EventHandler<App> for CustomEventHandler {
+    fn on_event(&mut self, app: &mut App, event: &Event, _renderer: &mut dyn Renderer) {
+        match event {
+            Event::KeyDown(KeyboardEvent { key }) => {
+                println!("KeyDown: {:?}, Modifiers: {:?}", key, app.input_state());
+            }
+            Event::KeyUp(KeyboardEvent { key }) => {
+                println!("KeyUp: {:?}, Modifiers: {:?}", key, app.input_state());
+            }
+            _ => {}
+        }
+    }
+}
+
+fn main() -> Result<()> {
+    // Now returns anyhow::Result
     let app = App::new();
 
     let mut event_handler: RootEventHandler<App> = RootEventHandler::new();
     event_handler.add_handler(Box::new(RenderEventHandler::new()));
+    event_handler.add_handler(Box::new(ModifierKeyHandler));
+    event_handler.add_handler(Box::new(CustomEventHandler)); // Add the custom handler
 
     let config = WindowConfig {
         title: "Hello, World!".to_string(),

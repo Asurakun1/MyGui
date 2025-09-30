@@ -1,4 +1,5 @@
 use crate::core::event::event_handler::EventHandler;
+use crate::core::event::input_state::HasInputState;
 use crate::core::platform::window_backend::WindowBackend;
 use crate::core::platform::wndproc::wndproc;
 use crate::core::window::config::WindowConfig;
@@ -20,7 +21,7 @@ pub struct Win32Window<T, E: EventHandler<T>> {
     pub app: T,
 }
 
-impl<T: 'static, E: EventHandler<T> + 'static> Win32Window<T, E> {
+impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> Win32Window<T, E> {
     /// Creates a new Win32 window.
     pub fn new(config: &WindowConfig, event_handler: E, app: T) -> anyhow::Result<Box<Self>> {
         let instance = unsafe { GetModuleHandleW(None)? };
@@ -102,7 +103,7 @@ impl<T: 'static, E: EventHandler<T> + 'static> Win32Window<T, E> {
     }
 }
 
-impl<T, E: EventHandler<T>> WindowBackend<T, E> for Win32Window<T, E> {
+impl<T: HasInputState, E: EventHandler<T>> WindowBackend<T, E> for Win32Window<T, E> {
     fn run(&self) -> anyhow::Result<()> {
         let mut message = MSG::default();
         while unsafe { GetMessageW(&mut message, None, 0, 0) }.into() {

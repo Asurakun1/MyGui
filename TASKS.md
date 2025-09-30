@@ -1,13 +1,12 @@
 ## To Do
 
-- [x] **Abstract Unsafe Drawing Operations**:
-  - **Task**: Create safe abstractions for Direct2D drawing primitives.
-  - **Goal**: Provide a safe and easy-to-use API for drawing basic shapes, eliminating the need for `unsafe` blocks in user code.
-  - **Importance**: This will make the framework safer, more ergonomic, and more accessible to developers who are not familiar with the intricacies of the Win32 API.
+- [ ] **Enhance Event Handling System**:
+  - **Task**: Improve mouse and keyboard input handling to be more modular and extensible.
+  - **Goal**: Provide a robust and flexible event system that allows for advanced user interactions.
+  - **Importance**: This will make the framework more powerful and easier to use for creating complex UIs.
   - **Implementation**:
-    1.  Create new structs for basic shapes (e.g., `Rectangle`, `Circle`, `Line`) that implement the `Drawable` trait.
-    2.  The `draw` method for these structs will contain the `unsafe` Direct2D calls, providing a safe wrapper around them.
-    3.  Consider creating a higher-level "canvas" or "surface" abstraction for more complex, constraint-based layouts.
+    1.  **Mouse Input**: Refactor mouse input handling, a new module. This should include tracking button state (down, up, held), mouse position, and possibly drag-and-drop operations.
+    2.  **Key Combinations**: Implement a system for handling key combinations (e.g., `Ctrl+S`). This should be modular, allowing users to define their own key combiners and shortcuts.
 
 - [ ] **Create a Higher-Level Canvas/Surface Abstraction**:
     - **Task**: Design and implement a `Canvas` or `Surface` struct that acts as a container for drawable objects with its own coordinate system and constraints.
@@ -19,15 +18,6 @@
         3.  Implement methods to define the canvas's size and position within the scene (e.g., `set_rect`, `set_size`, `set_position`).
         4.  The `Canvas` should implement the `Drawable` trait, so it can be added to the main `Scene`. Its `draw` method will be responsible for drawing its contained objects, clipped to its own boundaries.
         5.  Consider how to handle events within the canvas's coordinate system.
-
-- [ ] **Enhance Event Handling System**:
-  - **Task**: Improve mouse and keyboard input handling to be more modular and extensible.
-  - **Goal**: Provide a robust and flexible event system that allows for advanced user interactions.
-  - **Importance**: This will make the framework more powerful and easier to use for creating complex UIs.
-  - **Implementation**:
-    1.  **Mouse Input**: Refactor mouse input handling, a new module. This should include tracking button state (down, up, held), mouse position, and possibly drag-and-drop operations.
-    2.  **Key Combinations**: Implement a system for handling key combinations (e.g., `Ctrl+S`). This should be modular, allowing users to define their own key combiners and shortcuts.
-    3.  **Modifier Keys**: Track the state of modifier keys (`Shift`, `Ctrl`, `Alt`) in the `App` struct or a dedicated input state struct.
 
 - [ ] **Regenerate Comprehensive Documentation**:
     - **Task**: Update all documentation to reflect the new architecture.
@@ -41,6 +31,24 @@
 ---
 
 ## Completed
+
+- [x] **Track Modifier Key State**:
+  - **Task**: Track the state of modifier keys (`Shift`, `Ctrl`, `Alt`).
+  - **Goal**: To provide the necessary foundation for implementing key combinations and advanced mouse input.
+  - **Importance**: This is a foundational feature for more advanced user interactions.
+  - **Implementation**:
+    1.  Created an `InputState` struct to hold the state of modifier keys.
+    2.  The `wndproc` function now updates the `InputState` on `WM_KEYDOWN` and `WM_KEYUP` events for modifier keys.
+    3.  The `App` state now owns the `InputState` and the `HasInputState` trait provides generic access to it.
+
+- [x] **Abstract Unsafe Drawing Operations**:
+  - **Task**: Create safe abstractions for Direct2D drawing primitives.
+  - **Goal**: Provide a safe and easy-to-use API for drawing basic shapes, eliminating the need for `unsafe` blocks in user code.
+  - **Importance**: This will make the framework safer, more ergonomic, and more accessible to developers who are not familiar with the intricacies of the Win32 API.
+  - **Implementation**:
+    1.  Create new structs for basic shapes (e.g., `Rectangle`, `Circle`, `Line`) that implement the `Drawable` trait.
+    2.  The `draw` method for these structs will contain the `unsafe` Direct2D calls, providing a safe wrapper around them.
+    3.  Consider creating a higher-level "canvas" or "surface" abstraction for more complex, constraint-based layouts.
 
 - [x] **Implement Conditional Compilation for Platform Backends**:
   - **Task**: Refactor the `WindowBuilder` to use conditional compilation (`#[cfg]`) to select the appropriate platform-specific window backend.

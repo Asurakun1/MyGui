@@ -1,4 +1,5 @@
 /// Represents a generic 2D size with width and height.
+#[derive(Debug, Clone, PartialEq, Copy)]
 pub struct Size {
     pub width: u32,
     pub height: u32,

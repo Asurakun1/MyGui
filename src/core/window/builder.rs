@@ -1,7 +1,9 @@
+use crate::core::event::input_state::HasInputState;
 use anyhow::Result;
 use crate::core::event::event_handler::EventHandler;
 use crate::core::window::config::WindowConfig;
 use crate::core::platform::window_backend::WindowBackend;
+
 /// A builder for creating and configuring a `Window`.
 ///
 /// This struct provides a fluent interface for setting window properties.
@@ -62,7 +64,7 @@ impl WindowBuilder {
     /// # Errors
     ///
     /// This function will return an error if it fails to create the window.
-    pub fn build<T: 'static, E: EventHandler<T> + 'static>(
+    pub fn build<T: 'static + HasInputState, E: EventHandler<T> + 'static>(
         &self,
         event_handler: E,
         app: T,
