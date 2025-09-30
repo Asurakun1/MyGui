@@ -18,12 +18,6 @@ impl Rectangle {
 
 impl Drawable for Rectangle {
     /// Draws the rectangle to the render target using the provided `Renderer`.
-    ///
-    /// # Safety
-    ///
-    /// This function contains an `unsafe` block for calling the Direct2D `FillRectangle`
-    /// method. The caller must ensure that the `renderer` contains valid
-    /// Direct2D resources.
     fn draw(&self, renderer: &mut dyn Renderer) -> anyhow::Result<()> {
         renderer.draw_rectangle(self)
     }

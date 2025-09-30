@@ -1,6 +1,6 @@
 ## To Do
 
-- [ ] **Abstract Unsafe Drawing Operations**:
+- [x] **Abstract Unsafe Drawing Operations**:
   - **Task**: Create safe abstractions for Direct2D drawing primitives.
   - **Goal**: Provide a safe and easy-to-use API for drawing basic shapes, eliminating the need for `unsafe` blocks in user code.
   - **Importance**: This will make the framework safer, more ergonomic, and more accessible to developers who are not familiar with the intricacies of the Win32 API.
@@ -8,6 +8,17 @@
     1.  Create new structs for basic shapes (e.g., `Rectangle`, `Circle`, `Line`) that implement the `Drawable` trait.
     2.  The `draw` method for these structs will contain the `unsafe` Direct2D calls, providing a safe wrapper around them.
     3.  Consider creating a higher-level "canvas" or "surface" abstraction for more complex, constraint-based layouts.
+
+- [ ] **Create a Higher-Level Canvas/Surface Abstraction**:
+    - **Task**: Design and implement a `Canvas` or `Surface` struct that acts as a container for drawable objects with its own coordinate system and constraints.
+    - **Goal**: To enable more complex, constraint-based layouts and UI components (widgets). This abstraction will function like a "sheet of paper" on the main scene, with its own defined boundaries and drawing limits.
+    - **Importance**: This will provide a powerful tool for building more sophisticated UIs, allowing for the creation of independent, reusable components that can be positioned and sized within the main window.
+    - **Implementation**:
+        1.  Define a `Canvas` struct that holds a collection of `Drawable` objects.
+        2.  The `Canvas` should have its own coordinate system, allowing objects to be positioned relative to the canvas itself, not the entire scene.
+        3.  Implement methods to define the canvas's size and position within the scene (e.g., `set_rect`, `set_size`, `set_position`).
+        4.  The `Canvas` should implement the `Drawable` trait, so it can be added to the main `Scene`. Its `draw` method will be responsible for drawing its contained objects, clipped to its own boundaries.
+        5.  Consider how to handle events within the canvas's coordinate system.
 
 - [ ] **Enhance Event Handling System**:
   - **Task**: Improve mouse and keyboard input handling to be more modular and extensible.

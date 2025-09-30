@@ -33,12 +33,6 @@ impl Drawable for TextObject {
     /// # Errors
     ///
     /// This function will return an error if it fails to create the text layout.
-    ///
-    /// # Safety
-    ///
-    /// This function contains `unsafe` blocks for creating the text layout and drawing
-    /// the text. The caller must ensure that the `renderer` contains valid
-    /// Direct2D and DirectWrite resources.
     fn draw(&self, renderer: &mut dyn Renderer) -> Result<()> {
         renderer.draw_text(self)
     }

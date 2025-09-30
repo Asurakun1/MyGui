@@ -30,12 +30,6 @@ impl Line {
 
 impl Drawable for Line {
     /// Draws the line to the render target using the provided `Renderer`.
-    ///
-    /// # Safety
-    ///
-    /// This function contains an `unsafe` block for calling the Direct2D `DrawLine`
-    /// method. The caller must ensure that the `renderer` contains valid
-    /// Direct2D resources.
     fn draw(&self, renderer: &mut dyn Renderer) -> anyhow::Result<()> {
         renderer.draw_line(self)
     }
