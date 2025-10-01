@@ -2,8 +2,8 @@ use crate::core::event::event_handler::EventHandler;
 use crate::core::event::input_state::HasInputState;
 
 use crate::core::event::Event;
-use crate::core::event::keyboard_handler::KeyboardEvent;
-use crate::core::event::mouse_handler::{MouseButton, MouseEvent};
+use crate::core::event::handlers::keyboard_handler::KeyboardEvent;
+use crate::core::event::handlers::mouse_handler::{MouseButton, MouseEvent};
 use crate::core::platform::win32::input::from_vkey;
 use crate::core::platform::win32_window::Win32Window;
 use crate::core::types::Size;

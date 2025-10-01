@@ -10,11 +10,13 @@ use my_gui::core::{
     event::{
         Event,
         event_handler::EventHandler,
+        handlers::{
+            keyboard_handler::{KeyboardEvent, KeyboardInputHandler},
+            mouse_handler::{HasMouseState, MouseEvent, MouseInputHandler, MouseState},
+            render_event_handler::RenderEventHandler,
+            root_event_handler::RootEventHandler,
+        },
         input_state::{HasInputState, InputState},
-        keyboard_handler::{KeyboardEvent, KeyboardInputHandler},
-        mouse_handler::{HasMouseState, MouseEvent, MouseInputHandler, MouseState},
-        render_event_handler::RenderEventHandler,
-        root_event_handler::RootEventHandler,
     },
     render::{
         objects::{
@@ -23,7 +25,7 @@ use my_gui::core::{
         },
         scene::{HasScene, Scene},
     },
-    window::{config::KeyboardInputMode, WindowBuilder, config::WindowConfig},
+    window::{WindowBuilder, config::KeyboardInputMode, config::WindowConfig},
 };
 
 // 1. Define the application state.

@@ -6,15 +6,12 @@
 
 pub mod event_handler;
 pub mod input_state;
-pub mod keyboard_handler;
-pub mod mouse_handler;
+pub mod handlers;
 pub mod key_id;
-pub mod render_event_handler;
-pub mod root_event_handler;
 
 use crate::core::types::Size;
-use crate::core::event::keyboard_handler::KeyboardEvent;
-use crate::core::event::mouse_handler::MouseEvent;
+use crate::core::event::handlers::keyboard_handler::KeyboardEvent;
+use crate::core::event::handlers::mouse_handler::MouseEvent;
 
 
 /// Represents a platform-agnostic GUI event.

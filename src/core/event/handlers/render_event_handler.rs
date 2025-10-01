@@ -1,4 +1,4 @@
-use super::event_handler::EventHandler;
+use crate::core::event::event_handler::EventHandler;
 use crate::core::backend::renderer::Renderer;
 use crate::core::event::Event;
 use crate::core::render::scene::HasScene;

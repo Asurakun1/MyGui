@@ -1,6 +1,6 @@
 use crate::core::backend::renderer::Renderer;
 use crate::core::event::Event;
-use super::event_handler::EventHandler;
+use crate::core::event::event_handler::EventHandler;
 
 /// The primary event handler that composes and delegates to other, more specialized handlers.
 ///
