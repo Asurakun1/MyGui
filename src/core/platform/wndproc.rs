@@ -7,6 +7,7 @@ use crate::core::event::handlers::mouse_handler::{MouseButton, MouseEvent};
 use crate::core::platform::win32::input::from_vkey;
 use crate::core::platform::win32_window::Win32Window;
 use crate::core::types::Size;
+use crate::core::event::key_id::KeyId;
 use crate::core::window::config::KeyboardInputMode;
 use windows::{Win32::Foundation::*, Win32::UI::Input::KeyboardAndMouse::*, Win32::UI::WindowsAndMessaging::*};
 
@@ -123,12 +124,22 @@ pub extern "system" fn wndproc<T: 'static + HasInputState, E: EventHandler<T> + 
             let vkey = wparam.0 as u16;
             let key_id = from_vkey(vkey);
 
-            if mode == KeyboardInputMode::RawAndTranslated || mode == KeyboardInputMode::Raw {
-                window.event_handler.on_event(
-                    &mut window.app,
-                    &Event::KeyDown(KeyboardEvent { key: key_id }),
-                    &mut *window.renderer,
-                );
+            match (key_id, mode) {
+                (KeyId::Control | KeyId::Shift | KeyId::Alt, _) => {
+                    window.event_handler.on_event(
+                        &mut window.app,
+                        &Event::KeyDown(KeyboardEvent { key: key_id }),
+                        &mut *window.renderer,
+                    );
+                }
+                (_, KeyboardInputMode::Raw | KeyboardInputMode::RawAndTranslated) => {
+                    window.event_handler.on_event(
+                        &mut window.app,
+                        &Event::KeyDown(KeyboardEvent { key: key_id }),
+                        &mut *window.renderer,
+                    );
+                }
+                _ => {}
             }
 
             if mode == KeyboardInputMode::RawAndTranslated || mode == KeyboardInputMode::Translated {
@@ -157,11 +168,17 @@ pub extern "system" fn wndproc<T: 'static + HasInputState, E: EventHandler<T> + 
         }
         WM_KEYUP => {
             let mode = window.config.keyboard_input_mode;
-            if mode == KeyboardInputMode::RawAndTranslated || mode == KeyboardInputMode::Raw {
-                let key = from_vkey(wparam.0 as u16);
-                Some(Event::KeyUp(KeyboardEvent { key }))
-            } else {
-                None
+            let vkey = wparam.0 as u16;
+            let key_id = from_vkey(vkey);
+
+            match (key_id, mode) {
+                (KeyId::Control | KeyId::Shift | KeyId::Alt, _) => {
+                    Some(Event::KeyUp(KeyboardEvent { key: key_id }))
+                }
+                (_, KeyboardInputMode::Raw | KeyboardInputMode::RawAndTranslated) => {
+                    Some(Event::KeyUp(KeyboardEvent { key: key_id }))
+                }
+                _ => None,
             }
         }
         WM_DESTROY => Some(Event::WindowClose),
