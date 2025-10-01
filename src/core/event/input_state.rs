@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 //! # Input State
 //!
 //! This module defines the `InputState` struct, which holds the real-time state

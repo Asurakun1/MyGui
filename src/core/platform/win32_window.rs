@@ -19,6 +19,7 @@ pub struct Win32Window<T, E: EventHandler<T>> {
     pub renderer: Box<dyn Renderer>, // Now owns a Box<dyn Renderer>
     pub event_handler: E,
     pub app: T,
+    pub config: WindowConfig,
 }
 
 impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> Win32Window<T, E> {
@@ -38,6 +39,7 @@ impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> Win32Window<T, E>
             renderer: temp_renderer,
             event_handler,
             app,
+            config: config.clone(),
         });
 
         let hwnd = unsafe {

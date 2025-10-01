@@ -1,11 +1,14 @@
 use crate::core::event::event_handler::EventHandler;
 use crate::core::event::input_state::HasInputState;
 
-use crate::core::event::{Event, KeyboardEvent, MouseButton, MouseEvent};
+use crate::core::event::Event;
+use crate::core::event::keyboard_handler::KeyboardEvent;
+use crate::core::event::mouse_handler::{MouseButton, MouseEvent};
 use crate::core::platform::win32::input::from_vkey;
 use crate::core::platform::win32_window::Win32Window;
 use crate::core::types::Size;
-use windows::{Win32::Foundation::*, Win32::UI::WindowsAndMessaging::*};
+use crate::core::window::config::KeyboardInputMode;
+use windows::{Win32::Foundation::*, Win32::UI::Input::KeyboardAndMouse::*, Win32::UI::WindowsAndMessaging::*};
 
 pub extern "system" fn wndproc<T: 'static + HasInputState, E: EventHandler<T> + 'static>(
     hwnd: HWND,
@@ -74,13 +77,92 @@ pub extern "system" fn wndproc<T: 'static + HasInputState, E: EventHandler<T> + 
                 button: Some(MouseButton::Left),
             }))
         }
+        WM_RBUTTONDOWN => {
+            let x = (lparam.0 & 0xFFFF) as i32;
+            let y = ((lparam.0 >> 16) & 0xFFFF) as i32;
+            Some(Event::MouseDown(MouseEvent {
+                x,
+                y,
+                button: Some(MouseButton::Right),
+            }))
+        }
+        WM_RBUTTONUP => {
+            let x = (lparam.0 & 0xFFFF) as i32;
+            let y = ((lparam.0 >> 16) & 0xFFFF) as i32;
+            Some(Event::MouseUp(MouseEvent {
+                x,
+                y,
+                button: Some(MouseButton::Right),
+            }))
+        }
+        WM_MBUTTONDOWN => {
+            let x = (lparam.0 & 0xFFFF) as i32;
+            let y = ((lparam.0 >> 16) & 0xFFFF) as i32;
+            Some(Event::MouseDown(MouseEvent {
+                x,
+                y,
+                button: Some(MouseButton::Middle),
+            }))
+        }
+        WM_MBUTTONUP => {
+            let x = (lparam.0 & 0xFFFF) as i32;
+            let y = ((lparam.0 >> 16) & 0xFFFF) as i32;
+            Some(Event::MouseUp(MouseEvent {
+                x,
+                y,
+                button: Some(MouseButton::Middle),
+            }))
+        }
+        WM_MOUSEWHEEL => {
+            let delta = (wparam.0 >> 16) as i16;
+            let delta = delta as f32 / WHEEL_DELTA as f32;
+            Some(Event::MouseWheel(delta))
+        }
         WM_KEYDOWN => {
-            let key = from_vkey(wparam.0 as u16);
-            Some(Event::KeyDown(KeyboardEvent { key }))
+            let mode = window.config.keyboard_input_mode;
+            let vkey = wparam.0 as u16;
+            let key_id = from_vkey(vkey);
+
+            if mode == KeyboardInputMode::RawAndTranslated || mode == KeyboardInputMode::Raw {
+                window.event_handler.on_event(
+                    &mut window.app,
+                    &Event::KeyDown(KeyboardEvent { key: key_id }),
+                    &mut *window.renderer,
+                );
+            }
+
+            if mode == KeyboardInputMode::RawAndTranslated || mode == KeyboardInputMode::Translated {
+                let mut keyboard_state = [0u8; 256];
+                if unsafe { GetKeyboardState(&mut keyboard_state).is_ok() } {
+                    let mut buffer = [0u16; 4];
+                    let count = unsafe {
+                        ToUnicode(vkey as u32, 0, Some(&keyboard_state), &mut buffer, 0)
+                    };
+
+                    if count > 0 {
+                        for &utf16_char in &buffer[..count as usize] {
+                            if let Some(character) = char::from_u32(utf16_char as u32) {
+                                window.event_handler.on_event(
+                                    &mut window.app,
+                                    &Event::Character(character),
+                                    &mut *window.renderer,
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+
+            return unsafe { DefWindowProcW(hwnd, message, wparam, lparam) };
         }
         WM_KEYUP => {
-            let key = from_vkey(wparam.0 as u16);
-            Some(Event::KeyUp(KeyboardEvent { key }))
+            let mode = window.config.keyboard_input_mode;
+            if mode == KeyboardInputMode::RawAndTranslated || mode == KeyboardInputMode::Raw {
+                let key = from_vkey(wparam.0 as u16);
+                Some(Event::KeyUp(KeyboardEvent { key }))
+            } else {
+                None
+            }
         }
         WM_DESTROY => Some(Event::WindowClose),
         WM_NCDESTROY => {

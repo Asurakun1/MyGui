@@ -8,10 +8,11 @@ use my_gui::core::{
     backend::renderer::Renderer,
     backend::renderer::RendererConfig, // Import RendererConfig
     event::{
-        Event, KeyboardEvent,
+        Event,
         event_handler::EventHandler,
         input_state::{HasInputState, InputState},
-        modifier_key_handler::ModifierKeyHandler,
+        keyboard_handler::{KeyboardEvent, KeyboardInputHandler},
+        mouse_handler::{HasMouseState, MouseEvent, MouseInputHandler, MouseState},
         render_event_handler::RenderEventHandler,
         root_event_handler::RootEventHandler,
     },
@@ -22,7 +23,7 @@ use my_gui::core::{
         },
         scene::{HasScene, Scene},
     },
-    window::{WindowBuilder, config::WindowConfig},
+    window::{config::KeyboardInputMode, WindowBuilder, config::WindowConfig},
 };
 
 // 1. Define the application state.
@@ -30,6 +31,7 @@ pub struct App {
     pub scene: Scene,
     pub display_text: String,
     pub input_state: InputState,
+    pub mouse_state: MouseState,
 }
 
 impl HasScene for App {
@@ -45,6 +47,16 @@ impl HasInputState for App {
 
     fn input_state_mut(&mut self) -> &mut InputState {
         &mut self.input_state
+    }
+}
+
+impl HasMouseState for App {
+    fn mouse_state(&self) -> &MouseState {
+        &self.mouse_state
+    }
+
+    fn mouse_state_mut(&mut self) -> &mut MouseState {
+        &mut self.mouse_state
     }
 }
 
@@ -64,6 +76,7 @@ impl App {
             scene,
             display_text,
             input_state: InputState::default(),
+            mouse_state: MouseState::default(),
         }
     }
 }
@@ -80,6 +93,21 @@ impl EventHandler<App> for CustomEventHandler {
             Event::KeyUp(KeyboardEvent { key }) => {
                 println!("KeyUp: {:?}, Modifiers: {:?}", key, app.input_state());
             }
+            // Event::MouseMove(MouseEvent { x, y, .. }) => {
+            //     println!("MouseMove: x: {}, y: {}", x, y);
+            // }
+            Event::MouseDown(MouseEvent { button, .. }) => {
+                println!("MouseDown: {:?}", button);
+            }
+            Event::MouseUp(MouseEvent { button, .. }) => {
+                println!("MouseUp: {:?}", button);
+            }
+            Event::MouseWheel(delta) => {
+                println!("MouseWheel: {:?}", delta);
+            }
+            Event::Character(character) => {
+                println!("Character: {}", character);
+            }
             _ => {}
         }
     }
@@ -91,7 +119,8 @@ fn main() -> Result<()> {
 
     let mut event_handler: RootEventHandler<App> = RootEventHandler::new();
     event_handler.add_handler(Box::new(RenderEventHandler::new()));
-    event_handler.add_handler(Box::new(ModifierKeyHandler));
+    event_handler.add_handler(Box::new(KeyboardInputHandler::default()));
+    event_handler.add_handler(Box::new(MouseInputHandler));
     event_handler.add_handler(Box::new(CustomEventHandler)); // Add the custom handler
 
     let config = WindowConfig {
@@ -99,6 +128,7 @@ fn main() -> Result<()> {
         width: 900,
         height: 600,
         renderer_config: RendererConfig::Direct2D, // Specify the renderer
+        keyboard_input_mode: KeyboardInputMode::Translated,
         ..Default::default()
     };
 
