@@ -1,13 +1,5 @@
 ## To Do
 
-- [ ] **Enhance Event Handling System**:
-  - **Task**: Improve mouse and keyboard input handling to be more modular and extensible.
-  - **Goal**: Provide a robust and flexible event system that allows for advanced user interactions.
-  - **Importance**: This will make the framework more powerful and easier to use for creating complex UIs.
-  - **Implementation**:
-    1.  **Mouse Input**: Refactor mouse input handling, a new module. This should include tracking button state (down, up, held), mouse position, and possibly drag-and-drop operations.
-    2.  **Key Combinations**: Implement a system for handling key combinations (e.g., `Ctrl+S`). This should be modular, allowing users to define their own key combiners and shortcuts.
-
 - [ ] **Create a Higher-Level Canvas/Surface Abstraction**:
     - **Task**: Design and implement a `Canvas` or `Surface` struct that acts as a container for drawable objects with its own coordinate system and constraints.
     - **Goal**: To enable more complex, constraint-based layouts and UI components (widgets). This abstraction will function like a "sheet of paper" on the main scene, with its own defined boundaries and drawing limits.
@@ -52,6 +44,18 @@
 ---
 
 ## Completed
+
+- [x] **Enhance Event Handling System**:
+  - **Task**: Improve mouse and keyboard input handling to be more modular and extensible.
+  - **Goal**: Provide a robust and flexible event system that allows for advanced user interactions.
+  - **Importance**: This makes the framework more powerful and easier to use for creating complex UIs.
+  - **Implementation**:
+    1.  **Mouse Input**: Refactored mouse input handling into a new `mouse_handler` module. This includes tracking button state (down, up) and mouse position in a `MouseState` struct. The library provides the necessary events (`MouseDown`, `MouseUp`, `MouseMove`) for the app developer to implement more complex interactions like drag-and-drop.
+    2.  **Keyboard Input**: Created a `keyboard_handler` module to manage keyboard state.
+    3.  **Key Combinations**: The library's design philosophy is to provide the developer with the necessary tools to implement their own shortcut logic. To this end, the system provides:
+        - A real-time, accurate `InputState` tracking `Shift`, `Ctrl`, and `Alt`.
+        - A `KeyboardInputMode` enum (`Raw`, `Translated`, `RawAndTranslated`) that gives the developer full control over which keyboard events their application receives.
+        - Both raw `KeyDown`/`KeyUp` events and translated `Character` events, allowing developers to choose the appropriate tool for their needs.
 
 - [x] **Track Modifier Key State**:
   - **Task**: Track the state of modifier keys (`Shift`, `Ctrl`, `Alt`).

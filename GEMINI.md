@@ -19,7 +19,8 @@ The project uses Cargo, Rust's package manager and build system.
     *   `src/lib.rs`: The main library file, which exports the public API.
     *   `src/core`: Contains the core modules for windowing, event handling, and rendering.
         *   `window/`: Manages window creation (`WindowBuilder`) and configuration (`WindowConfig`).
-        *   `event/`: Defines the event handling system, including the `EventHandler` and `RootEventHandler` traits, and event types like `KeyboardEvent`.
+        *   `event/`: Defines the event handling system, including the `EventHandler` trait and the `Event` enum.
+            *   `handlers/`: Contains specialized event handlers like `KeyboardInputHandler`, `MouseInputHandler`, and `RootEventHandler`.
         *   `render/`: Contains the `Drawable` trait, the `Scene` graph, and drawing primitives (`Rectangle`, `Ellipse`, `Line`, `TextObject`).
         *   `platform/`: Holds platform-specific code, currently with a `win32` implementation for window creation and message handling (`wndproc`).
         *   `backend/`: Abstracts the rendering engine with a `Renderer` trait and provides a `Direct2DRenderer` implementation.
@@ -32,8 +33,15 @@ The project uses Cargo, Rust's package manager and build system.
 *   **Event Handling:** A modular, composable event handling system is used.
     *   **`EventHandler` Trait:** Defines the interface for handling window messages. Methods will receive a mutable reference to the user-defined state `T` and a mutable reference to the `Renderer` trait object, allowing them to modify the state and perform drawing operations.
     *   **`RootEventHandler`:** The primary event handler that is passed to the `Window`. It composes multiple specialized event handlers.
-    *   **Current Implementation**: The system currently handles `KeyDown` and `KeyUp` events and tracks the state of modifier keys (`Shift`, `Ctrl`, `Alt`) via the `ModifierKeyHandler` and `InputState` struct.
-    *   **Future Enhancements**: The event system will be enhanced to support advanced mouse input and user-defined key combinations.
+    *   **Specialized Handlers**: The library provides a set of specialized handlers for common tasks, located in `src/core/event/handlers/`:
+        *   `KeyboardInputHandler`: Manages the state of the keyboard, including which keys are pressed and the state of modifier keys (`Shift`, `Ctrl`, `Alt`) in the `InputState` struct.
+        *   `MouseInputHandler`: Manages the state of the mouse, including position and button presses, in the `MouseState` struct.
+        *   `RenderEventHandler`: Handles the `Paint` event and is responsible for drawing the application's scene.
+    *   **Event Types**: The system dispatches different types of events, including:
+        *   `KeyDown`/`KeyUp`: Raw physical key press events.
+        *   `Character`: Translated Unicode character input.
+        *   `MouseDown`/`MouseUp`/`MouseMove`/`MouseWheel`: Mouse input events.
+    *   **Configurable Input**: The `WindowConfig` includes a `KeyboardInputMode` enum (`Raw`, `Translated`, `RawAndTranslated`) that gives the developer full control over which keyboard events their application receives, allowing them to tailor the event stream to their specific needs.
 *   **Drawing:** The rendering is implemented using a platform-agnostic `Renderer` trait.
     *   **`Renderer` Trait:** Defines the interface for all drawing operations, abstracting away the underlying graphics API (e.g., Direct2D, OpenGL). It also includes methods for managing device-dependent resources (creation, release, resizing).
     *   **`Direct2DRenderer`:** A concrete implementation of the `Renderer` trait for Direct2D.
