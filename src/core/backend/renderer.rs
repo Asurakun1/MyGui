@@ -1,32 +1,26 @@
-use crate::core::render::objects::primitives::{ellipse::Ellipse, line::Line, rectangle::Rectangle};
+use crate::core::platform::RawWindowHandle;
+use crate::core::render::objects::primitives::{
+    ellipse::Ellipse, line::Line, rectangle::Rectangle,
+};
 use crate::core::render::objects::text_object::TextObject;
-use windows::Win32::Foundation::HWND;
-use crate::core::types::Size; // Use the generic Size struct
-
-/// Configuration for the renderer.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RendererConfig {
-    /// Use the Direct2D renderer.
-    Direct2D,
-    // Add other renderer types here (e.g., OpenGL, Vulkan)
-}
+use glam::{Affine2, UVec2};
 
 /// A trait for platform-agnostic rendering operations.
 ///
 /// This trait defines the interface for drawing various shapes and text,
 /// abstracting away the underlying graphics API.
 pub trait Renderer {
-    /// Creates resources that are tied to a specific rendering device (the `HWND`).
-    fn create_device_dependent_resources(&mut self, hwnd: HWND) -> anyhow::Result<()>;
+    /// Creates resources that are tied to a specific rendering device.
+    fn create_device_dependent_resources(&mut self, handle: RawWindowHandle) -> anyhow::Result<()>;
 
     /// Releases device-dependent resources.
     fn release_device_dependent_resources(&mut self);
 
     /// Returns the size of the render target, if available.
-    fn get_render_target_size(&self) -> Option<Size>; // Changed to generic Size
+    fn get_render_target_size(&self) -> Option<UVec2>; // Changed to generic Size
 
     /// Resizes the render target.
-    fn resize_render_target(&mut self, new_size: Size) -> anyhow::Result<()>; // Changed to generic Size
+    fn resize_render_target(&mut self, new_size: UVec2) -> anyhow::Result<()>; // Changed to generic Size
 
     /// Begins a new drawing operation.
     fn begin_draw(&mut self);
@@ -36,6 +30,18 @@ pub trait Renderer {
 
     /// Clears the render target with the specified color.
     fn clear(&mut self, r: f32, g: f32, b: f32, a: f32);
+
+    /// Pushes a clipping rectangle onto the render target.
+    fn push_axis_aligned_clip(&mut self, x: f32, y: f32, width: f32, height: f32);
+
+    /// Pops the last clipping rectangle from the render target.
+    fn pop_axis_aligned_clip(&mut self);
+
+    /// Sets the transformation matrix of the render target.
+    fn set_transform(&mut self, matrix: &Affine2);
+
+    /// Gets the transformation matrix of the render target.
+    fn get_transform(&self) -> Affine2;
 
     /// Draws a rectangle.
     fn draw_rectangle(&mut self, rectangle: &Rectangle) -> anyhow::Result<()>;

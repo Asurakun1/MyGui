@@ -5,3 +5,4 @@
 
 pub mod primitives;
 pub mod text_object;
+pub mod canvas;

@@ -9,9 +9,9 @@ pub mod input_state;
 pub mod handlers;
 pub mod key_id;
 
-use crate::core::types::Size;
 use crate::core::event::handlers::keyboard_handler::KeyboardEvent;
 use crate::core::event::handlers::mouse_handler::MouseEvent;
+use glam::UVec2;
 
 
 /// Represents a platform-agnostic GUI event.
@@ -21,7 +21,7 @@ pub enum Event {
     WindowClose,
 
     /// The window has been resized.
-    WindowResize(Size),
+    WindowResize(UVec2),
 
     /// A keyboard key was pressed.
     KeyDown(KeyboardEvent),

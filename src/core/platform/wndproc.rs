@@ -1,3 +1,4 @@
+use crate::core::platform::RawWindowHandle;
 use crate::core::event::event_handler::EventHandler;
 use crate::core::event::input_state::HasInputState;
 
@@ -6,7 +7,6 @@ use crate::core::event::handlers::keyboard_handler::KeyboardEvent;
 use crate::core::event::handlers::mouse_handler::{MouseButton, MouseEvent};
 use crate::core::platform::win32::input::from_vkey;
 use crate::core::platform::win32_window::Win32Window;
-use crate::core::types::Size;
 use crate::core::window::config::KeyboardInputMode;
 use windows::{
     Win32::Foundation::*, Win32::UI::Input::KeyboardAndMouse::*, Win32::UI::WindowsAndMessaging::*,
@@ -40,7 +40,7 @@ pub extern "system" fn wndproc<T: 'static + HasInputState, E: EventHandler<T> + 
             if window.renderer.get_render_target_size().is_none() {
                 window
                     .renderer
-                    .create_device_dependent_resources(hwnd)
+                    .create_device_dependent_resources(RawWindowHandle::Win32(hwnd))
                     .unwrap_or_else(|e| {
                         println!("Failed to recreate device dependent resources: {:?}", e);
                     });
@@ -50,11 +50,11 @@ pub extern "system" fn wndproc<T: 'static + HasInputState, E: EventHandler<T> + 
         WM_SIZE => {
             let width = (lparam.0 & 0xFFFF) as u32;
             let height = ((lparam.0 >> 16) & 0xFFFF) as u32;
-            let new_size = Size::new(width, height);
+            let new_size = glam::uvec2(width, height);
             if let Err(e) = window.renderer.resize_render_target(new_size) {
                 println!("Failed to resize render target: {:?}", e);
             }
-            Some(Event::WindowResize(Size::new(width, height)))
+            Some(Event::WindowResize(new_size))
         }
         WM_MOUSEMOVE => {
             let x = (lparam.0 & 0xFFFF) as i32;

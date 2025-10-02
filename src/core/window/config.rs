@@ -1,4 +1,4 @@
-use crate::core::backend::renderer::RendererConfig; // Import RendererConfig
+use crate::core::backend::config::RendererConfig;
 
 /// Specifies the desired keyboard input mode.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -1,10 +1,12 @@
+use crate::core::backend::config::RendererConfig;
+use crate::core::backend::direct2d_renderer::Direct2DRenderer;
+use crate::core::backend::renderer::Renderer;
 use crate::core::event::event_handler::EventHandler;
 use crate::core::event::input_state::HasInputState;
 use crate::core::platform::window_backend::WindowBackend;
 use crate::core::platform::wndproc::wndproc;
+use crate::core::platform::RawWindowHandle;
 use crate::core::window::config::WindowConfig;
-use crate::core::backend::renderer::{Renderer, RendererConfig}; // Use the Renderer trait and RendererConfig
-use crate::core::backend::direct2d_renderer::Direct2DRenderer; // Use the Direct2DRenderer concrete type
 use windows::{
     core::*,
     Win32::Foundation::{GetLastError, *},
@@ -30,7 +32,7 @@ impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> Win32Window<T, E>
 
         // Create a temporary renderer for the initial Box::new, will be replaced later
         let temp_renderer: Box<dyn Renderer> = match config.renderer_config {
-            RendererConfig::Direct2D => Box::new(Direct2DRenderer::new(HWND(std::ptr::null_mut()), &config.font_face_name, config.font_size as f32)?),
+            RendererConfig::Direct2D => Box::new(Direct2DRenderer::new(&config.font_face_name, config.font_size as f32)?),
             // Add other renderer types here
         };
 
@@ -62,10 +64,12 @@ impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> Win32Window<T, E>
         window.hwnd = hwnd;
         // Create the actual renderer based on configuration
         window.renderer = match config.renderer_config {
-            RendererConfig::Direct2D => Box::new(Direct2DRenderer::new(hwnd, &config.font_face_name, config.font_size as f32)?),
+            RendererConfig::Direct2D => Box::new(Direct2DRenderer::new(&config.font_face_name, config.font_size as f32)?),
             // Add other renderer types here
         };
-        window.renderer.create_device_dependent_resources(hwnd)?;
+        window
+            .renderer
+            .create_device_dependent_resources(RawWindowHandle::Win32(hwnd))?;
 
         unsafe {
             let _ = ShowWindow(hwnd, SW_SHOW);

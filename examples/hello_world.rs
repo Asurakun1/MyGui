@@ -5,8 +5,8 @@
 use anyhow::Result; // Use anyhow::Result
 
 use my_gui::core::{
+    backend::config::RendererConfig, // Import RendererConfig
     backend::renderer::Renderer,
-    backend::renderer::RendererConfig, // Import RendererConfig
     event::{
         Event,
         event_handler::EventHandler,
@@ -20,8 +20,8 @@ use my_gui::core::{
     },
     render::{
         objects::{
-            primitives::{ellipse::Ellipse, line::Line, rectangle::Rectangle},
-            text_object::TextObject,
+            canvas::Canvas,
+            primitives::{ellipse::Ellipse, rectangle::Rectangle},
         },
         scene::{HasScene, Scene},
     },
@@ -66,14 +66,21 @@ impl App {
     pub fn new() -> Self {
         let display_text = "日本語ハローワールドテスト。".to_string();
         let mut scene = Scene::new();
-        scene.add_object(TextObject::new(&display_text, 10.0, 10.0));
-        scene.add_object(Rectangle::new(10.0, 50.0, 200.0, 100.0));
-        // Add a circle
-        scene.add_object(Ellipse::new(300.0, 100.0, 50.0, 50.0));
-        // Add a stretched ellipse
-        scene.add_object(Ellipse::new(500.0, 100.0, 100.0, 30.0));
-        // Add a line
-        scene.add_object(Line::new_with_xy(10.0, 170.0, 600.0, 200.0, 2.0));
+        // scene.add_object(TextObject::new(&display_text, 10.0, 10.0));
+        // scene.add_object(Rectangle::new(10.0, 50.0, 200.0, 100.0));
+        // // Add a circle
+        // scene.add_object(Ellipse::new(300.0, 100.0, 50.0, 50.0));
+        // // Add a stretched ellipse
+        // scene.add_object(Ellipse::new(500.0, 100.0, 100.0, 30.0));
+        // // Add a line
+        // scene.add_object(Line::new_with_xy(10.0, 170.0, 600.0, 200.0, 2.0));
+
+        // Create a canvas
+        let mut canvas = Canvas::new(250.0, 250.0, 300.0, 200.0);
+        canvas.add_object(Box::new(Rectangle::new(10.0, 10.0, 100.0, 50.0)));
+        canvas.add_object(Box::new(Ellipse::new(150.0, 100.0, 50.0, 50.0)));
+        scene.add_object(canvas);
+
         Self {
             scene,
             display_text,

@@ -1,14 +1,19 @@
 use crate::core::backend::renderer::Renderer;
+use crate::core::platform::RawWindowHandle;
 use crate::core::render::objects::primitives::{
     ellipse::Ellipse, line::Line, rectangle::Rectangle,
 };
 use crate::core::render::objects::text_object::TextObject;
-use crate::core::types::Size; // Use the generic Size struct
 use anyhow::Context;
+use glam::{Affine2, UVec2};
 use windows::{
-    Win32::Foundation::*, Win32::Graphics::Direct2D::Common::*, Win32::Graphics::Direct2D::*,
-    Win32::Graphics::DirectWrite::*, Win32::System::Com::*,
-    Win32::UI::WindowsAndMessaging::GetClientRect, core::*,
+    Win32::Foundation::*,
+    Win32::Graphics::Direct2D::Common::*,
+    Win32::Graphics::Direct2D::*,
+    Win32::Graphics::DirectWrite::*,
+    Win32::System::Com::*,
+    Win32::UI::WindowsAndMessaging::GetClientRect,
+    core::*,
 };
 
 /// A Direct2D implementation of the `Renderer` trait.
@@ -21,12 +26,11 @@ pub struct Direct2DRenderer {
     // Device-dependent resources
     pub render_target: Option<ID2D1HwndRenderTarget>,
     pub brush: Option<ID2D1SolidColorBrush>,
-    pub hwnd: HWND,
 }
 
 impl Direct2DRenderer {
     /// Creates a new `Direct2DRenderer` and initializes device-independent resources.
-    pub fn new(hwnd: HWND, font_face_name: &str, font_size: f32) -> anyhow::Result<Self> {
+    pub fn new(font_face_name: &str, font_size: f32) -> anyhow::Result<Self> {
         unsafe {
             CoInitializeEx(None, COINIT_APARTMENTTHREADED)
                 .ok()
@@ -75,13 +79,14 @@ impl Direct2DRenderer {
             text_format,
             render_target: None,
             brush: None,
-            hwnd,
         })
     }
 }
 
 impl Renderer for Direct2DRenderer {
-    fn create_device_dependent_resources(&mut self, hwnd: HWND) -> anyhow::Result<()> {
+    fn create_device_dependent_resources(&mut self, handle: RawWindowHandle) -> anyhow::Result<()> {
+        let RawWindowHandle::Win32(hwnd) = handle;
+
         let mut rect = RECT::default();
         unsafe { GetClientRect(hwnd, &mut rect).context("Failed to get client rect")? };
 
@@ -131,18 +136,18 @@ impl Renderer for Direct2DRenderer {
         self.brush = None;
     }
 
-    fn get_render_target_size(&self) -> Option<Size> {
+    fn get_render_target_size(&self) -> Option<UVec2> {
         self.render_target.as_ref().map(|rt| {
             let d2d_size = unsafe { rt.GetPixelSize() };
-            Size::new(d2d_size.width, d2d_size.height)
+            glam::uvec2(d2d_size.width, d2d_size.height)
         })
     }
 
-    fn resize_render_target(&mut self, new_size: Size) -> anyhow::Result<()> {
+    fn resize_render_target(&mut self, new_size: UVec2) -> anyhow::Result<()> {
         if let Some(render_target) = &self.render_target {
             let d2d_new_size = D2D_SIZE_U {
-                width: new_size.width,
-                height: new_size.height,
+                width: new_size.x,
+                height: new_size.y,
             };
             unsafe {
                 render_target
@@ -175,6 +180,55 @@ impl Renderer for Direct2DRenderer {
     fn clear(&mut self, r: f32, g: f32, b: f32, a: f32) {
         if let Some(render_target) = &self.render_target {
             unsafe { render_target.Clear(Some(&D2D1_COLOR_F { r, g, b, a })) };
+        }
+    }
+
+    fn push_axis_aligned_clip(&mut self, x: f32, y: f32, width: f32, height: f32) {
+        if let Some(render_target) = &self.render_target {
+            let rect = D2D_RECT_F {
+                left: x,
+                top: y,
+                right: x + width,
+                bottom: y + height,
+            };
+            unsafe {
+                render_target.PushAxisAlignedClip(
+                    &rect,
+                    D2D1_ANTIALIAS_MODE_PER_PRIMITIVE,
+                );
+            }
+        }
+    }
+
+    fn pop_axis_aligned_clip(&mut self) {
+        if let Some(render_target) = &self.render_target {
+            unsafe { render_target.PopAxisAlignedClip() };
+        }
+    }
+
+    fn set_transform(&mut self, matrix: &Affine2) {
+        if let Some(render_target) = &self.render_target {
+            let d2d_matrix = windows_numerics::Matrix3x2 {
+                M11: matrix.x_axis.x,
+                M12: matrix.x_axis.y,
+                M21: matrix.y_axis.x,
+                M22: matrix.y_axis.y,
+                M31: matrix.translation.x,
+                M32: matrix.translation.y,
+            };
+            unsafe { render_target.SetTransform(&d2d_matrix) };
+        }
+    }
+
+    fn get_transform(&self) -> Affine2 {
+        if let Some(render_target) = &self.render_target {
+            let mut d2d_matrix = windows_numerics::Matrix3x2::default();
+            unsafe { render_target.GetTransform(&mut d2d_matrix) };
+            Affine2::from_cols_array(&[
+                d2d_matrix.M11, d2d_matrix.M12, d2d_matrix.M21, d2d_matrix.M22, d2d_matrix.M31, d2d_matrix.M32,
+            ])
+        } else {
+            Affine2::default()
         }
     }
 
