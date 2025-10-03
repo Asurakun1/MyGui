@@ -3,6 +3,7 @@
 //! This is a simple example of how to use the `my_gui` framework to create a
 //! "Hello, World!" application.
 use anyhow::Result; // Use anyhow::Result
+use env_logger;
 
 use my_gui::core::{
     backend::config::RendererConfig, // Import RendererConfig
@@ -103,25 +104,25 @@ impl EventHandler<App> for CustomEventHandler {
     fn on_event(&mut self, app: &mut App, event: &Event, _renderer: &mut dyn Renderer) {
         match event {
             Event::KeyDown(KeyboardEvent { key }) => {
-                println!("KeyDown: {:?}, Modifiers: {:?}", key, app.input_state());
+                log::info!("KeyDown: {:?}, Modifiers: {:?}", key, app.input_state());
             }
             Event::KeyUp(KeyboardEvent { key }) => {
-                println!("KeyUp: {:?}, Modifiers: {:?}", key, app.input_state());
+                log::info!("KeyUp: {:?}, Modifiers: {:?}", key, app.input_state());
             }
             // Event::MouseMove(MouseEvent { x, y, .. }) => {
-            //     println!("MouseMove: x: {}, y: {}", x, y);
+            //     log::info!("MouseMove: x: {}, y: {}", x, y);
             // }
             Event::MouseDown(MouseEvent { button, .. }) => {
-                println!("MouseDown: {:?}", button);
+                log::info!("MouseDown: {:?}", button);
             }
             Event::MouseUp(MouseEvent { button, .. }) => {
-                println!("MouseUp: {:?}", button);
+                log::info!("MouseUp: {:?}", button);
             }
             Event::MouseWheel(delta) => {
-                println!("MouseWheel: {:?}", delta);
+                log::info!("MouseWheel: {:?}", delta);
             }
             Event::Character(character) => {
-                println!("Character: {}", character);
+                log::info!("Character: {}", character);
             }
             _ => {}
         }
@@ -129,6 +130,7 @@ impl EventHandler<App> for CustomEventHandler {
 }
 
 fn main() -> Result<()> {
+    env_logger::init();
     // Now returns anyhow::Result
     let app = App::new();
 

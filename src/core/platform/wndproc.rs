@@ -42,7 +42,7 @@ pub extern "system" fn wndproc<T: 'static + HasInputState, E: EventHandler<T> + 
                     .renderer
                     .create_device_dependent_resources(RawWindowHandle::Win32(hwnd))
                     .unwrap_or_else(|e| {
-                        println!("Failed to recreate device dependent resources: {:?}", e);
+                                        log::error!("Failed to recreate device dependent resources: {:?}", e);
                     });
             }
             Some(Event::Paint)
@@ -52,7 +52,7 @@ pub extern "system" fn wndproc<T: 'static + HasInputState, E: EventHandler<T> + 
             let height = ((lparam.0 >> 16) & 0xFFFF) as u32;
             let new_size = glam::uvec2(width, height);
             if let Err(e) = window.renderer.resize_render_target(new_size) {
-                println!("Failed to resize render target: {:?}", e);
+                            log::error!("Failed to resize render target: {:?}", e);
             }
             Some(Event::WindowResize(new_size))
         }

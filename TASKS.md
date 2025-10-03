@@ -12,7 +12,7 @@
     1.  Add `impl Drop for Direct2DRenderer { ... }`.
     2.  Inside the `drop` method, call `unsafe { windows::Win32::System::Com::CoUninitialize() }`.
 
-- [ ] **Replace `println!` with a proper logging mechanism**:
+- [x] **Replace `println!` with a proper logging mechanism**:
   - **Task**: Integrate the `log` crate and `env_logger` to replace all `println!` calls with structured logging.
   - **Goal**: Improve debuggability, provide configurable verbosity, and enable better error reporting with contextual information (timestamps, log levels, module paths).
   - **Importance**: Essential for building robust, maintainable applications, especially in production environments.
@@ -21,7 +21,7 @@
     2.  Initialize `env_logger::init()` at the start of the application.
     3.  Replace `println!` calls with `log::error!`, `log::warn!`, `log::info!`, `log::debug!`, or `log::trace!` as appropriate.
 
-- [ ] **Improve error propagation and context**:
+- [x] **Improve error propagation and context**:
   - **Task**: Enhance error messages by adding more context to `anyhow::Result` errors and consider introducing custom error types.
   - **Goal**: Make debugging easier and provide more informative error messages to users and developers.
   - **Importance**: Crucial for understanding and resolving issues efficiently in a complex application.

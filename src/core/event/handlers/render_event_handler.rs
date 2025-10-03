@@ -61,12 +61,12 @@ impl<T: HasScene> EventHandler<T> for RenderEventHandler<T> {
             // Draw all objects in the scene.
             if let Err(e) = app.scene().draw_all(renderer) {
                 // In a real application, this should be logged more robustly.
-                println!("Failed to draw scene: {:?}", e);
+                                log::error!("Failed to draw scene: {:?}", e);
             }
 
             // Finalize the drawing for this frame.
             if let Err(e) = renderer.end_draw() {
-                println!("EndDraw failed: {:?}", e);
+                            log::error!("EndDraw failed: {:?}", e);
             }
         }
     }

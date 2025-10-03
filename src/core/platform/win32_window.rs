@@ -7,6 +7,7 @@ use crate::core::platform::window_backend::WindowBackend;
 use crate::core::platform::wndproc::wndproc;
 use crate::core::platform::RawWindowHandle;
 use crate::core::window::config::WindowConfig;
+use anyhow::Context;
 use windows::{
     core::*,
     Win32::Foundation::{GetLastError, *},
@@ -27,12 +28,12 @@ pub struct Win32Window<T, E: EventHandler<T>> {
 impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> Win32Window<T, E> {
     /// Creates a new Win32 window.
     pub fn new(config: &WindowConfig, event_handler: E, app: T) -> anyhow::Result<Box<Self>> {
-        let instance = unsafe { GetModuleHandleW(None)? };
-        Self::register_class(instance.into(), &config.class_name)?;
+        let instance = unsafe { GetModuleHandleW(None).context("Failed to get module handle")? };
+        Self::register_class(instance.into(), &config.class_name).context("Failed to register window class")?;
 
         // Create a temporary renderer for the initial Box::new, will be replaced later
         let temp_renderer: Box<dyn Renderer> = match config.renderer_config {
-            RendererConfig::Direct2D => Box::new(Direct2DRenderer::new(&config.font_face_name, config.font_size as f32)?),
+            RendererConfig::Direct2D => Box::new(Direct2DRenderer::new(&config.font_face_name, config.font_size as f32).context("Failed to create Direct2DRenderer for existing window")?),
             // Add other renderer types here
         };
 
@@ -58,18 +59,18 @@ impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> Win32Window<T, E>
                 None,
                 Some(instance.into()),
                 Some(window.as_mut() as *mut _ as *mut _),
-            )?
+            ).context("Failed to create window")?
         };
 
         window.hwnd = hwnd;
         // Create the actual renderer based on configuration
         window.renderer = match config.renderer_config {
-            RendererConfig::Direct2D => Box::new(Direct2DRenderer::new(&config.font_face_name, config.font_size as f32)?),
+            RendererConfig::Direct2D => Box::new(Direct2DRenderer::new(&config.font_face_name, config.font_size as f32).context("Failed to create Direct2DRenderer")?),
             // Add other renderer types here
         };
         window
             .renderer
-            .create_device_dependent_resources(RawWindowHandle::Win32(hwnd))?;
+            .create_device_dependent_resources(RawWindowHandle::Win32(hwnd)).context("Failed to create device dependent resources")?;
 
         unsafe {
             let _ = ShowWindow(hwnd, SW_SHOW);
@@ -91,12 +92,12 @@ impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> Win32Window<T, E>
             cbClsExtra: 0,
             cbWndExtra: std::mem::size_of::<*mut Self>() as i32,
             hInstance: instance,
-            hIcon: unsafe { LoadIconW(None, IDI_APPLICATION)? },
-            hCursor: unsafe { LoadCursorW(None, IDC_ARROW)? },
+            hIcon: unsafe { LoadIconW(None, IDI_APPLICATION).context("Failed to load application icon")? },
+            hCursor: unsafe { LoadCursorW(None, IDC_ARROW).context("Failed to load arrow cursor")? },
             hbrBackground: unsafe { HBRUSH(GetStockObject(BLACK_BRUSH).0) },
             lpszMenuName: PCWSTR::null(),
             lpszClassName: PCWSTR::from_raw(class_name_hstring.as_ptr()),
-            hIconSm: unsafe { LoadIconW(None, IDI_APPLICATION)? },
+            hIconSm: unsafe { LoadIconW(None, IDI_APPLICATION).context("Failed to load small application icon")? },
         };
 
         unsafe {

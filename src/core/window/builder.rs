@@ -1,8 +1,10 @@
-use crate::core::event::input_state::HasInputState;
-use anyhow::Result;
-use crate::core::event::event_handler::EventHandler;
-use crate::core::window::config::WindowConfig;
-use crate::core::platform::window_backend::WindowBackend;
+use anyhow::{Context, Result};
+use crate::core::{
+    event::event_handler::EventHandler,
+    event::input_state::HasInputState,
+    window::config::WindowConfig,
+    platform::window_backend::WindowBackend,
+};
 
 /// A builder for creating and configuring a `Window`.
 ///
@@ -150,7 +152,7 @@ impl WindowBuilder {
         #[cfg(target_os = "windows")]
         {
             use crate::core::platform::win32_window::Win32Window;
-            let backend = Win32Window::new(&self.config, event_handler, app)?;
+            let backend = Win32Window::new(&self.config, event_handler, app).context("Failed to create Win32 window backend")?;
             Ok(backend)
         }
 

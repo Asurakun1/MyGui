@@ -42,7 +42,7 @@ impl Direct2DRenderer {
         unsafe {
             CoInitializeEx(None, COINIT_APARTMENTTHREADED)
                 .ok()
-                .context("Failed to initialize COM")?;
+                .context("Failed to initialize COM for Direct2DRenderer")?;
         }
 
         let d2d_factory_options = D2D1_FACTORY_OPTIONS {
@@ -58,12 +58,12 @@ impl Direct2DRenderer {
                 D2D1_FACTORY_TYPE_SINGLE_THREADED,
                 Some(&d2d_factory_options),
             )
-            .context("Failed to create D2D factory")?
+            .context("Failed to create ID2D1Factory1 for Direct2DRenderer")?
         };
 
         let dwrite_factory: IDWriteFactory = unsafe {
             DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED)
-                .context("Failed to create DWrite factory")?
+                .context("Failed to create IDWriteFactory for Direct2DRenderer")?
         };
 
         // Create a DirectWrite text format object.
@@ -78,7 +78,7 @@ impl Direct2DRenderer {
                     font_size,
                     &HSTRING::from("en-us"),
                 )
-                .context("Failed to create text format")?
+                .context("Failed to create IDWriteTextFormat for Direct2DRenderer")?
         };
 
         Ok(Self {
@@ -96,7 +96,7 @@ impl Renderer for Direct2DRenderer {
         let RawWindowHandle::Win32(hwnd) = handle;
 
         let mut rect = RECT::default();
-        unsafe { GetClientRect(hwnd, &mut rect).context("Failed to get client rect")? };
+        unsafe { GetClientRect(hwnd, &mut rect).context("Failed to get client rectangle for window")? };
 
         let render_target_properties = D2D1_RENDER_TARGET_PROPERTIES::default();
 
@@ -113,10 +113,10 @@ impl Renderer for Direct2DRenderer {
             let factory = self
                 .d2d_factory
                 .cast::<ID2D1Factory>()
-                .context("Failed to cast D2D factory")?;
+                .context("Failed to cast ID2D1Factory1 to ID2D1Factory")?;
             factory
                 .CreateHwndRenderTarget(&render_target_properties, &hwnd_render_target_properties)
-                .context("Failed to create Hwnd Render Target")?
+                .context("Failed to create ID2D1HwndRenderTarget")?
         };
 
         let brush = unsafe {
@@ -130,7 +130,7 @@ impl Renderer for Direct2DRenderer {
                 },
                 None,
             )
-            .context("Failed to create solid color brush")?
+            .context("Failed to create ID2D1SolidColorBrush")?
         };
 
         self.render_target = Some(render_target);
@@ -160,7 +160,7 @@ impl Renderer for Direct2DRenderer {
             unsafe {
                 render_target
                     .Resize(&d2d_new_size)
-                    .context("Failed to resize render target")?
+                    .context("Failed to resize ID2D1HwndRenderTarget")?
             };
         }
         Ok(())
@@ -298,7 +298,7 @@ impl Renderer for Direct2DRenderer {
             let text_layout = unsafe {
                 self.dwrite_factory
                     .CreateTextLayout(&text_utf16, &self.text_format, size.width, size.height)
-                    .context("Failed to create text layout")?
+                    .context("Failed to create IDWriteTextLayout")?
             };
 
             let origin = windows_numerics::Vector2 {
