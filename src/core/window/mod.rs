@@ -1,47 +1,67 @@
-//! # Windowing
+//! # Windowing System
 //!
-//! This module provides the primary interface for creating and managing native windows.
+//! This module provides the primary, high-level interface for creating and
+//! managing native application windows.
 //!
-//! It abstracts away the platform-specific details of window creation and management,
-//! offering a clean and unified API for developers. The main components are:
+//! It abstracts away the platform-specific complexities of window creation,
+//! offering a clean and unified API centered around the **builder pattern**.
 //!
-//! - **`WindowBuilder`**: A fluent builder for configuring and constructing a `Window`.
-//!   This is the recommended starting point for creating a new window. It allows you
-//!   to set properties like title, size, and more before creating the window.
+//! ## Core Components
 //!
-//! - **`WindowConfig`**: A struct that holds all the configuration parameters for a
-//!   window. It is used by the `WindowBuilder` to gather settings.
+//! - **[`WindowBuilder`]**: A fluent builder for configuring and constructing a
+//!   window. This is the main entry point for creating a new window. It allows
+//!   you to set properties like title, size, and more before creation.
 //!
-//! The `platform` module contains the actual window implementation, which is selected
-//! at compile time based on the target operating system.
+//! - **[`WindowConfig`]**: A struct that holds all the configuration parameters
+//!   for a window. While it can be used directly, it is most often managed
+//!   internally by the `WindowBuilder`.
+//!
+//! The actual platform-specific window implementation is handled by the
+//! `platform` module, which is selected at compile time.
 //!
 //! ## Example
 //!
 //! ```rust,no_run
-//! use my_gui::core::window::{WindowBuilder, config::WindowConfig};
-//! use my_gui::core::event::root_event_handler::RootEventHandler;
+//! use my_gui::core::window::WindowBuilder;
+//! use my_gui::core::event::handlers::root_event_handler::RootEventHandler;
+//! use my_gui::core::event::input_state::InputState;
+//! use my_gui::core::event::handlers::mouse_handler::MouseState;
 //!
-//! // Define a simple application state
+//! // 1. Define the application's state.
 //! #[derive(Default)]
-//! struct MyApp;
+//! struct MyApp {
+//!     input_state: InputState,
+//!     mouse_state: MouseState,
+//! }
+//!
+//! // Implement the necessary state traits.
+//! use my_gui::core::event::input_state::HasInputState;
+//! use my_gui::core::event::handlers::mouse_handler::HasMouseState;
+//!
+//! impl HasInputState for MyApp {
+//!     fn input_state(&self) -> &InputState { &self.input_state }
+//!     fn input_state_mut(&mut self) -> &mut InputState { &mut self.input_state }
+//! }
+//!
+//! impl HasMouseState for MyApp {
+//!     fn mouse_state(&self) -> &MouseState { &self.mouse_state }
+//!     fn mouse_state_mut(&mut self) -> &mut MouseState { &mut self.mouse_state }
+//! }
 //!
 //! fn main() -> anyhow::Result<()> {
-//!     let app = MyApp;
+//!     // 2. Create the application state and the root event handler.
+//!     let app = MyApp::default();
 //!     let event_handler = RootEventHandler::new();
-//!     let config = WindowConfig {
-//!         title: "My Awesome App".to_string(),
-//!         width: 800,
-//!         height: 600,
-//!         ..Default::default()
-//!     };
 //!
-//!     let window = WindowBuilder::from_config(config)
+//!     // 3. Use the WindowBuilder to configure and build the window.
+//!     let window = WindowBuilder::new()
+//!         .with_title("My Awesome App")
+//!         .with_width(800)
+//!         .with_height(600)
 //!         .build(event_handler, app)?;
 //!
-//!     // Run the application's main loop.
-//!     window.run()?;
-//!
-//!     Ok(())
+//!     // 4. Run the application's main event loop.
+//!     window.run()
 //! }
 //! ```
 

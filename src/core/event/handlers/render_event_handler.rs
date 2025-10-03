@@ -1,27 +1,32 @@
-use crate::core::event::event_handler::EventHandler;
-use crate::core::backend::renderer::Renderer;
-use crate::core::event::Event;
-use crate::core::render::scene::HasScene;
-use crate::core::render::color::Color;
+//! # Render Event Handler
+//!
+//! This module provides the `RenderEventHandler`, a specialized handler
+//! responsible for orchestrating the drawing of the application's scene.
+
+use crate::core::{
+    backend::renderer::Renderer,
+    event::{event_handler::EventHandler, Event},
+    render::{color::Color, scene::HasScene},
+};
 use std::marker::PhantomData;
 
-/// An `EventHandler` responsible for rendering the application's scene.
+/// An [`EventHandler`] responsible for rendering the application's scene graph.
 ///
-/// This handler specifically listens for the `Event::Paint` event. When this event
-/// is received, it orchestrates the entire drawing process for a single frame:
+/// This handler specifically listens for the [`Event::Paint`] event. When this
+/// event is received, it orchestrates the entire drawing process for a single frame:
 ///
-/// 1. It calls `begin_draw()` on the `Renderer`.
-/// 2. It clears the render target with a solid color (currently black).
-/// 3. It iterates through all `Drawable` objects in the application's `Scene`
-///    and calls their respective `draw` methods.
-/// 4. It calls `end_draw()` on the `Renderer` to present the final frame.
+-/// 1. It calls `begin_draw()` on the [`Renderer`].
+-/// 2. It clears the render target with a solid background color.
+-/// 3. It traverses the application's `Scene` and calls the `draw` method on
+-///    every `Drawable` object.
+-/// 4. It calls `end_draw()` on the [`Renderer`] to present the final frame.
 ///
 /// For this handler to function, the application's state struct (`T`) must
 /// implement the `HasScene` trait, which provides access to the `Scene` that
 /// needs to be rendered.
 ///
-/// This handler is essential for any application that needs to display graphics
-/// and should typically be one of the first handlers added to the `RootEventHandler`.
+/// This handler is essential for any application that displays graphics and should
+/// be added to the `RootEventHandler`.
 pub struct RenderEventHandler<T> {
     _phantom: PhantomData<T>,
 }
@@ -56,18 +61,19 @@ impl<T: HasScene> EventHandler<T> for RenderEventHandler<T> {
     fn on_event(&mut self, app: &mut T, event: &Event, renderer: &mut dyn Renderer) {
         if let Event::Paint = event {
             renderer.begin_draw();
-            // Clear the background to black using the framework's Color struct.
+
+            // Clear the background to a default color.
             renderer.clear(&Color::BLACK);
 
-            // Draw all objects in the scene.
+            // Draw all objects in the scene graph.
             if let Err(e) = app.scene().draw_all(renderer) {
                 // In a real application, this should be logged more robustly.
-                                log::error!("Failed to draw scene: {:?}", e);
+                log::error!("Failed to draw scene: {:?}", e);
             }
 
-            // Finalize the drawing for this frame.
+            // Finalize and present the frame.
             if let Err(e) = renderer.end_draw() {
-                            log::error!("EndDraw failed: {:?}", e);
+                log::error!("EndDraw failed: {:?}", e);
             }
         }
     }

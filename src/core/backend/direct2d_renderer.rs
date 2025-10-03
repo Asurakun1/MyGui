@@ -1,6 +1,11 @@
-use crate::core::render::color::Color;
+//! # Direct2D Renderer Implementation
+//!
+//! This module provides a `Direct2DRenderer`, an implementation of the [`Renderer`]
+//! trait that uses the Direct2D and DirectWrite APIs on the Windows platform.
+
 use crate::core::backend::renderer::Renderer;
 use crate::core::platform::RawWindowHandle;
+use crate::core::render::color::Color;
 use crate::core::render::objects::primitives::{
     ellipse::Ellipse, line::Line, rectangle::Rectangle,
 };
@@ -8,39 +13,45 @@ use crate::core::render::objects::text_object::TextObject;
 use anyhow::Context;
 use glam::{Affine2, UVec2};
 use windows::{
-    Win32::Foundation::*,
-    Win32::Graphics::Direct2D::Common::*,
-    Win32::Graphics::Direct2D::*,
-    Win32::Graphics::DirectWrite::*,
-    Win32::System::Com::*,
+    core::*, Win32::Foundation::*, Win32::Graphics::Direct2D::Common::*,
+    Win32::Graphics::Direct2D::*, Win32::Graphics::DirectWrite::*, Win32::System::Com::*,
     Win32::UI::WindowsAndMessaging::GetClientRect,
-    core::*,
 };
 
-/// A Direct2D implementation of the `Renderer` trait.
+/// A Direct2D implementation of the [`Renderer`] trait.
 ///
-/// This struct manages Direct2D and DirectWrite resources to render 2D graphics
-/// to a window. It handles the creation and management of device-independent
-/// resources (factories, text formats) and device-dependent resources (render
-/// targets, brushes).
+/// This struct manages all Direct2D and DirectWrite resources required to render
+/// 2D graphics to a window. It handles the creation and lifecycle of both
+/// device-independent resources (like factories) and device-dependent resources
+/// (like render targets and brushes).
 ///
-/// It translates the framework's platform-agnostic drawing commands into
-/// Direct2D API calls.
+/// It translates the framework's platform-agnostic drawing commands into concrete
+/// Direct2D API calls, acting as a bridge between the core rendering logic and
+/// the Windows graphics subsystem.
 pub struct Direct2DRenderer {
-    // Device-independent resources: These resources are not tied to a specific
-    // graphics device and can be created once and reused across multiple devices.
+    // --- Device-Independent Resources ---
+    // These resources are not tied to a specific graphics device and can persist
+    // even if the device is lost.
+    /// The root factory for creating all Direct2D resources.
     pub d2d_factory: ID2D1Factory1,
+    /// The factory for creating DirectWrite resources, used for text rendering.
     pub dwrite_factory: IDWriteFactory,
+    /// The default text format, defining font, size, and style.
     pub text_format: IDWriteTextFormat,
 
-    // Device-dependent resources: These resources are tied to a specific graphics
-    // device and must be recreated if the device is lost (e.g., due to a display
-    // mode change or driver update).
+    // --- Device-Dependent Resources ---
+    // These resources are tied to a specific graphics adapter. They become invalid
+    // if the device is lost and must be recreated.
+    /// The render target, which is an off-screen buffer tied to the window's client area.
     pub render_target: Option<ID2D1HwndRenderTarget>,
+    /// A reusable solid color brush for drawing filled shapes and text.
     pub brush: Option<ID2D1SolidColorBrush>,
 }
 
 impl Drop for Direct2DRenderer {
+    /// Uninitializes COM when the renderer is dropped.
+    ///
+    /// This is essential to clean up COM resources allocated by the thread.
     fn drop(&mut self) {
         unsafe {
             windows::Win32::System::Com::CoUninitialize();
@@ -51,26 +62,32 @@ impl Drop for Direct2DRenderer {
 impl Direct2DRenderer {
     /// Creates a new `Direct2DRenderer` and initializes device-independent resources.
     ///
-    /// This method performs the initial setup for Direct2D and DirectWrite, creating
-    /// factories and a default text format. These resources are not tied to a specific
-    /// display device and can be reused even if the graphics device is lost.
+    /// This method performs the initial setup for Direct2D and DirectWrite by:
+    /// 1. Initializing COM for the current thread.
+    /// 2. Creating the Direct2D and DirectWrite factories.
+    /// 3. Creating a default `IDWriteTextFormat` for text rendering.
+    ///
+    /// These resources are "device-independent" because they are not tied to a
+    /// specific graphics card and can be reused even if the display adapter changes.
     ///
     /// # Arguments
     ///
-    /// * `font_face_name` - The name of the default font face to use for text rendering.
-    /// * `font_size` - The default font size in DIPs (Device Independent Pixels).
+    /// * `font_face_name` - The name of the default font (e.g., "Arial").
+    /// * `font_size` - The default font size in DIPs (Device-Independent Pixels).
     ///
     /// # Errors
     ///
-    /// Returns an `anyhow::Result` if COM initialization fails, or if Direct2D or
-    /// DirectWrite factories or the text format cannot be created.
+    /// Returns an error if COM initialization fails or if any of the factory or
+    /// text format creation calls fail.
     pub fn new(font_face_name: &str, font_size: f32) -> anyhow::Result<Self> {
+        // COM must be initialized on the thread that will be using Direct2D.
         unsafe {
             CoInitializeEx(None, COINIT_APARTMENTTHREADED)
                 .ok()
                 .context("Failed to initialize COM for Direct2DRenderer")?;
         }
 
+        // Enable debug logging for Direct2D in debug builds.
         let d2d_factory_options = D2D1_FACTORY_OPTIONS {
             debugLevel: if cfg!(debug_assertions) {
                 D2D1_DEBUG_LEVEL_INFORMATION
@@ -79,6 +96,7 @@ impl Direct2DRenderer {
             },
         };
 
+        // Create the main Direct2D factory.
         let d2d_factory: ID2D1Factory1 = unsafe {
             D2D1CreateFactory(
                 D2D1_FACTORY_TYPE_SINGLE_THREADED,
@@ -87,22 +105,24 @@ impl Direct2DRenderer {
             .context("Failed to create ID2D1Factory1 for Direct2DRenderer")?
         };
 
+        // Create the main DirectWrite factory.
         let dwrite_factory: IDWriteFactory = unsafe {
             DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED)
                 .context("Failed to create IDWriteFactory for Direct2DRenderer")?
         };
 
-        // Create a DirectWrite text format object.
+        // Create a default text format object. This specifies the default font,
+        // weight, style, and size for all text drawn by this renderer.
         let text_format = unsafe {
             dwrite_factory
                 .CreateTextFormat(
                     &HSTRING::from(font_face_name),
-                    None,
+                    None, // Font collection, `None` for system fonts.
                     DWRITE_FONT_WEIGHT_NORMAL,
                     DWRITE_FONT_STYLE_NORMAL,
                     DWRITE_FONT_STRETCH_NORMAL,
                     font_size,
-                    &HSTRING::from("en-us"),
+                    &HSTRING::from("en-us"), // Locale name
                 )
                 .context("Failed to create IDWriteTextFormat for Direct2DRenderer")?
         };
@@ -118,23 +138,25 @@ impl Direct2DRenderer {
 }
 
 impl Renderer for Direct2DRenderer {
-    /// Creates resources that are dependent on the rendering device, such as the
-    /// `ID2D1HwndRenderTarget` and a default `ID2D1SolidColorBrush`.
+    /// Creates device-dependent resources, specifically the `ID2D1HwndRenderTarget`
+    /// and a default `ID2D1SolidColorBrush`.
     ///
-    /// This method is typically called when the renderer is first initialized or
-    /// when the graphics device is lost and needs to be recreated.
+    /// This method is called when the renderer is first initialized and whenever the
+    /// graphics device is lost and needs to be recreated (a "device loss" event).
+    /// It links the renderer to a specific window (`HWND`).
     ///
     /// # Arguments
     ///
-    /// * `handle` - A `RawWindowHandle` representing the window to render to.
+    /// * `handle` - A `RawWindowHandle` which must be a Win32 `HWND`.
     ///
     /// # Errors
     ///
-    /// Returns an `anyhow::Result` if the client rectangle cannot be retrieved,
-    /// or if the Direct2D render target or solid color brush cannot be created.
+    /// Returns an error if the window's client rectangle cannot be retrieved, or if
+    /// the Direct2D render target or the solid color brush cannot be created.
     fn create_device_dependent_resources(&mut self, handle: RawWindowHandle) -> anyhow::Result<()> {
         let RawWindowHandle::Win32(hwnd) = handle;
 
+        // Get the initial size of the window's client area.
         let mut rect = RECT::default();
         unsafe { GetClientRect(hwnd, &mut rect).context("Failed to get client rectangle for window")? };
 
@@ -149,6 +171,7 @@ impl Renderer for Direct2DRenderer {
             presentOptions: D2D1_PRESENT_OPTIONS_NONE,
         };
 
+        // Create the render target, which is the surface we draw on.
         let render_target = unsafe {
             let factory = self
                 .d2d_factory
@@ -159,6 +182,8 @@ impl Renderer for Direct2DRenderer {
                 .context("Failed to create ID2D1HwndRenderTarget")?
         };
 
+        // Create a reusable solid color brush. Its color will be changed for each
+        // drawing operation, which is more efficient than creating a new brush every time.
         let brush = unsafe {
             let rt: &ID2D1RenderTarget = &render_target;
             rt.CreateSolidColorBrush(
@@ -179,11 +204,12 @@ impl Renderer for Direct2DRenderer {
         Ok(())
     }
 
-    /// Releases all device-dependent resources held by the renderer.
+    /// Releases all device-dependent resources.
     ///
-    /// This method sets the `render_target` and `brush` options to `None`,
-    /// effectively releasing the underlying COM objects. This is crucial for
-    /// handling device loss scenarios, where these resources become invalid.
+    /// This method sets the `render_target` and `brush` fields to `None`, which
+    /// causes the underlying COM objects to be released. This is a critical step
+    /// in handling device loss, as it frees the invalid resources so they can be
+    /// recreated later.
     fn release_device_dependent_resources(&mut self) {
         self.render_target = None;
         self.brush = None;
@@ -193,8 +219,8 @@ impl Renderer for Direct2DRenderer {
     ///
     /// # Returns
     ///
-    /// An `Option<UVec2>` containing the width and height of the render target
-    /// if it exists, or `None` otherwise.
+    /// An `Option<UVec2>` containing the pixel dimensions (width, height) of the
+    /// render target if it exists, or `None` if it has not been created yet.
     fn get_render_target_size(&self) -> Option<UVec2> {
         self.render_target.as_ref().map(|rt| {
             let d2d_size = unsafe { rt.GetPixelSize() };
@@ -202,17 +228,18 @@ impl Renderer for Direct2DRenderer {
         })
     }
 
-    /// Resizes the Direct2D render target to the new specified dimensions.
+    /// Resizes the Direct2D render target.
     ///
-    /// This method is typically called in response to a window resize event.
+    /// This is typically called in response to a window resize event.
     ///
     /// # Arguments
     ///
-    /// * `new_size` - A `UVec2` representing the new width and height of the render target.
+    /// * `new_size` - The new size of the render target in pixels.
     ///
     /// # Errors
     ///
-    /// Returns an `anyhow::Result` if the render target exists but fails to resize.
+    /// Returns an error if the render target exists but the underlying `Resize`
+    /// call fails.
     fn resize_render_target(&mut self, new_size: UVec2) -> anyhow::Result<()> {
         if let Some(render_target) = &self.render_target {
             let d2d_new_size = D2D_SIZE_U {
@@ -228,29 +255,33 @@ impl Renderer for Direct2DRenderer {
         Ok(())
     }
 
-    /// Initiates a drawing operation on the render target.
+    /// Begins a drawing session.
     ///
-    /// This method must be called before any drawing commands are issued.
-    /// It effectively prepares the render target for drawing.
+    /// This must be called before any other drawing commands can be issued.
+    /// It prepares the render target for receiving new drawing instructions.
     fn begin_draw(&mut self) {
         if let Some(render_target) = &self.render_target {
             unsafe { render_target.BeginDraw() };
         }
     }
 
-    /// Concludes a drawing operation and presents the rendered frame.
+    /// Ends the drawing session and presents the frame.
     ///
-    /// This method must be called after all drawing commands have been issued.
-    /// It finalizes the frame and handles potential device loss scenarios.
-    /// If `D2DERR_RECREATE_TARGET` is returned, device-dependent resources are released.
+    /// This finalizes all drawing commands issued since `begin_draw`. It also
+    /// includes critical error handling for "device loss". If the `EndDraw` call
+    /// returns `D2DERR_RECREATE_TARGET`, it means the graphics device has become
+    /// invalid, and all device-dependent resources are released so they can be
+    /// recreated on the next frame.
     ///
     /// # Errors
     ///
-    /// Returns an `anyhow::Result` if the drawing operation fails to end gracefully.
+    /// Returns an error if the `EndDraw` call fails for any reason other than
+    /// device loss.
     fn end_draw(&mut self) -> anyhow::Result<()> {
         if let Some(render_target) = &self.render_target {
             let hr = unsafe { render_target.EndDraw(None, None) };
             if let Err(e) = hr {
+                // This is the standard way to handle device loss in Direct2D.
                 if e.code() == D2DERR_RECREATE_TARGET {
                     self.release_device_dependent_resources();
                 }
@@ -260,14 +291,11 @@ impl Renderer for Direct2DRenderer {
         Ok(())
     }
 
-    /// Clears the entire render target with the specified `Color`.
-    ///
-    /// This method takes a platform-agnostic `Color` struct and converts it
-    /// to the Direct2D-specific `D2D1_COLOR_F` before clearing the surface.
+    /// Clears the entire render target with the specified color.
     ///
     /// # Arguments
     ///
-    /// * `color` - A reference to the `Color` to clear the render target with.
+    /// * `color` - The `Color` to use for clearing the background.
     fn clear(&mut self, color: &Color) {
         if let Some(render_target) = &self.render_target {
             unsafe { render_target.Clear(Some(&D2D1_COLOR_F { r: color.r, g: color.g, b: color.b, a: color.a })) };
@@ -276,15 +304,13 @@ impl Renderer for Direct2DRenderer {
 
     /// Pushes an axis-aligned clipping rectangle onto the render target's clip stack.
     ///
-    /// Subsequent drawing operations will be clipped to the intersection of this
-    /// rectangle and any previously pushed clips.
+    /// All subsequent drawing operations will be clipped to the intersection of this
+    /// rectangle and any other clips on the stack. This is useful for UI components
+    /// like scroll viewers or panels.
     ///
     /// # Arguments
     ///
-    /// * `x` - The x-coordinate of the top-left corner of the clipping rectangle.
-    /// * `y` - The y-coordinate of the top-left corner of the clipping rectangle.
-    /// * `width` - The width of the clipping rectangle.
-    /// * `height` - The height of the clipping rectangle.
+    /// * `x`, `y`, `width`, `height` - The dimensions of the clipping rectangle.
     fn push_axis_aligned_clip(&mut self, x: f32, y: f32, width: f32, height: f32) {
         if let Some(render_target) = &self.render_target {
             let rect = D2D_RECT_F {
@@ -302,23 +328,24 @@ impl Renderer for Direct2DRenderer {
         }
     }
 
-    /// Removes the last axis-aligned clipping rectangle from the render target's clip stack.
+    /// Removes the last clipping rectangle from the stack.
     ///
-    /// This restores the clipping region that was active before the last `push_axis_aligned_clip` call.
+    /// This restores the clipping region to the state it was in before the
+    /// corresponding `push_axis_aligned_clip` call.
     fn pop_axis_aligned_clip(&mut self) {
         if let Some(render_target) = &self.render_target {
             unsafe { render_target.PopAxisAlignedClip() };
         }
     }
 
-    /// Sets the current world transformation matrix for the renderer.
+    /// Sets the current transformation matrix for all subsequent drawing operations.
     ///
-    /// All subsequent drawing operations will be transformed by this matrix.
-    /// The `Affine2` matrix is converted to Direct2D's `Matrix3x2F` format.
+    /// The `glam::Affine2` matrix is converted to Direct2D's `Matrix3x2F` format.
+    /// This is used to implement translation, scaling, and rotation for UI elements.
     ///
     /// # Arguments
     ///
-    /// * `matrix` - A reference to the `glam::Affine2` transformation matrix to apply.
+    /// * `matrix` - The transformation matrix to apply.
     fn set_transform(&mut self, matrix: &Affine2) {
         if let Some(render_target) = &self.render_target {
             let d2d_matrix = windows_numerics::Matrix3x2 {
@@ -333,14 +360,14 @@ impl Renderer for Direct2DRenderer {
         }
     }
 
-    /// Retrieves the current world transformation matrix from the renderer.
+    /// Retrieves the current transformation matrix from the renderer.
     ///
-    /// The Direct2D `Matrix3x2F` is converted to a `glam::Affine2` matrix.
+    /// Converts Direct2D's `Matrix3x2F` back to a `glam::Affine2`.
     ///
     /// # Returns
     ///
-    /// The current `glam::Affine2` transformation matrix. If no render target
-    /// is active, it returns an identity matrix.
+    /// The current `glam::Affine2` transformation matrix. Returns the identity
+    /// matrix if the render target is not available.
     fn get_transform(&self) -> Affine2 {
         if let Some(render_target) = &self.render_target {
             let mut d2d_matrix = windows_numerics::Matrix3x2::default();
@@ -353,19 +380,18 @@ impl Renderer for Direct2DRenderer {
         }
     }
 
-    /// Draws a filled rectangle using the properties defined in the `Rectangle` struct.
+    /// Draws a filled rectangle.
     ///
-    /// This method extracts the position, size, and `Color` from the provided `Rectangle`
-    /// and uses them to draw a filled rectangle on the Direct2D render target.
-    /// A solid color brush is created or updated with the `Rectangle`'s color.
+    /// This method sets the color of the reusable solid color brush and then
+    /// issues the `FillRectangle` command to the render target.
     ///
     /// # Arguments
     ///
-    /// * `rectangle` - A reference to the `Rectangle` struct containing drawing parameters.
+    /// * `rectangle` - A reference to the `Rectangle` to draw.
     ///
     /// # Errors
     ///
-    /// Returns an `anyhow::Result` if the underlying Direct2D brush creation fails.
+    /// Propagates any errors from the underlying Direct2D calls.
     fn draw_rectangle(&mut self, rectangle: &Rectangle) -> anyhow::Result<()> {
         if let Some(render_target) = &self.render_target {
             let rect = D2D_RECT_F {
@@ -387,19 +413,17 @@ impl Renderer for Direct2DRenderer {
         Ok(())
     }
 
-    /// Draws a filled ellipse using the properties defined in the `Ellipse` struct.
+    /// Draws a filled ellipse.
     ///
-    /// This method extracts the center, radii, and `Color` from the provided `Ellipse`
-    /// and uses them to draw a filled ellipse on the Direct2D render target.
-    /// A solid color brush is created or updated with the `Ellipse`'s color.
+    /// Sets the brush color and issues the `FillEllipse` command.
     ///
     /// # Arguments
     ///
-    /// * `ellipse` - A reference to the `Ellipse` struct containing drawing parameters.
+    /// * `ellipse` - A reference to the `Ellipse` to draw.
     ///
     /// # Errors
     ///
-    /// Returns an `anyhow::Result` if the underlying Direct2D brush creation fails.
+    /// Propagates any errors from the underlying Direct2D calls.
     fn draw_ellipse(&mut self, ellipse: &Ellipse) -> anyhow::Result<()> {
         if let Some(render_target) = &self.render_target {
             let d2d_ellipse = D2D1_ELLIPSE {
@@ -423,19 +447,17 @@ impl Renderer for Direct2DRenderer {
         Ok(())
     }
 
-    /// Draws a line segment using the properties defined in the `Line` struct.
+    /// Draws a line segment.
     ///
-    /// This method extracts the start and end points, stroke width, and `Color`
-    /// from the provided `Line` and uses them to draw a line on the Direct2D render target.
-    /// A solid color brush is created or updated with the `Line`'s color.
+    /// Sets the brush color and issues the `DrawLine` command.
     ///
     /// # Arguments
     ///
-    /// * `line` - A reference to the `Line` struct containing drawing parameters.
+    /// * `line` - A reference to the `Line` to draw.
     ///
     /// # Errors
     ///
-    /// Returns an `anyhow::Result` if the underlying Direct2D brush creation fails.
+    /// Propagates any errors from the underlying Direct2D calls.
     fn draw_line(&mut self, line: &Line) -> anyhow::Result<()> {
         if let Some(render_target) = &self.render_target {
             let brush = self.brush.get_or_insert_with(|| unsafe {
@@ -464,26 +486,30 @@ impl Renderer for Direct2DRenderer {
         Ok(())
     }
 
-    /// Draws text using the properties defined in the `TextObject` struct.
+    /// Draws a string of text.
     ///
-    /// This method extracts the text content, position, and `Color` from the provided `TextObject`.
-    /// It creates a DirectWrite text layout and uses a solid color brush (created or updated
-    /// with the `TextObject`'s color) to draw the text on the Direct2D render target.
+    /// This method performs the following steps:
+    /// 1. Encodes the UTF-8 string into UTF-16, as required by DirectWrite.
+    /// 2. Creates a temporary `IDWriteTextLayout` object, which handles complex
+    ///    text processing like word wrapping and font fallback.
+    /// 3. Sets the brush color.
+    /// 4. Issues the `DrawTextLayout` command.
     ///
     /// # Arguments
     ///
-    /// * `text` - A reference to the `TextObject` struct containing text rendering parameters.
+    /// * `text` - A reference to the `TextObject` to draw.
     ///
     /// # Errors
     ///
-    /// Returns an `anyhow::Result` if the DirectWrite text layout cannot be created
-    /// or if the underlying Direct2D brush creation fails.
+    /// Returns an error if the `CreateTextLayout` call fails.
     fn draw_text(&mut self, text: &TextObject) -> anyhow::Result<()> {
         if let Some(render_target) = &self.render_target {
             let text_utf16: Vec<u16> = text.text.encode_utf16().collect();
 
             let size = unsafe { render_target.GetSize() };
 
+            // Create a text layout object. This is a temporary object that holds
+            // the text and its formatting properties.
             let text_layout = unsafe {
                 self.dwrite_factory
                     .CreateTextLayout(&text_utf16, &self.text_format, size.width, size.height)

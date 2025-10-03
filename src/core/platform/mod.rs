@@ -1,22 +1,25 @@
 //! # Platform Abstraction Layer
 //!
-//! This module is responsible for isolating platform-specific code from the rest of
-//! the framework. It defines common, platform-agnostic traits and enums that are
-//! then implemented for each target operating system (currently, only Windows).
+//! This module is responsible for abstracting away all platform-specific details,
+//! such as window creation, message handling, and raw input processing. It ensures
+//! that the core framework logic remains decoupled from any particular operating
+//! system API.
 //!
-//! The primary goal is to ensure that the core logic of the framework (`core::window`,
-//! `core::event`, `core::render`) remains independent of any specific OS API.
+//! ## Core Abstractions
 //!
-//! ## Key Components
+//! - **[`RawWindowHandle`]**: An enum that provides a platform-agnostic wrapper
+//!   around native window handles (e.g., `HWND` on Windows). This allows the
+//!   rendering backend to interact with the window without platform-specific code.
 //!
-//! - **`RawWindowHandle`**: An enum that provides a platform-agnostic wrapper around
-//!   native window handles (like `HWND` on Windows).
+//! - **[`WindowBackend`]**: A trait that defines the generic interface for a
+//!   platform-specific window. It standardizes the window's lifecycle, including
+//!   creation and the execution of the main message loop.
 //!
-//! - **`WindowBackend`**: A trait that defines the interface for a platform-specific
-//!   window implementation. It handles the actual window creation, message loop,
-//!   and event dispatching.
+//! ## Implementations
 //!
-//! - **`win32`**: A submodule containing the Windows-specific implementation details.
+//! - **`win32`**: The submodule containing the implementation for the Microsoft
+//!   Windows (Win32) platform. All Win32 API calls and platform-specific logic
+//!   are encapsulated within this module.
 
 use windows::Win32::Foundation::HWND;
 
@@ -24,15 +27,14 @@ use windows::Win32::Foundation::HWND;
 ///
 /// This enum wraps the raw window handle from the underlying operating system,
 /// allowing components like the `Renderer` to interact with the window in a
-/// generic way.
-#[derive(Clone, Copy)]
+/// generic, type-safe way.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum RawWindowHandle {
-    /// A handle to a window on Microsoft Windows.
+    /// A handle to a window on Microsoft Windows (`HWND`).
     Win32(HWND),
-    // Other platforms, such as MacOS (NSView) or Linux (X11/Wayland), would be added here.
+    // Future platforms, such as MacOS (NSView) or Linux (X11/Wayland),
+    // would have their handle types added as variants here.
 }
 
 pub mod win32;
-pub mod win32_window;
 pub mod window_backend;
-pub mod wndproc;

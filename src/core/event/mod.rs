@@ -1,67 +1,69 @@
-//! # Event Handling
+//! # Event Handling System
 //!
-//! This module defines the core components of the event handling system. The system
-//! is designed to be modular and extensible, allowing for a clear separation of
-//! concerns when processing user input and window events.
+//! This module defines the core components of the event-driven architecture. The
+//! system is designed to be modular and extensible, allowing for a clear separation
+//! of concerns when processing user input and window lifecycle events.
 //!
-//! ## Core Components
+//! ## Core Concepts
 //!
-//! - **`Event`**: An enum that represents all possible events that can occur in the
-//!   application, such as keyboard input, mouse movements, and window actions.
-//!   It serves as a unified, platform-agnostic representation of events.
+//! - **[`Event`]**: A platform-agnostic enum representing all possible events,
+//!   such as keyboard input, mouse movements, and window actions.
 //!
-//! - **`EventHandler`**: A trait that defines the interface for handling events.
-//!   Developers can implement this trait to create custom logic for responding
-//!   to specific events.
+//! - **[`EventHandler`]**: A trait that defines a generic interface for handling
+//!   events. Developers implement this trait to create custom logic for responding
+//!   to user interactions and system notifications.
 //!
-//! - **`RootEventHandler`**: A concrete implementation of `EventHandler` that can
-//!   compose multiple other event handlers. This allows for a modular design
-//!   where different handlers can be responsible for different aspects of event
-//!   processing (e.g., one for rendering, one for UI logic).
+//! - **Composition over Inheritance**: Event handling logic is built by composing
+//!   multiple `EventHandler` implementations within a [`RootEventHandler`]. This
+//!   promotes modularity, allowing different handlers to manage distinct
+//!   responsibilities (e.g., rendering, input state tracking, application logic).
 //!
-//! - **`InputState`**: A struct that tracks the real-time state of modifier keys
-//!   (Shift, Ctrl, Alt) and mouse buttons. This is useful for implementing
-//!   complex interactions that depend on the current input state.
+//! - **State Management**: The state of input devices (like keyboard modifiers
+//!   and mouse position) is tracked in dedicated structs (`InputState`, `MouseState`)
+//!   and accessed via traits (`HasInputState`, `HasMouseState`). This provides a
+//!   centralized and predictable way to query input state.
 //!
 //! ## Event Flow
 //!
-//! 1. The platform-specific window backend receives a native OS message.
-//! 2. The message is translated into a platform-agnostic `Event`.
-//! 3. The `Event` is passed to the `RootEventHandler`.
-//! 4. The `RootEventHandler` dispatches the `Event` to all of its registered
-//!    child handlers, allowing each one to process it.
+//! 1. The platform-specific windowing layer (e.g., Win32) captures a native OS message.
+//! 2. The message is translated into a platform-agnostic [`Event`].
+//! 3. The [`Event`] is passed to the top-level [`RootEventHandler`].
+//! 4. The [`RootEventHandler`] dispatches the [`Event`] to its list of child handlers,
+//!    allowing each one to process it in sequence.
 
 pub mod event_handler;
-pub mod input_state;
 pub mod handlers;
+pub mod input_state;
 pub mod key_id;
 
-use crate::core::event::handlers::keyboard_handler::KeyboardEvent;
-use crate::core::event::handlers::mouse_handler::MouseEvent;
+use crate::core::event::handlers::{keyboard_handler::KeyboardEvent, mouse_handler::MouseEvent};
 use glam::UVec2;
 
-/// Represents a platform-agnostic GUI event.
+/// A platform-agnostic enumeration of all possible GUI events.
 ///
-/// This enum encapsulates all possible events that an application can receive,
-/// from window actions to user input. Each variant contains the necessary data
-/// to handle the event.
+/// This enum is the primary means of communication between the windowing backend
+/// and the application logic. It encapsulates everything from window lifecycle
+/// events to user input, providing a single, unified type for the event loop.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Event {
+    // --- Window Events ---
     /// The user has requested to close the window (e.g., by clicking the 'X' button).
-    ///
-    /// The default behavior is to terminate the application's message loop.
+    /// The default response is to terminate the application's message loop.
     WindowClose,
 
     /// The window's client area has been resized.
     ///
-    /// Contains the new size of the window in pixels.
+    /// Contains the new size of the window in physical pixels. This event is
+    /// typically used to resize the renderer's swap chain.
     WindowResize(UVec2),
 
-    /// A keyboard key was pressed.
+    // --- Keyboard Events ---
+    /// A keyboard key was pressed down.
     ///
-    /// This event is triggered for raw key presses and provides detailed information
-    /// about the key, including its virtual key code and the state of modifier keys.
-    /// This is useful for implementing shortcuts or game controls.
+    /// This event provides the raw, platform-agnostic `KeyId` of the key. It is
+    /// best used for actions that require immediate response, like game controls
+    /// or application shortcuts. It may be fired multiple times if the key is
+    /// held down (key repeat).
     KeyDown(KeyboardEvent),
 
     /// A keyboard key was released.
@@ -71,41 +73,41 @@ pub enum Event {
 
     /// A translated character was received from the keyboard.
     ///
-    /// This event represents a character that has been processed by the OS's
-    /// input method editor (IME). It is suitable for text input fields, as it
-    /// correctly handles things like dead keys and complex script input.
+    /// This event should be used for text input, as it correctly handles characters
+    /// generated by the OS's Input Method Editor (IME), including dead keys,
+    /// accents, and complex scripts.
     Character(char),
 
+    // --- Mouse Events ---
     /// The mouse cursor has moved over the window's client area.
     ///
-    /// Contains detailed information about the mouse state, including its
-    /// current position and which buttons are pressed.
+    /// Contains the new coordinates of the cursor. This event can fire very
+    /// frequently, so handlers should be efficient.
     MouseMove(MouseEvent),
 
-    /// A mouse button was pressed.
+    /// A mouse button was pressed down.
     ///
-    /// Contains detailed information about the mouse state at the moment the
-    /// button was pressed.
+    /// Contains the state of the mouse at the moment the button was pressed.
     MouseDown(MouseEvent),
 
     /// A mouse button was released.
     ///
-    /// Contains detailed information about the mouse state at the moment the
-    /// button was released.
+    /// Contains the state of the mouse at the moment the button was released.
     MouseUp(MouseEvent),
 
     /// The mouse wheel was scrolled.
     ///
-    /// Contains the scroll delta. A positive value indicates scrolling forward
-    /// (away from the user), and a negative value indicates scrolling backward
-    /// (toward the user).
+    /// Contains the scroll delta. A positive value typically indicates scrolling
+    /// forward (away from the user), while a negative value indicates scrolling
+    /// backward (toward the user).
     MouseWheel(f32),
 
+    // --- Rendering Events ---
     /// The window's content needs to be repainted.
     ///
-    /// This event is triggered whenever the OS determines that the window's
-    /// client area is invalid and needs to be redrawn (e.g., after being
-    /// uncovered or resized). The `RenderEventHandler` is responsible for
-    /// handling this event.
+    /// This event is triggered by the OS whenever the window's client area is
+    /// invalid and must be redrawn (e.g., after being uncovered, resized, or
+    /// explicitly invalidated). The `RenderEventHandler` is responsible for
+    /// handling this event and orchestrating the drawing of a new frame.
     Paint,
 }

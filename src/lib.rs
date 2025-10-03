@@ -1,40 +1,36 @@
 //! # my_gui: A Retained-Mode GUI Framework for Windows
 //!
-//! `my_gui` is a lightweight, modular framework for building GUI applications in Rust,
-//! leveraging the raw Windows API for windowing and Direct2D for hardware-accelerated
-//! rendering. It is designed as a learning exercise but provides a solid foundation
-//! for simple, high-performance graphical applications.
+//! `my_gui` is a lightweight, modular framework for building simple GUI applications
+//! in Rust. It leverages the raw Windows API for windowing and Direct2D for
+//! hardware-accelerated rendering.
 //!
 //! ## Core Concepts
 //!
 //! The framework is built on a few key ideas:
 //!
-//! - **Retained-Mode Rendering**: You define a `Scene` populated with `Drawable`
+//! - **Retained-Mode Rendering**: You define a [`Scene`] populated with [`Drawable`]
 //!   objects (like shapes and text). The framework "retains" this scene and is
-//!   responsible for redrawing it whenever the window needs to be repainted. This
-//!   contrasts with immediate-mode, where the application must manually issue
-//!   draw calls every frame.
+//!   responsible for redrawing it whenever the window needs to be repainted.
 //!
 //! - **Event-Driven Architecture**: Application logic is driven by events. You
-//!   create `EventHandler`s to respond to user input (like `MouseDown` or `KeyDown`)
+//!   create [`EventHandler`]s to respond to user input (like `MouseDown` or `KeyDown`)
 //!   and window events (like `Paint` or `WindowClose`).
 //!
 //! - **Composition and Modularity**: The framework is designed to be composed.
-//!   A `RootEventHandler` can hold multiple specialized handlers, and `Drawable`
-//!   objects can be grouped in a `Canvas` to create complex, reusable components.
+//!   A [`RootEventHandler`] can hold multiple specialized handlers, and `Drawable`
+//!   objects can be grouped in a [`Canvas`] to create complex, reusable components.
 //!
 //! ## Architecture
 //!
 //! The `core` module encapsulates all the framework's functionality:
 //!
-//! - `window`: Provides the `WindowBuilder` for creating and configuring windows.
-//! - `event`: Defines the event handling system, including the `Event` enum and the
-//!   `EventHandler` trait.
-//! - `render`: Contains the `Scene`, the `Drawable` trait, and a collection of
-//!   built-in drawable objects like shapes, text, and the `Canvas` container.
-//! - `backend`: Abstracts the rendering API. The `Renderer` trait defines a set of
-//!   platform-agnostic drawing commands.
-//! - `platform`: Isolates platform-specific code, like Win32 API calls.
+//! - [`core::window`]: Provides the [`WindowBuilder`] for creating and configuring windows.
+//! - [`core::event`]: Defines the event handling system, including the [`Event`] enum and the
+//!   [`EventHandler`] trait.
+//! - [`core::render`]: Contains the [`Scene`], the [`Drawable`] trait, and a collection of
+//!   built-in drawable objects.
+//! - [`core::backend`]: Abstracts the rendering API via the [`Renderer`] trait.
+//! - [`core::platform`]: Isolates platform-specific code, like Win32 API calls.
 //!
 //! ## Getting Started
 //!
@@ -42,22 +38,20 @@
 //!
 //! ```rust,no_run
 //! use anyhow::Result;
-//! use my_gui::core::render::color::Color; // Import the Color struct
 //! use my_gui::core::{
 //!     event::{
 //!         event_handler::EventHandler,
 //!         handlers::{
-//!             keyboard_handler::KeyboardInputHandler, mouse_handler::MouseInputHandler,
+//!             keyboard_handler::KeyboardInputHandler, mouse_handler::{HasMouseState, MouseInputHandler, MouseState},
 //!             render_event_handler::RenderEventHandler, root_event_handler::RootEventHandler,
 //!         },
 //!         input_state::{HasInputState, InputState},
-//!         handlers::mouse_handler::{HasMouseState, MouseState},
 //!         Event,
 //!     },
 //!     render::{
-//!         drawable::Drawable,
+//!         color::Color,
 //!         objects::{
-//!             primitives::{Rectangle, Ellipse},
+//!             primitives::{Ellipse, Rectangle},
 //!             text_object::TextObject,
 //!         },
 //!         scene::{HasScene, Scene},
@@ -66,7 +60,8 @@
 //! };
 //!
 //! // 1. Define your application's state.
-//! // It must hold the scene and input states and implement the corresponding traits.
+//! // It must hold the scene and any input state trackers, and implement the
+//! // corresponding "Has" traits.
 //! #[derive(Default)]
 //! pub struct MyApp {
 //!     scene: Scene,
@@ -75,9 +70,7 @@
 //! }
 //!
 //! impl HasScene for MyApp {
-//!     fn scene(&self) -> &Scene {
-//!         &self.scene
-//!     }
+//!     fn scene(&self) -> &Scene { &self.scene }
 //! }
 //!
 //! impl HasInputState for MyApp {
@@ -96,8 +89,8 @@
 //! impl<T: HasMouseState> EventHandler<T> for AppLogicHandler {
 //!     fn on_event(&mut self, app: &mut T, event: &Event, _renderer: &mut dyn my_gui::core::backend::renderer::Renderer) {
 //!         if let Event::MouseDown(_) = event {
-//!             let mouse = app.mouse_state();
-//!             log::info!("Mouse clicked at ({}, {})", mouse.x, mouse.y);
+//!             // A logger (like simple_logger) would be needed for this to print.
+//!             log::info!("Mouse clicked at ({}, {})", app.mouse_state().x, app.mouse_state().y);
 //!         }
 //!     }
 //! }
@@ -107,7 +100,7 @@
 //!     let mut scene = Scene::new();
 //!     scene.add_object(Rectangle::new(50.0, 50.0, 100.0, 80.0, Color::RED));
 //!     scene.add_object(Ellipse::new(250.0, 150.0, 80.0, 80.0, Color::BLUE));
-//!     scene.add_object(TextObject::new("Hello, my_gui!", 50.0, 250.0, Color::BLACK));
+//!     scene.add_object(TextObject::new("Hello, my_gui!".to_string(), 50.0, 250.0, Color::BLACK));
 //!
 //!     // 4. Create the application state.
 //!     let app = MyApp {

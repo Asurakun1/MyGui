@@ -1,41 +1,51 @@
-//! # 2D Rendering Engine
+//! # 2D Retained-Mode Rendering Engine
 //!
-//! This module provides the core abstractions for rendering 2D graphics. It is
-//! designed around a retained-mode graphics model, where a persistent scene graph
-//! (`Scene`) is maintained and rendered by the framework.
+//! This module provides the core abstractions for rendering 2D graphics using a
+//! **retained-mode** approach. In this model, a persistent scene graph (a [`Scene`]
+//! containing [`Drawable`] objects) is constructed and "retained" by the framework,
+//! which then takes responsibility for rendering it efficiently.
 //!
 //! ## Core Concepts
 //!
-//! The rendering system is built on two primary abstractions:
+//! The rendering system is built on a few key abstractions:
 //!
-//! - **`Drawable`**: A trait representing any object that can be drawn on the screen.
-//!   It has a single method, `draw`, which takes a `Renderer` and performs the
-//!   necessary drawing operations.
+//! - **[`Drawable`]**: A fundamental trait representing any object that can be
+//!   drawn on the screen. It has a single method, `draw`, which takes a [`Renderer`]
+//!   and issues the necessary drawing commands.
 //!
-//! - **`Scene`**: A container that holds a collection of `Drawable` objects. The `Scene`
-//!   is responsible for managing all the elements that need to be rendered. The
-//!   `RenderEventHandler` uses the `Scene` to draw the entire frame.
+//! - **[`Scene`]**: A container that holds a heterogeneous collection of `Drawable`
+//!   objects. This acts as the scene graph, managing all elements that need to
+//!   be rendered.
+//!
+//! - **[`Renderer`]**: A trait (defined in `core::backend`) that provides a
+//!   platform-agnostic interface for all drawing operations.
+//!
+//! - **[`Color`]**: A simple struct for representing RGBA colors in a
+//!   platform-independent way.
 //!
 //! ## How It Works
 //!
-//! 1.  You create objects that you want to draw. These objects must implement the
-//!     `Drawable` trait. The `objects` submodule provides several built-in shapes
-//!     and text objects.
-//! 2.  You add these `Drawable` objects to a `Scene`.
-//! 3.  Your application state struct must implement the `HasScene` trait to give the
-//!     rendering system access to your `Scene`.
-//! 4.  When the window needs to be repainted, the `RenderEventHandler` gets the `Scene`
-//!     from your application state and calls `draw_all`, which in turn calls the `draw`
-//!     method on every object in the scene.
+//! 1.  You create graphical objects (e.g., shapes, text, custom widgets) that
+//!     implement the [`Drawable`] trait.
+//! 2.  You add these `Drawable` objects to a [`Scene`] instance.
+//! 3.  Your main application state struct must implement the `HasScene` trait to
+//!     provide the framework with access to your scene.
+//! 4.  When the window needs to be repainted (indicated by a `Paint` event), the
+//!     `RenderEventHandler` retrieves the `Scene` and calls its `draw_all` method.
+//! 5.  The `draw_all` method iterates through every `Drawable` object in the
+//!     scene and calls its `draw` method, passing a `Renderer` to perform the
+//!     actual drawing operations.
 //!
 //! ## Example
 //!
 //! ```rust,no_run
 //! use my_gui::core::render::scene::{Scene, HasScene};
-//! use my_gui::core::render::objects::rectangle::Rectangle;
+//! use my_gui::core::render::objects::primitives::Rectangle;
 //! use my_gui::core::render::objects::text_object::TextObject;
+//! use my_gui::core::render::color::Color;
 //!
 //! // 1. Define your application state with a Scene.
+//! #[derive(Default)]
 //! struct MyApp {
 //!     scene: Scene,
 //! }
@@ -48,15 +58,14 @@
 //!
 //! // 2. Create a scene and add drawable objects to it.
 //! let mut my_scene = Scene::new();
-//! my_scene.add_object(Rectangle::new(10.0, 10.0, 100.0, 50.0));
-//! my_scene.add_object(TextObject::new("Hello, Renderer!", 20.0, 70.0));
+//! my_scene.add_object(Rectangle::new(10.0, 10.0, 100.0, 50.0, Color::RED));
+//! my_scene.add_object(TextObject::new("Hello, Renderer!".to_string(), 20.0, 70.0, Color::BLACK));
 //!
 //! // 3. Store the scene in your app state.
 //! let app = MyApp { scene: my_scene };
 //! ```
 
+pub mod color;
 pub mod drawable;
 pub mod objects;
 pub mod scene;
-/// Defines the `Color` struct for platform-agnostic color representation.
-pub mod color;

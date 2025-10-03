@@ -1,57 +1,54 @@
 //! # Text Object
 //!
-//! This module defines the `TextObject`, a simple `Drawable` for rendering text.
+//! This module defines the `TextObject`, a `Drawable` primitive for rendering
+//! a single line of text.
 
+use crate::core::{
+    backend::renderer::Renderer,
+    render::{color::Color, drawable::Drawable},
+};
 use anyhow::Result;
-use crate::core::render::drawable::Drawable;
-use crate::core::backend::renderer::Renderer;
-use crate::core::render::color::Color;
 
 /// A `Drawable` struct for rendering a single line of text.
 ///
-/// This struct acts as a simple container for a string, its position on the
-/// screen, and its `color`. It is a fundamental building block for displaying
-/// text in an application.
+/// This struct acts as a simple container for a `String`, its top-left position
+/// on the screen, and its `color`. It is a fundamental building block for
+/// displaying text in an application.
 ///
-/// The `TextObject` itself does not contain any complex layout logic. It simply
-/// holds the data and delegates the rendering work to the active `Renderer` via
-/// its `draw` method. The renderer is then responsible for handling font selection,
-/// text layout, and drawing.
+/// The `TextObject` itself does not perform any complex layout calculations. It
+/// simply holds the data and delegates the rendering work to the active
+/// [`Renderer`] via its `draw` method. The renderer is then responsible for
+/// handling font selection, text measurement, and rasterization.
 pub struct TextObject {
     /// The text content to be rendered.
     pub text: String,
-    /// The x-coordinate of the top-left corner of the text's layout rectangle.
+    /// The x-coordinate of the top-left corner of the text's layout box.
     pub x: f32,
-    /// The y-coordinate of the top-left corner of the text's layout rectangle.
+    /// The y-coordinate of the top-left corner of the text's layout box.
     pub y: f32,
-    /// The color of the text, represented by a `Color` struct.
+    /// The color of the text.
     pub color: Color,
 }
 
 impl TextObject {
-    /// Creates a new `TextObject` with the specified text content, position, and color.
+    /// Creates a new `TextObject` with the specified text, position, and color.
     ///
     /// # Arguments
     ///
-    /// * `text` - The string slice to be rendered.
+    /// * `text` - The `String` to be rendered.
     /// * `x` - The x-coordinate where the text rendering will begin.
     /// * `y` - The y-coordinate where the text rendering will begin.
     /// * `color` - The `Color` of the text.
-    pub fn new(text: &str, x: f32, y: f32, color: Color) -> Self {
-        Self {
-            text: text.to_string(),
-            x,
-            y,
-            color,
-        }
+    pub fn new(text: String, x: f32, y: f32, color: Color) -> Self {
+        Self { text, x, y, color }
     }
 }
 
 impl Drawable for TextObject {
-    /// Draws the text by delegating to the `Renderer`.
+    /// Draws the text by delegating to the active `Renderer`.
     ///
-    /// This method simply calls the `draw_text` method on the provided `Renderer`,
-    /// passing itself (which contains all the necessary text, position, and color data).
+    /// This method calls the `draw_text` method on the provided `Renderer`,
+    /// passing a reference to itself.
     ///
     /// # Arguments
     ///
