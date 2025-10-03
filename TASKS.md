@@ -2,6 +2,35 @@
 
 ---
 
+## Pending
+
+- [ ] **Implement `Drop` for `Direct2DRenderer` to call `CoUninitialize`**:
+  - **Task**: Implement the `Drop` trait for `Direct2DRenderer` to ensure `CoUninitialize` is called when the renderer is dropped.
+  - **Goal**: Properly manage COM resources and prevent resource leaks by ensuring the COM library is uninitialized when no longer needed.
+  - **Importance**: Adheres to proper COM lifecycle management and improves the robustness of the application.
+  - **Implementation**:
+    1.  Add `impl Drop for Direct2DRenderer { ... }`.
+    2.  Inside the `drop` method, call `unsafe { windows::Win32::System::Com::CoUninitialize() }`.
+
+- [ ] **Replace `println!` with a proper logging mechanism**:
+  - **Task**: Integrate the `log` crate and `env_logger` to replace all `println!` calls with structured logging.
+  - **Goal**: Improve debuggability, provide configurable verbosity, and enable better error reporting with contextual information (timestamps, log levels, module paths).
+  - **Importance**: Essential for building robust, maintainable applications, especially in production environments.
+  - **Implementation**:
+    1.  Add `log = "0.4"` and `env_logger = "0.10"` to `Cargo.toml`.
+    2.  Initialize `env_logger::init()` at the start of the application.
+    3.  Replace `println!` calls with `log::error!`, `log::warn!`, `log::info!`, `log::debug!`, or `log::trace!` as appropriate.
+
+- [ ] **Improve error propagation and context**:
+  - **Task**: Enhance error messages by adding more context to `anyhow::Result` errors and consider introducing custom error types.
+  - **Goal**: Make debugging easier and provide more informative error messages to users and developers.
+  - **Importance**: Crucial for understanding and resolving issues efficiently in a complex application.
+  - **Implementation**:
+    1.  Use `.context("descriptive message")?` from `anyhow` more liberally around fallible operations, especially FFI calls.
+    2.  (Future consideration) Define domain-specific error types using `thiserror` for more structured error handling in the library's public API.
+
+---
+
 ## Future Discussion (Prioritized)
 
 - **Widget System**:
