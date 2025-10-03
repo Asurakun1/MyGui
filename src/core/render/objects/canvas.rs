@@ -79,11 +79,11 @@ impl Canvas {
 
     /// Adds a `Drawable` object to this canvas.
     ///
-    * The added object will be drawn relative to this canvas's top-left corner.
+    /// The added object will be drawn relative to this canvas's top-left corner.
     ///
     /// # Arguments
     ///
-    * `object` - A `Box<dyn Drawable>` to be added to the canvas's list of children.
+    /// * `object` - A `Box<dyn Drawable>` to be added to the canvas's list of children.
     pub fn add_object(&mut self, object: Box<dyn Drawable>) {
         self.objects.push(object);
     }

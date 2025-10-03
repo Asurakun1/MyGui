@@ -29,7 +29,7 @@ pub enum KeyboardInputMode {
 
     /// Dispatch only translated `Character` events.
     ///
-    -    /// This mode is useful for applications that only need to process text input.
+    /// This mode is useful for applications that only need to process text input.
     Translated,
 }
 
