@@ -17,10 +17,10 @@ pub trait Renderer {
     fn release_device_dependent_resources(&mut self);
 
     /// Returns the size of the render target, if available.
-    fn get_render_target_size(&self) -> Option<UVec2>; // Changed to generic Size
+    fn get_render_target_size(&self) -> Option<UVec2>;
 
     /// Resizes the render target.
-    fn resize_render_target(&mut self, new_size: UVec2) -> anyhow::Result<()>; // Changed to generic Size
+    fn resize_render_target(&mut self, new_size: UVec2) -> anyhow::Result<()>;
 
     /// Begins a new drawing operation.
     fn begin_draw(&mut self);

@@ -32,6 +32,7 @@
 //! use anyhow::Result;
 //!
 //! // 1. Define the application state.
+//! #[derive(Default)]
 //! pub struct App {
 //!     pub scene: Scene,
 //! }

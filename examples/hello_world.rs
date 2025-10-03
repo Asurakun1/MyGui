@@ -62,6 +62,12 @@ impl HasMouseState for App {
     }
 }
 
+impl Default for App {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl App {
     pub fn new() -> Self {
         let display_text = "日本語ハローワールドテスト。".to_string();
