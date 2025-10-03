@@ -2,6 +2,7 @@ use crate::core::event::event_handler::EventHandler;
 use crate::core::backend::renderer::Renderer;
 use crate::core::event::Event;
 use crate::core::render::scene::HasScene;
+use crate::core::render::color::Color;
 use std::marker::PhantomData;
 
 /// An `EventHandler` responsible for rendering the application's scene.
@@ -55,8 +56,8 @@ impl<T: HasScene> EventHandler<T> for RenderEventHandler<T> {
     fn on_event(&mut self, app: &mut T, event: &Event, renderer: &mut dyn Renderer) {
         if let Event::Paint = event {
             renderer.begin_draw();
-            // Clear the background to black.
-            renderer.clear(0.0, 0.0, 0.0, 1.0);
+            // Clear the background to black using the framework's Color struct.
+            renderer.clear(&Color::BLACK);
 
             // Draw all objects in the scene.
             if let Err(e) = app.scene().draw_all(renderer) {

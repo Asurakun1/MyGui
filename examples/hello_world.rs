@@ -4,6 +4,7 @@
 //! "Hello, World!" application.
 use anyhow::Result; // Use anyhow::Result
 use env_logger;
+use my_gui::core::render::color::Color;
 
 use my_gui::core::{
     backend::config::RendererConfig, // Import RendererConfig
@@ -84,8 +85,20 @@ impl App {
 
         // Create a canvas
         let mut canvas = Canvas::new(250.0, 250.0, 300.0, 200.0);
-        canvas.add_object(Box::new(Rectangle::new(10.0, 10.0, 100.0, 50.0)));
-        canvas.add_object(Box::new(Ellipse::new(150.0, 100.0, 50.0, 50.0)));
+        canvas.add_object(Box::new(Rectangle::new(
+            10.0,
+            10.0,
+            100.0,
+            50.0,
+            Color::RED,
+        )));
+        canvas.add_object(Box::new(Ellipse::new(
+            150.0,
+            100.0,
+            50.0,
+            50.0,
+            Color::BLUE,
+        )));
         scene.add_object(canvas);
 
         Self {

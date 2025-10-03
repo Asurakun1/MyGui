@@ -4,6 +4,17 @@
 
 ## Pending
 
+- [x] **Create Color Abstractions and Integrate with Renderer**:
+  - **Task**: Abstract color definitions from the render pass into a dedicated `Color` struct and bind it within the `render` folder.
+  - **Goal**: Enable flexible color specification for drawing primitives, moving beyond hardcoded values.
+  - **Importance**: Enhances visual expressiveness and modularity of the rendering pipeline.
+  - **Implementation**:
+    1.  Define a `Color` struct in `src/core/render/color.rs` with `f32` RGBA components and predefined constants (e.g., `Color::BLACK`).
+    2.  Implement `From<Color> for D2D1_COLOR_F` for seamless conversion to Direct2D's color type.
+    3.  Add a `pub color: Color` field to `Rectangle`, `Ellipse`, and `Line` structs.
+    4.  Update `Renderer` trait methods (`draw_rectangle`, `draw_ellipse`, `draw_line`) to accept a `&Color` parameter.
+    5.  Modify `Direct2DRenderer`'s drawing methods to use the provided `Color` to create/update the brush.
+
 - [x] **Implement `Drop` for `Direct2DRenderer` to call `CoUninitialize`**:
   - **Task**: Implement the `Drop` trait for `Direct2DRenderer` to ensure `CoUninitialize` is called when the renderer is dropped.
   - **Goal**: Properly manage COM resources and prevent resource leaks by ensuring the COM library is uninitialized when no longer needed.

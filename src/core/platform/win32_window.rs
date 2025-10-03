@@ -31,15 +31,15 @@ impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> Win32Window<T, E>
         let instance = unsafe { GetModuleHandleW(None).context("Failed to get module handle")? };
         Self::register_class(instance.into(), &config.class_name).context("Failed to register window class")?;
 
-        // Create a temporary renderer for the initial Box::new, will be replaced later
-        let temp_renderer: Box<dyn Renderer> = match config.renderer_config {
-            RendererConfig::Direct2D => Box::new(Direct2DRenderer::new(&config.font_face_name, config.font_size as f32).context("Failed to create Direct2DRenderer for existing window")?),
+        // Create the renderer once. It only initializes device-independent resources.
+        let initial_renderer: Box<dyn Renderer> = match config.renderer_config {
+            RendererConfig::Direct2D => Box::new(Direct2DRenderer::new(&config.font_face_name, config.font_size as f32).context("Failed to create Direct2DRenderer")?),
             // Add other renderer types here
         };
 
         let mut window = Box::new(Self {
-            hwnd: HWND(std::ptr::null_mut()),
-            renderer: temp_renderer,
+            hwnd: HWND(std::ptr::null_mut()), // Placeholder HWND
+            renderer: initial_renderer, // Use the single renderer instance
             event_handler,
             app,
             config: config.clone(),
@@ -63,11 +63,7 @@ impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> Win32Window<T, E>
         };
 
         window.hwnd = hwnd;
-        // Create the actual renderer based on configuration
-        window.renderer = match config.renderer_config {
-            RendererConfig::Direct2D => Box::new(Direct2DRenderer::new(&config.font_face_name, config.font_size as f32).context("Failed to create Direct2DRenderer")?),
-            // Add other renderer types here
-        };
+        // Now that HWND is available, create device-dependent resources on the *existing* renderer.
         window
             .renderer
             .create_device_dependent_resources(RawWindowHandle::Win32(hwnd)).context("Failed to create device dependent resources")?;

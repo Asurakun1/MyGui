@@ -10,9 +10,8 @@
 //! - **`Ellipse`**: An ellipse defined by its center and radii.
 //! - **`Line`**: A line segment defined by two points and a stroke width.
 //!
-//! All primitives are currently rendered as solid-color shapes. The color is
-//! hardcoded within their `draw` methods for simplicity, but a future enhancement
-//! could involve adding color properties to the structs themselves.
+//! All primitives are rendered as solid-color shapes, with their color defined
+//! as a property of the struct itself.
 
 pub mod ellipse;
 pub mod line;

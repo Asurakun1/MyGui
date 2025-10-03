@@ -58,3 +58,5 @@
 pub mod drawable;
 pub mod objects;
 pub mod scene;
+/// Defines the `Color` struct for platform-agnostic color representation.
+pub mod color;

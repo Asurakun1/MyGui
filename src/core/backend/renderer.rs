@@ -8,6 +8,7 @@ use crate::core::render::objects::primitives::{
     ellipse::Ellipse, line::Line, rectangle::Rectangle,
 };
 use crate::core::render::objects::text_object::TextObject;
+use crate::core::render::color::Color;
 use glam::{Affine2, UVec2};
 
 /// A platform-agnostic interface for 2D rendering operations.
@@ -55,7 +56,7 @@ pub trait Renderer {
     fn end_draw(&mut self) -> anyhow::Result<()>;
 
     /// Clears the entire render target with the specified RGBA color.
-    fn clear(&mut self, r: f32, g: f32, b: f32, a: f32);
+    fn clear(&mut self, color: &Color);
 
     // --- State Management (Transforms and Clipping) ---
 
@@ -80,13 +81,25 @@ pub trait Renderer {
 
     // --- Primitive Drawing ---
 
-    /// Draws a rectangle.
+    /// Draws a rectangle using the properties defined in the provided `Rectangle` struct.
+    ///
+    /// # Arguments
+    ///
+    /// * `rectangle` - A reference to the `Rectangle` struct containing the position, size, and color.
     fn draw_rectangle(&mut self, rectangle: &Rectangle) -> anyhow::Result<()>;
 
-    /// Draws an ellipse.
+    /// Draws an ellipse using the properties defined in the provided `Ellipse` struct.
+    ///
+    /// # Arguments
+    ///
+    /// * `ellipse` - A reference to the `Ellipse` struct containing the center, radii, and color.
     fn draw_ellipse(&mut self, ellipse: &Ellipse) -> anyhow::Result<()>;
 
-    /// Draws a line.
+    /// Draws a line using the properties defined in the provided `Line` struct.
+    ///
+    /// # Arguments
+    ///
+    /// * `line` - A reference to the `Line` struct containing the start/end points, stroke width, and color.
     fn draw_line(&mut self, line: &Line) -> anyhow::Result<()>;
 
     /// Draws a `TextObject`. The renderer is responsible for font and layout.

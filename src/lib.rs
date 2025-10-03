@@ -42,6 +42,7 @@
 //!
 //! ```rust,no_run
 //! use anyhow::Result;
+//! use my_gui::core::render::color::Color; // Import the Color struct
 //! use my_gui::core::{
 //!     event::{
 //!         event_handler::EventHandler,
@@ -96,7 +97,7 @@
 //!     fn on_event(&mut self, app: &mut T, event: &Event, _renderer: &mut dyn my_gui::core::backend::renderer::Renderer) {
 //!         if let Event::MouseDown(_) = event {
 //!             let mouse = app.mouse_state();
-//!             println!("Mouse clicked at ({}, {})", mouse.x, mouse.y);
+//!             log::info!("Mouse clicked at ({}, {})", mouse.x, mouse.y);
 //!         }
 //!     }
 //! }
@@ -104,9 +105,9 @@
 //! fn main() -> Result<()> {
 //!     // 3. Create the scene and add drawable objects.
 //!     let mut scene = Scene::new();
-//!     scene.add_object(Rectangle::new(50.0, 50.0, 100.0, 80.0));
-//!     scene.add_object(Ellipse::new(250.0, 150.0, 80.0, 80.0));
-//!     scene.add_object(TextObject::new("Hello, my_gui!", 50.0, 250.0));
+//!     scene.add_object(Rectangle::new(50.0, 50.0, 100.0, 80.0, Color::RED));
+//!     scene.add_object(Ellipse::new(250.0, 150.0, 80.0, 80.0, Color::BLUE));
+//!     scene.add_object(TextObject::new("Hello, my_gui!", 50.0, 250.0, Color::BLACK));
 //!
 //!     // 4. Create the application state.
 //!     let app = MyApp {
