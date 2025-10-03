@@ -4,7 +4,7 @@
 
 ## Pending
 
-- [ ] **Implement `Drop` for `Direct2DRenderer` to call `CoUninitialize`**:
+- [x] **Implement `Drop` for `Direct2DRenderer` to call `CoUninitialize`**:
   - **Task**: Implement the `Drop` trait for `Direct2DRenderer` to ensure `CoUninitialize` is called when the renderer is dropped.
   - **Goal**: Properly manage COM resources and prevent resource leaks by ensuring the COM library is uninitialized when no longer needed.
   - **Importance**: Adheres to proper COM lifecycle management and improves the robustness of the application.

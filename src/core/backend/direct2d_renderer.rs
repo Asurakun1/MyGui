@@ -28,6 +28,14 @@ pub struct Direct2DRenderer {
     pub brush: Option<ID2D1SolidColorBrush>,
 }
 
+impl Drop for Direct2DRenderer {
+    fn drop(&mut self) {
+        unsafe {
+            windows::Win32::System::Com::CoUninitialize();
+        }
+    }
+}
+
 impl Direct2DRenderer {
     /// Creates a new `Direct2DRenderer` and initializes device-independent resources.
     pub fn new(font_face_name: &str, font_size: f32) -> anyhow::Result<Self> {
