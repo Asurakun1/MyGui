@@ -102,6 +102,7 @@ struct CustomEventHandler;
 
 impl EventHandler<App> for CustomEventHandler {
     fn on_event(&mut self, app: &mut App, event: &Event, _renderer: &mut dyn Renderer) {
+        log::debug!("CustomEventHandler received event: {:?}", event);
         match event {
             Event::KeyDown(KeyboardEvent { key }) => {
                 log::info!("KeyDown: {:?}, Modifiers: {:?}", key, app.input_state());
