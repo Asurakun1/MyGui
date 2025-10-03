@@ -15,11 +15,11 @@ use std::marker::PhantomData;
 /// This handler specifically listens for the [`Event::Paint`] event. When this
 /// event is received, it orchestrates the entire drawing process for a single frame:
 ///
--/// 1. It calls `begin_draw()` on the [`Renderer`].
--/// 2. It clears the render target with a solid background color.
--/// 3. It traverses the application's `Scene` and calls the `draw` method on
--///    every `Drawable` object.
--/// 4. It calls `end_draw()` on the [`Renderer`] to present the final frame.
+/// 1. It calls `begin_draw()` on the [`Renderer`].
+/// 2. It clears the render target with a solid background color.
+/// 3. It traverses the application's `Scene` and calls the `draw` method on
+///    every `Drawable` object.
+/// 4. It calls `end_draw()` on the [`Renderer`] to present the final frame.
 ///
 /// For this handler to function, the application's state struct (`T`) must
 /// implement the `HasScene` trait, which provides access to the `Scene` that

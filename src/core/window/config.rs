@@ -35,11 +35,7 @@ pub enum KeyboardInputMode {
 ///
 /// This struct is used by the [`WindowBuilder`] to gather all the necessary
 /// parameters before creating a platform-specific window.
-///
-/// It is marked as `#[non_exhaustive]` to allow for future settings to be
-/// added without breaking existing code.
 #[derive(Clone, Debug)]
-#[non_exhaustive]
 pub struct WindowConfig {
     /// The title of the window, which is displayed in the title bar.
     pub title: String,
