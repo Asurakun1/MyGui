@@ -1,6 +1,35 @@
 ## All Tasks Completed!
 
 ---
+## Future Enhancements
+
+- **Layout System**:
+  - **Idea**: Introduce a layout system to manage the positioning and sizing of UI elements automatically, instead of relying on hardcoded coordinates.
+  - **Discussion Points**:
+    - Should we use a container-based model (e.g., `VBox`, `HBox`, `Grid`)?
+    - How should the layout system interact with the `Scene` and `Drawable` objects?
+    - How will it handle window resizing and dynamic content?
+
+- **Widget System**:
+  - **Idea**: Define a `Widget` trait that unifies appearance, behavior, and layout.
+  - **Discussion Points**:
+    - A widget is a self-contained component that manages a specific region of the screen.
+    - **Appearance (Drawing)**: A widget needs to be `Drawable` and will use a `Canvas` for its drawing surface and local coordinate system.
+    - **Behavior (Event Handling)**: A widget must be able to receive events, perform hit-testing to see if the event is within its bounds, manage its own state, and emit actions.
+    - **Layout (Sizing and Positioning)**: A widget needs to be able to report its preferred size and adapt to the constraints given to it by a parent layout container.
+    - **Composition**: Widgets can be composed of other widgets.
+
+- **Cross-Platform Support**:
+  - **Idea**: Add support for macOS (using Metal/Cocoa) and Linux (using Vulkan/Wayland).
+  - **Discussion Points**:
+    - The abstraction layer is in place, but new backends will need to be created for each platform.
+    - This will involve creating new implementations of the `WindowBackend`, `Renderer`, and `EventLoopBackend` traits.
+
+- **Advanced State Management**:
+  - **Idea**: Explore more advanced state management patterns for complex applications.
+  - **Discussion Points**:
+    - For more complex applications, the current approach of passing the entire `app` state around could become cumbersome.
+    - Research and consider patterns like Entity-Component-System (ECS) or other state management libraries.
 
 ## Completed
 
