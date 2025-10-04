@@ -36,5 +36,6 @@ pub enum RawWindowHandle {
     // would have their handle types added as variants here.
 }
 
+pub mod event_loop;
 pub mod win32;
 pub mod window_backend;

@@ -89,8 +89,4 @@ impl<T: 'static + HasInputState, E: 'static + EventHandler<T>> Window<T, E> {
             WindowBuilder::from_config(from_config).build(event_handler, app)?;
         Ok(Self { window_backend })
     }
-
-    pub fn run(self) -> anyhow::Result<()> {
-        self.window_backend.run()
-    }
 }
