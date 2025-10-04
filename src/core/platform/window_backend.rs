@@ -5,6 +5,4 @@
 
 use crate::core::event::event_handler::EventHandler;
 
-pub trait WindowBackend<T, E: EventHandler<T>> {
-    fn run(self: Box<Self>) -> anyhow::Result<()>;
-}
+pub trait WindowBackend<T, E: EventHandler<T>> {}

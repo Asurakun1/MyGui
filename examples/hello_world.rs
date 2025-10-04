@@ -2,8 +2,8 @@
 //!
 //! This is a simple example of how to use the `my_gui` framework to create a
 //! "Hello, World!" application.
-use my_gui::prelude::*;
 use env_logger;
+use my_gui::prelude::*;
 
 // 1. Define the application state.
 pub struct App {
@@ -117,6 +117,10 @@ impl EventHandler<App> for CustomEventHandler {
     }
 }
 
+use my_gui::core::event::event_loop::EventLoop;
+
+// ... (rest of the file is the same until main)
+
 fn main() -> Result<()> {
     env_logger::init();
     log::info!("Hello, World!");
@@ -140,7 +144,10 @@ fn main() -> Result<()> {
 
     let window = Window::new(config, event_handler, app)?;
 
-    let result = window.run();
+    let mut event_loop = EventLoop::new();
+    event_loop.run()?;
 
-    result
+    std::mem::forget(window);
+
+    Ok(())
 }

@@ -32,6 +32,7 @@
 //!    allowing each one to process it in sequence.
 
 pub mod event_handler;
+pub mod event_loop;
 pub mod handlers;
 pub mod input_state;
 pub mod key_id;

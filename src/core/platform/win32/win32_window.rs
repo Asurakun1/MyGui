@@ -142,16 +142,4 @@ impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> Win32Window<T, E>
     }
 }
 
-impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> WindowBackend<T, E> for Win32Window<T, E> {
-    fn run(self: Box<Self>) -> anyhow::Result<()> {
-        let mut message = MSG::default();
-        while unsafe { GetMessageW(&mut message, None, 0, 0) }.into() {
-            unsafe {
-                let _ = TranslateMessage(&message);
-                DispatchMessageW(&message);
-            };
-        }
-        std::mem::forget(self);
-        Ok(())
-    }
-}
+impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> WindowBackend<T, E> for Win32Window<T, E> {}
