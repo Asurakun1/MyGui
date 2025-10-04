@@ -38,7 +38,3 @@ pub enum RawWindowHandle {
 
 pub mod win32;
 pub mod window_backend;
-
-pub trait EventLoopBackend {
-    fn run(&mut self) -> anyhow::Result<()>;
-}

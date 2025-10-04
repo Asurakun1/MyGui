@@ -83,8 +83,6 @@ where
     pub window_backend: Box<dyn WindowBackend<T, E>>,
 }
 
-use crate::core::event::event_loop::EventLoop;
-
 impl<T: 'static + HasInputState, E: 'static + EventHandler<T>> Window<T, E> {
     pub fn new(from_config: WindowConfig, event_handler: E, app: T) -> Result<Self, anyhow::Error> {
         let window_backend: Box<dyn WindowBackend<T, E>> =
@@ -93,9 +91,6 @@ impl<T: 'static + HasInputState, E: 'static + EventHandler<T>> Window<T, E> {
     }
 
     pub fn run(self) -> anyhow::Result<()> {
-        let mut event_loop = EventLoop::new();
-        event_loop.run()?;
-        std::mem::forget(self);
-        Ok(())
+        self.window_backend.run()
     }
 }

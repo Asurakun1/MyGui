@@ -133,7 +133,7 @@ fn main() -> Result<()> {
         title: "Hello, World!".to_string(),
         width: 900,
         height: 600,
-        renderer_config: RendererConfig::Direct2D, // Specify the renderer
+        renderer_config: RendererConfig::Direct2D(Default::default()), // Specify the renderer
         keyboard_input_mode: KeyboardInputMode::Translated,
         ..Default::default()
     };

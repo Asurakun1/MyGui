@@ -1,0 +1,8 @@
+refactor: Decouple event loop from Win32 API
+
+This commit decouples the event loop from the Win32 API by introducing a
+`PlatformEventLoop` trait. The `Win32EventLoop` provides the
+platform-specific implementation for Windows.
+
+The `Window::run` method now creates and runs the event loop, while the
+`WindowBackend` is no longer responsible for the message loop.

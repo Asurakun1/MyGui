@@ -11,7 +11,6 @@ pub use crate::core::{
     backend::renderer::Renderer,
     event::{
         event_handler::EventHandler,
-        event_loop::EventLoop,
         handlers::{
             keyboard_handler::{KeyboardEvent, KeyboardInputHandler},
             mouse_handler::{HasMouseState, MouseEvent, MouseInputHandler, MouseState},

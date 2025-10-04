@@ -17,7 +17,6 @@
 //!   input codes (like Windows Virtual-Key codes) into the framework's
 //!   platform-agnostic `KeyId` enum.
 
-pub mod event_loop;
 pub mod input;
 pub mod win32_window;
 pub mod wndproc;
