@@ -113,6 +113,7 @@ impl EventHandler<App> for CustomEventHandler {
     }
 }
 
+use my_gui::core::event::handlers::default_input_handler::DefaultInputHandler;
 use my_gui::core::event::event_loop::EventLoop;
 
 // ... (rest of the file is the same until main)
@@ -124,9 +125,7 @@ fn main() -> Result<()> {
     let app = App::new();
 
     let mut event_handler: RootEventHandler<App> = RootEventHandler::new();
-    event_handler.add_handler(Box::new(RenderEventHandler::new()));
-    event_handler.add_handler(Box::new(KeyboardInputHandler::default()));
-    event_handler.add_handler(Box::new(MouseInputHandler));
+    event_handler.add_handler(Box::new(DefaultInputHandler::new()));
     event_handler.add_handler(Box::new(CustomEventHandler)); // Add the custom handler
 
     let config = WindowConfig {

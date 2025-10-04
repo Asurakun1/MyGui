@@ -32,11 +32,6 @@
 //! - [`core::backend`]: Abstracts the rendering API via the [`Renderer`] trait.
 //! - [`core::platform`]: Isolates platform-specific code, like Win32 API calls.
 //!
-//! ## Getting Started
-//!
-//! Here is a complete example of a simple application that displays some shapes and text.
-//!
-
 pub mod core;
 
 pub mod prelude {
