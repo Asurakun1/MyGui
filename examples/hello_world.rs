@@ -113,9 +113,6 @@ impl EventHandler<App> for CustomEventHandler {
     }
 }
 
-use my_gui::core::event::handlers::default_input_handler::DefaultInputHandler;
-use my_gui::core::event::event_loop::EventLoop;
-
 // ... (rest of the file is the same until main)
 
 fn main() -> Result<()> {

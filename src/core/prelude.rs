@@ -12,10 +12,11 @@ pub use crate::core::{
     event::{
         Event,
         event_handler::EventHandler,
+        event_loop::EventLoop,
         handlers::{
-            keyboard_handler::{KeyboardEvent, KeyboardInputHandler},
-            mouse_handler::{MouseEvent, MouseInputHandler},
-            render_event_handler::RenderEventHandler,
+            default_input_handler::DefaultInputHandler,
+            keyboard_handler::KeyboardEvent,
+            mouse_handler::MouseEvent,
             root_event_handler::RootEventHandler,
         },
         input_state::{HasInputContext, InputContext, InputState, MouseState},
@@ -33,3 +34,12 @@ pub use crate::core::{
         config::{KeyboardInputMode, WindowConfig},
     },
 };
+
+// Specific event handler implementations can be imported directly if needed:
+// pub use crate::core::event::handlers::{
+//     keyboard_handler::KeyboardInputHandler,
+//     mouse_handler::MouseInputHandler,
+//     render_event_handler::RenderEventHandler,
+//     root_event_handler::RootEventHandler,
+//     default_input_handler::DefaultInputHandler,
+// };

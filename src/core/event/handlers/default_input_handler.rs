@@ -1,5 +1,10 @@
-use crate::prelude::{Event, EventHandler, HasInputContext, HasScene, KeyboardInputHandler, MouseInputHandler, RenderEventHandler, Renderer};
-
+use crate::{
+    core::event::handlers::{
+        keyboard_handler::KeyboardInputHandler, mouse_handler::MouseInputHandler,
+        render_event_handler::RenderEventHandler,
+    },
+    prelude::{Event, EventHandler, HasInputContext, HasScene, Renderer},
+};
 pub struct DefaultInputHandler<T> {
     render_handler: RenderEventHandler<T>,
     keyboard_handler: KeyboardInputHandler,
