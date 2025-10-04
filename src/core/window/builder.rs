@@ -6,7 +6,7 @@
 use crate::core::{
     backend::config::RendererConfig,
     event::event_handler::EventHandler,
-    event::input_state::HasInputState,
+    event::input_state::HasInputContext,
     platform::window_backend::WindowBackend,
     window::config::WindowConfig,
 };
@@ -25,17 +25,17 @@ use anyhow::{Context, Result};
 /// ```rust,no_run
 /// use my_gui::core::window::WindowBuilder;
 /// use my_gui::core::event::handlers::root_event_handler::RootEventHandler;
-/// use my_gui::core::event::input_state::{InputState, HasInputState};
+/// use my_gui::core::event::input_state::{InputContext, HasInputContext};
 ///
 /// // Define a simple application state
 /// #[derive(Default)]
 /// struct MyApp {
-///     input_state: InputState,
+///     input_context: InputContext,
 /// }
 ///
-/// impl HasInputState for MyApp {
-///     fn input_state(&self) -> &InputState { &self.input_state }
-///     fn input_state_mut(&mut self) -> &mut InputState { &mut self.input_state }
+/// impl HasInputContext for MyApp {
+///     fn input_context(&self) -> &InputContext { &self.input_context }
+///     fn input_context_mut(&mut self) -> &mut InputContext { &mut self.input_context }
 /// }
 ///
 /// fn main() -> anyhow::Result<()> {
@@ -118,7 +118,7 @@ impl WindowBuilder {
     ///
     /// # Type Parameters
     ///
-    /// * `T`: The application's state struct. It must be `'static` and implement `HasInputState`.
+    /// * `T`: The application's state struct. It must be `'static` and implement `HasInputContext`.
     /// * `E`: The application's root event handler, which must implement `EventHandler<T>`.
     ///
     /// # Arguments
@@ -131,7 +131,7 @@ impl WindowBuilder {
     /// Returns an error if the platform-specific window creation fails. On
     /// Windows, for example, this could be due to a failure in registering the
     /// window class or creating the native window handle.
-    pub fn build<T: 'static + HasInputState, E: EventHandler<T> + 'static>(
+    pub fn build<T: 'static + HasInputContext, E: EventHandler<T> + 'static>(
         &self,
         event_handler: E,
         app: T,

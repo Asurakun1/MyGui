@@ -10,7 +10,7 @@ use crate::core::{
             keyboard_handler::KeyboardEvent,
             mouse_handler::{MouseButton, MouseEvent},
         },
-        input_state::HasInputState,
+        input_state::HasInputContext,
         Event,
     },
     platform::{
@@ -41,7 +41,7 @@ use windows::{
 ///     forwards them to `DefWindowProcW` for default system processing.
 /// 5.  **Cleanup**: In response to `WM_NCDESTROY`, it cleans up the associated
 ///     `Win32Window` instance, preventing memory leaks.
-pub extern "system" fn wndproc<T: 'static + HasInputState, E: EventHandler<T> + 'static>(
+pub extern "system" fn wndproc<T: 'static + HasInputContext, E: EventHandler<T> + 'static>(
     hwnd: HWND,
     message: u32,
     wparam: WPARAM,

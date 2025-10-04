@@ -5,7 +5,7 @@
 
 use crate::core::{
     backend::{config::RendererConfig, direct2d_renderer::Direct2DRenderer, renderer::Renderer},
-    event::{event_handler::EventHandler, input_state::HasInputState},
+    event::{event_handler::EventHandler, input_state::HasInputContext},
     platform::{RawWindowHandle, win32::wndproc::wndproc, window_backend::WindowBackend},
     window::config::WindowConfig,
 };
@@ -38,7 +38,7 @@ pub struct Win32Window<T, E: EventHandler<T>> {
     pub config: WindowConfig,
 }
 
-impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> Win32Window<T, E> {
+impl<T: 'static + HasInputContext, E: EventHandler<T> + 'static> Win32Window<T, E> {
     /// Creates and initializes a new Win32 window.
     ///
     /// This function orchestrates the entire window creation process:
@@ -144,7 +144,7 @@ impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> Win32Window<T, E>
     }
 }
 
-impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> WindowBackend<T, E>
+impl<T: 'static + HasInputContext, E: EventHandler<T> + 'static> WindowBackend<T, E>
     for Win32Window<T, E>
 {
     fn run(self: Box<Self>) -> anyhow::Result<()> {

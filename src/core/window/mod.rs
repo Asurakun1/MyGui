@@ -24,28 +24,18 @@
 //! ```rust,no_run
 //! use my_gui::core::window::WindowBuilder;
 //! use my_gui::core::event::handlers::root_event_handler::RootEventHandler;
-//! use my_gui::core::event::input_state::InputState;
-//! use my_gui::core::event::handlers::mouse_handler::MouseState;
+//! use my_gui::core::event::input_state::{InputContext, HasInputContext};
 //!
 //! // 1. Define the application's state.
 //! #[derive(Default)]
 //! struct MyApp {
-//!     input_state: InputState,
-//!     mouse_state: MouseState,
+//!     input_context: InputContext,
 //! }
 //!
 //! // Implement the necessary state traits.
-//! use my_gui::core::event::input_state::HasInputState;
-//! use my_gui::core::event::handlers::mouse_handler::HasMouseState;
-//!
-//! impl HasInputState for MyApp {
-//!     fn input_state(&self) -> &InputState { &self.input_state }
-//!     fn input_state_mut(&mut self) -> &mut InputState { &mut self.input_state }
-//! }
-//!
-//! impl HasMouseState for MyApp {
-//!     fn mouse_state(&self) -> &MouseState { &self.mouse_state }
-//!     fn mouse_state_mut(&mut self) -> &mut MouseState { &mut self.mouse_state }
+//! impl HasInputContext for MyApp {
+//!     fn input_context(&self) -> &InputContext { &self.input_context }
+//!     fn input_context_mut(&mut self) -> &mut InputContext { &mut self.input_context }
 //! }
 //!
 //! fn main() -> anyhow::Result<()> {
@@ -71,7 +61,7 @@ pub mod config;
 pub use builder::WindowBuilder;
 
 use crate::core::event::event_handler::EventHandler;
-use crate::core::event::input_state::HasInputState;
+use crate::core::event::input_state::HasInputContext;
 use crate::core::platform::window_backend::WindowBackend;
 use crate::core::window::config::WindowConfig;
 
@@ -83,7 +73,7 @@ where
     pub window_backend: Box<dyn WindowBackend<T, E>>,
 }
 
-impl<T: 'static + HasInputState, E: 'static + EventHandler<T>> Window<T, E> {
+impl<T: 'static + HasInputContext, E: 'static + EventHandler<T>> Window<T, E> {
     pub fn new(from_config: WindowConfig, event_handler: E, app: T) -> Result<Self, anyhow::Error> {
         let window_backend: Box<dyn WindowBackend<T, E>> =
             WindowBuilder::from_config(from_config).build(event_handler, app)?;

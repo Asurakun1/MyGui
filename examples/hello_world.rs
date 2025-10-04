@@ -9,8 +9,7 @@ use my_gui::prelude::*;
 pub struct App {
     pub scene: Scene,
     pub display_text: String,
-    pub input_state: InputState,
-    pub mouse_state: MouseState,
+    pub input_context: InputContext,
 }
 
 impl HasScene for App {
@@ -19,23 +18,13 @@ impl HasScene for App {
     }
 }
 
-impl HasInputState for App {
-    fn input_state(&self) -> &InputState {
-        &self.input_state
+impl HasInputContext for App {
+    fn input_context(&self) -> &InputContext {
+        &self.input_context
     }
 
-    fn input_state_mut(&mut self) -> &mut InputState {
-        &mut self.input_state
-    }
-}
-
-impl HasMouseState for App {
-    fn mouse_state(&self) -> &MouseState {
-        &self.mouse_state
-    }
-
-    fn mouse_state_mut(&mut self) -> &mut MouseState {
-        &mut self.mouse_state
+    fn input_context_mut(&mut self) -> &mut InputContext {
+        &mut self.input_context
     }
 }
 
@@ -79,8 +68,7 @@ impl App {
         Self {
             scene,
             display_text,
-            input_state: InputState::default(),
-            mouse_state: MouseState::default(),
+            input_context: InputContext::default(),
         }
     }
 }
@@ -92,10 +80,18 @@ impl EventHandler<App> for CustomEventHandler {
     fn on_event(&mut self, app: &mut App, event: &Event, _renderer: &mut dyn Renderer) {
         match event {
             Event::KeyDown(KeyboardEvent { key }) => {
-                log::info!("KeyDown: {:?}, Modifiers: {:?}", key, app.input_state());
+                log::info!(
+                    "KeyDown: {:?}, Modifiers: {:?}",
+                    key,
+                    app.input_context().keyboard
+                );
             }
             Event::KeyUp(KeyboardEvent { key }) => {
-                log::info!("KeyUp: {:?}, Modifiers: {:?}", key, app.input_state());
+                log::info!(
+                    "KeyUp: {:?}, Modifiers: {:?}",
+                    key,
+                    app.input_context().keyboard
+                );
             }
             // Event::MouseMove(MouseEvent { x, y, .. }) => {
             //     log::info!("MouseMove: x: {}, y: {}", x, y);

@@ -10,15 +10,15 @@ pub use crate::core::{
     backend::config::RendererConfig,
     backend::renderer::Renderer,
     event::{
+        Event,
         event_handler::EventHandler,
         handlers::{
             keyboard_handler::{KeyboardEvent, KeyboardInputHandler},
-            mouse_handler::{HasMouseState, MouseEvent, MouseInputHandler, MouseState},
+            mouse_handler::{MouseEvent, MouseInputHandler},
             render_event_handler::RenderEventHandler,
             root_event_handler::RootEventHandler,
         },
-        input_state::{HasInputState, InputState},
-        Event,
+        input_state::{HasInputContext, InputContext, InputState, MouseState},
     },
     render::{
         color::Color,
@@ -29,7 +29,7 @@ pub use crate::core::{
         scene::{HasScene, Scene},
     },
     window::{
-        config::{KeyboardInputMode, WindowConfig},
         Window,
+        config::{KeyboardInputMode, WindowConfig},
     },
 };

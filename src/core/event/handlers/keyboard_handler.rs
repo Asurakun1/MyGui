@@ -17,7 +17,7 @@
 
 use crate::core::{
     backend::renderer::Renderer,
-    event::{event_handler::EventHandler, input_state::HasInputState, key_id::KeyId, Event},
+    event::{event_handler::EventHandler, input_state::HasInputContext, key_id::KeyId, Event},
 };
 use std::collections::HashSet;
 
@@ -25,7 +25,7 @@ use std::collections::HashSet;
 ///
 /// This handler listens for `KeyDown` and `KeyUp` events to maintain an internal
 /// `HashSet` of which keys are currently held down. It also updates the shared
-/// [`InputState`] for modifier keys (`Shift`, `Ctrl`, `Alt`).
+/// [`InputContext`] for modifier keys (`Shift`, `Ctrl`, `Alt`).
 ///
 /// This handler should be added to the [`RootEventHandler`] to enable global key
 /// state tracking.
@@ -62,19 +62,19 @@ impl KeyboardInputHandler {
     }
 }
 
-impl<T: HasInputState> EventHandler<T> for KeyboardInputHandler {
+impl<T: HasInputContext> EventHandler<T> for KeyboardInputHandler {
     /// Updates the key state based on `KeyDown` and `KeyUp` events.
     ///
     /// - On `KeyDown`: The key is added to the `pressed_keys` set. If the key is
-    ///   a modifier, the corresponding flag in the application's `InputState` is
+    ///   a modifier, the corresponding flag in the application's `InputContext` is
     ///   set to `true`.
     /// - On `KeyUp`: The key is removed from the set, and the corresponding
-    ///   modifier flag in `InputState` is set to `false`.
+    ///   modifier flag in `InputContext` is set to `false`.
     fn on_event(&mut self, app: &mut T, event: &Event, _renderer: &mut dyn Renderer) {
         match event {
             Event::KeyDown(KeyboardEvent { key }) => {
                 self.pressed_keys.insert(*key);
-                let input_state = app.input_state_mut();
+                let input_state = &mut app.input_context_mut().keyboard;
                 match key {
                     KeyId::Shift => input_state.shift = true,
                     KeyId::Control => input_state.ctrl = true,
@@ -84,7 +84,7 @@ impl<T: HasInputState> EventHandler<T> for KeyboardInputHandler {
             }
             Event::KeyUp(KeyboardEvent { key }) => {
                 self.pressed_keys.remove(key);
-                let input_state = app.input_state_mut();
+                let input_state = &mut app.input_context_mut().keyboard;
                 match key {
                     KeyId::Shift => input_state.shift = false,
                     KeyId::Control => input_state.ctrl = false,
