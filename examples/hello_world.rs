@@ -2,33 +2,8 @@
 //!
 //! This is a simple example of how to use the `my_gui` framework to create a
 //! "Hello, World!" application.
-use anyhow::Result; // Use anyhow::Result
+use my_gui::prelude::*;
 use env_logger;
-use my_gui::core::render::color::Color;
-
-use my_gui::core::{
-    backend::config::RendererConfig, // Import RendererConfig
-    backend::renderer::Renderer,
-    event::{
-        Event,
-        event_handler::EventHandler,
-        handlers::{
-            keyboard_handler::{KeyboardEvent, KeyboardInputHandler},
-            mouse_handler::{HasMouseState, MouseEvent, MouseInputHandler, MouseState},
-            render_event_handler::RenderEventHandler,
-            root_event_handler::RootEventHandler,
-        },
-        input_state::{HasInputState, InputState},
-    },
-    render::{
-        objects::{
-            canvas::Canvas,
-            primitives::{ellipse::Ellipse, rectangle::Rectangle},
-        },
-        scene::{HasScene, Scene},
-    },
-    window::{WindowBuilder, config::KeyboardInputMode, config::WindowConfig},
-};
 
 // 1. Define the application state.
 pub struct App {
@@ -163,11 +138,9 @@ fn main() -> Result<()> {
         ..Default::default()
     };
 
-    let window = WindowBuilder::from_config(config).build(event_handler, app)?;
+    let window = Window::new(config, event_handler, app)?;
 
     let result = window.run();
-
-    std::mem::forget(window);
 
     result
 }

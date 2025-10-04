@@ -19,17 +19,4 @@ use crate::core::event::event_handler::EventHandler;
 ///
 /// * `T`: The application's state type, which is managed by the window.
 /// * `E`: The application's root event handler, which must implement `EventHandler<T>`.
-pub trait WindowBackend<T, E: EventHandler<T>> {
-    /// Runs the window's main message loop.
-    ///
-    /// This method starts the application's event loop, which is responsible for
-    /// listening for and dispatching operating system messages (e.g., user input,
-    /// paint requests, etc.). This function will block the current thread until
-    /// the window is closed and the message loop terminates.
-    ///
-    /// # Returns
-    ///
-    /// An `anyhow::Result<()>` which will be `Ok(())` if the message loop exits
-    /// gracefully, or an error if one occurs during the process.
-    fn run(&self) -> anyhow::Result<()>;
-}
+pub trait WindowBackend<T, E: EventHandler<T>> {}

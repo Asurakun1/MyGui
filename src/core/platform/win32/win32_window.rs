@@ -142,21 +142,4 @@ impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> Win32Window<T, E>
     }
 }
 
-impl<T: HasInputState, E: EventHandler<T>> WindowBackend<T, E> for Win32Window<T, E> {
-    /// Runs the main Win32 message loop.
-    ///
-    /// This function enters a loop that retrieves and dispatches messages from
-    /// the window's message queue. The loop continues until `PostQuitMessage`
-    /// is called (typically in response to a `WM_DESTROY` message), which
-    /// causes `GetMessageW` to return `false`.
-    fn run(&self) -> anyhow::Result<()> {
-        let mut message = MSG::default();
-        while unsafe { GetMessageW(&mut message, None, 0, 0) }.into() {
-            unsafe {
-                let _ = TranslateMessage(&message);
-                DispatchMessageW(&message);
-            };
-        }
-        Ok(())
-    }
-}
+impl<T: HasInputState, E: EventHandler<T>> WindowBackend<T, E> for Win32Window<T, E> {}
