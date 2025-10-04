@@ -393,8 +393,8 @@ impl Renderer for Direct2DRenderer {
     ///
     /// Propagates any errors from the underlying Direct2D calls.
     fn draw_rectangle(&mut self, rectangle: &Rectangle) -> anyhow::Result<()> {
-        if let Some(render_target) = &self.render_target {
-            if let Some(brush) = &self.brush {
+        if let Some(render_target) = &self.render_target
+            && let Some(brush) = &self.brush {
                 let rect = D2D_RECT_F {
                     left: rectangle.x,
                     top: rectangle.y,
@@ -405,7 +405,6 @@ impl Renderer for Direct2DRenderer {
                 unsafe { brush.SetColor(&D2D1_COLOR_F { r: rectangle.color.r, g: rectangle.color.g, b: rectangle.color.b, a: rectangle.color.a }) };
                 unsafe { render_target.FillRectangle(&rect, brush) };
             }
-        }
         Ok(())
     }
 
@@ -421,8 +420,8 @@ impl Renderer for Direct2DRenderer {
     ///
     /// Propagates any errors from the underlying Direct2D calls.
     fn draw_ellipse(&mut self, ellipse: &Ellipse) -> anyhow::Result<()> {
-        if let Some(render_target) = &self.render_target {
-            if let Some(brush) = &self.brush {
+        if let Some(render_target) = &self.render_target
+            && let Some(brush) = &self.brush {
                 let d2d_ellipse = D2D1_ELLIPSE {
                     point: windows_numerics::Vector2 {
                         X: ellipse.center_x,
@@ -435,7 +434,6 @@ impl Renderer for Direct2DRenderer {
                 unsafe { brush.SetColor(&D2D1_COLOR_F { r: ellipse.color.r, g: ellipse.color.g, b: ellipse.color.b, a: ellipse.color.a }) };
                 unsafe { render_target.FillEllipse(&d2d_ellipse, brush) };
             }
-        }
         Ok(())
     }
 
@@ -451,8 +449,8 @@ impl Renderer for Direct2DRenderer {
     ///
     /// Propagates any errors from the underlying Direct2D calls.
     fn draw_line(&mut self, line: &Line) -> anyhow::Result<()> {
-        if let Some(render_target) = &self.render_target {
-            if let Some(brush) = &self.brush {
+        if let Some(render_target) = &self.render_target
+            && let Some(brush) = &self.brush {
                 unsafe { brush.SetColor(&D2D1_COLOR_F { r: line.color.r, g: line.color.g, b: line.color.b, a: line.color.a }) };
                 unsafe {
                     render_target.DrawLine(
@@ -470,7 +468,6 @@ impl Renderer for Direct2DRenderer {
                     );
                 }
             }
-        }
         Ok(())
     }
 
@@ -491,8 +488,8 @@ impl Renderer for Direct2DRenderer {
     ///
     /// Returns an error if the `CreateTextLayout` call fails.
     fn draw_text(&mut self, text: &TextObject) -> anyhow::Result<()> {
-        if let Some(render_target) = &self.render_target {
-            if let Some(brush) = &self.brush {
+        if let Some(render_target) = &self.render_target
+            && let Some(brush) = &self.brush {
                 let text_utf16: Vec<u16> = text.text.encode_utf16().collect();
 
                 let size = unsafe { render_target.GetSize() };
@@ -518,7 +515,6 @@ impl Renderer for Direct2DRenderer {
                     );
                 }
             }
-        }
         Ok(())
     }
 }

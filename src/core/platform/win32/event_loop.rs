@@ -10,6 +10,12 @@ use windows::Win32::UI::WindowsAndMessaging::*;
 
 pub struct Win32EventLoop;
 
+impl Default for Win32EventLoop {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Win32EventLoop {
     pub fn new() -> Self {
         Self

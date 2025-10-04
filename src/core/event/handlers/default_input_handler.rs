@@ -6,6 +6,12 @@ pub struct DefaultInputHandler<T> {
     mouse_handler: MouseInputHandler,
 }
 
+impl<T: 'static + HasScene + HasInputContext> Default for DefaultInputHandler<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<T: 'static + HasScene + HasInputContext> DefaultInputHandler<T> {
     pub fn new() -> Self {
         Self {

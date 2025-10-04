@@ -11,6 +11,12 @@ pub struct EventLoop {
     platform_event_loop: Box<dyn PlatformEventLoop>,
 }
 
+impl Default for EventLoop {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl EventLoop {
     pub fn new() -> Self {
         Self {

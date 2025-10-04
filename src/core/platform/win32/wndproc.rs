@@ -75,14 +75,13 @@ pub extern "system" fn wndproc<T: 'static + HasInputContext, E: EventHandler<T> 
         // --- Rendering and Resizing ---
         WM_PAINT => {
             // If the render target has been lost, recreate it before painting.
-            if window.renderer.get_render_target_size().is_none() {
-                if let Err(e) = window
+            if window.renderer.get_render_target_size().is_none()
+                && let Err(e) = window
                     .renderer
                     .create_device_dependent_resources(RawWindowHandle::Win32(hwnd))
                 {
                     window.event_handler.on_error(&e);
                 }
-            }
             Some(Event::Paint)
         }
         WM_SIZE => {

@@ -19,8 +19,6 @@ use crate::core::event::Event;
 /// ## Composition
 ///
 /// Handlers are designed to be composed. The [`RootEventHandler`] maintains a
-/// list of child handlers, and when an event is received, it dispatches it to
-
 /// all of its children in sequence. This promotes a modular architecture where
 /// different handlers can manage separate concerns (e.g., rendering, input
 /// tracking, UI logic).
