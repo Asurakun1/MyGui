@@ -3,6 +3,14 @@
 ---
 ## Future Enhancements
 
+  - **Idea**: Reorganize the project into a Cargo workspace to improve modularity and compile times.
+  - **Plan**:
+    - Create a `crates` directory.
+    - Create individual crates for `backend`, `event`, `platform`, `render`, and `window`.
+    - Move the existing code from `src/core` into the new crates.
+    - Update the main `Cargo.toml` to define the workspace.
+    - Update the main `my_gui` library to act as a facade, re-exporting the components from the new crates.
+
 - **Layout System**:
   - **Idea**: Introduce a layout system to manage the positioning and sizing of UI elements automatically, instead of relying on hardcoded coordinates.
   - **Discussion Points**:
