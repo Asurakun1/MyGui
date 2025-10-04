@@ -6,7 +6,7 @@
 use crate::core::{
     backend::{config::RendererConfig, direct2d_renderer::Direct2DRenderer, renderer::Renderer},
     event::{event_handler::EventHandler, input_state::HasInputState},
-    platform::{RawWindowHandle, win32::wndproc::wndproc, window_backend::WindowBackend},
+    platform::{RawWindowHandle, window_backend::WindowBackend, win32::wndproc::wndproc},
     window::config::WindowConfig,
 };
 use anyhow::Context;
