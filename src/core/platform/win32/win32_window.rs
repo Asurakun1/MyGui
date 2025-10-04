@@ -6,18 +6,18 @@
 use crate::core::{
     backend::{config::RendererConfig, direct2d_renderer::Direct2DRenderer, renderer::Renderer},
     event::{event_handler::EventHandler, input_state::HasInputState},
-    platform::{win32::wndproc::wndproc, window_backend::WindowBackend, RawWindowHandle},
+    platform::{RawWindowHandle, win32::wndproc::wndproc, window_backend::WindowBackend},
     window::config::WindowConfig,
 };
 use anyhow::Context;
 use windows::{
-    core::*,
     Win32::{
         Foundation::{GetLastError, *},
         Graphics::Gdi::*,
         System::LibraryLoader::GetModuleHandleW,
         UI::WindowsAndMessaging::*,
     },
+    core::*,
 };
 
 /// The Win32 implementation of the [`WindowBackend`] trait.
@@ -123,7 +123,9 @@ impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> Win32Window<T, E>
             hIcon: unsafe {
                 LoadIconW(None, IDI_APPLICATION).context("Failed to load application icon")?
             },
-            hCursor: unsafe { LoadCursorW(None, IDC_ARROW).context("Failed to load arrow cursor")? },
+            hCursor: unsafe {
+                LoadCursorW(None, IDC_ARROW).context("Failed to load arrow cursor")?
+            },
             hbrBackground: unsafe { HBRUSH(GetStockObject(BLACK_BRUSH).0) },
             lpszMenuName: PCWSTR::null(),
             lpszClassName: PCWSTR::from_raw(class_name_hstring.as_ptr()),
@@ -142,7 +144,9 @@ impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> Win32Window<T, E>
     }
 }
 
-impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> WindowBackend<T, E> for Win32Window<T, E> {
+impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> WindowBackend<T, E>
+    for Win32Window<T, E>
+{
     fn run(self: Box<Self>) -> anyhow::Result<()> {
         let mut message = MSG::default();
         while unsafe { GetMessageW(&mut message, None, 0, 0) }.into() {
@@ -151,6 +155,7 @@ impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> WindowBackend<T, 
                 DispatchMessageW(&message);
             };
         }
+
         std::mem::forget(self);
         Ok(())
     }
