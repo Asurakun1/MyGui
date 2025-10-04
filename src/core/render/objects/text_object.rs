@@ -1,70 +1,63 @@
-use windows::{core::*, Win32::Graphics::Direct2D::D2D1_DRAW_TEXT_OPTIONS_NONE};
-use windows_numerics::Vector2;
+//! # Text Object
+//!
+//! This module defines the `TextObject`, a `Drawable` primitive for rendering
+//! a single line of text.
 
-use crate::core::render::drawable::Drawable;
-use crate::core::render::drawing_context::DrawingContext;
+use crate::core::{
+    backend::renderer::Renderer,
+    render::{color::Color, drawable::Drawable},
+};
+use anyhow::Result;
 
-/// A `Drawable` object that represents a piece of text.
+/// A `Drawable` struct for rendering a single line of text.
 ///
-/// This struct holds the text string and its position, and it implements the `Drawable`
-/// trait to render itself using Direct2D and DirectWrite.
+/// This struct acts as a simple container for a `String`, its top-left position
+/// on the screen, and its `color`. It is a fundamental building block for
+/// displaying text in an application.
+///
+/// The `TextObject` itself does not perform any complex layout calculations. It
+/// simply holds the data and delegates the rendering work to the active
+/// [`Renderer`] via its `draw` method. The renderer is then responsible for
+/// handling font selection, text measurement, and rasterization.
 pub struct TextObject {
-    /// The text to be rendered.
+    /// The text content to be rendered.
     pub text: String,
-    /// The x-coordinate of the top-left corner of the text layout box.
+    /// The x-coordinate of the top-left corner of the text's layout box.
     pub x: f32,
-    /// The y-coordinate of the top-left corner of the text layout box.
+    /// The y-coordinate of the top-left corner of the text's layout box.
     pub y: f32,
+    /// The color of the text.
+    pub color: Color,
 }
 
 impl TextObject {
-    /// Creates a new `TextObject` with the specified text and position.
-    pub fn new(text: &str, x: f32, y: f32) -> Self {
-        Self {
-            text: text.to_string(),
-            x,
-            y,
-        }
+    /// Creates a new `TextObject` with the specified text, position, and color.
+    ///
+    /// # Arguments
+    ///
+    /// * `text` - The `String` to be rendered.
+    /// * `x` - The x-coordinate where the text rendering will begin.
+    /// * `y` - The y-coordinate where the text rendering will begin.
+    /// * `color` - The `Color` of the text.
+    pub fn new(text: String, x: f32, y: f32, color: Color) -> Self {
+        Self { text, x, y, color }
     }
 }
 
 impl Drawable for TextObject {
-    /// Draws the text to the render target using the provided `DrawingContext`.
+    /// Draws the text by delegating to the active `Renderer`.
+    ///
+    /// This method calls the `draw_text` method on the provided `Renderer`,
+    /// passing a reference to itself.
+    ///
+    /// # Arguments
+    ///
+    /// * `renderer` - The `Renderer` that will perform the drawing operation.
     ///
     /// # Errors
     ///
-    /// This function will return an error if it fails to create the text layout.
-    ///
-    /// # Safety
-    ///
-    /// This function contains `unsafe` blocks for creating the text layout and drawing
-    /// the text. The caller must ensure that the `drawing_context` contains valid
-    /// Direct2D and DirectWrite resources.
-    fn draw(&self, context: &DrawingContext) -> Result<()> {
-        let text_utf16: Vec<u16> = self.text.encode_utf16().collect();
-
-        let size = unsafe { context.render_target.GetSize() };
-
-        let text_layout = unsafe {
-            context.dwrite_factory.CreateTextLayout(
-                &text_utf16,
-                context.text_format,
-                size.width,
-                size.height,
-            )?
-        };
-
-        let origin = Vector2 { X: self.x, Y: self.y };
-
-        unsafe {
-            context.render_target.DrawTextLayout(
-                origin,
-                &text_layout,
-                context.brush,
-                D2D1_DRAW_TEXT_OPTIONS_NONE,
-            );
-        }
-
-        Ok(())
+    /// This function will return an error if the renderer's `draw_text` method fails.
+    fn draw(&self, renderer: &mut dyn Renderer) -> Result<()> {
+        renderer.draw_text(self)
     }
 }

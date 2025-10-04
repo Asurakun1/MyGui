@@ -1,49 +1,95 @@
-use windows::Win32::UI::Input::KeyboardAndMouse::*;
+//! # Keyboard Key Identifiers
+//!
+//! This module defines the `KeyId` enum, which provides a comprehensive,
+//! platform-agnostic representation of virtual key codes.
 
-/// Represents a key on the keyboard.
+/// A unique, platform-agnostic identifier for a physical key on a keyboard.
+///
+/// This enum is a core part of [`KeyboardEvent`] and is used to identify which
+/// key was pressed or released, abstracting away the platform-specific details
+/// of virtual key codes.
+///
+/// The variant names are based on standard US keyboard layouts and are designed
+/// to be self-explanatory.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum KeyId {
-    // Letter keys
+    // --- Alphanumeric Keys ---
+    /// The 'A' key.
     A,
+    /// The 'B' key.
     B,
+    /// The 'C' key.
     C,
+    /// The 'D' key.
     D,
+    /// The 'E' key.
     E,
+    /// The 'F' key.
     F,
+    /// The 'G' key.
     G,
+    /// The 'H' key.
     H,
+    /// The 'I' key.
     I,
+    /// The 'J' key.
     J,
+    /// The 'K' key.
     K,
+    /// The 'L' key.
     L,
+    /// The 'M' key.
     M,
+    /// The 'N' key.
     N,
+    /// The 'O' key.
     O,
+    /// The 'P' key.
     P,
+    /// The 'Q' key.
     Q,
+    /// The 'R' key.
     R,
+    /// The 'S' key.
     S,
+    /// The 'T' key.
     T,
+    /// The 'U' key.
     U,
+    /// The 'V' key.
     V,
+    /// The 'W' key.
     W,
+    /// The 'X' key.
     X,
+    /// The 'Y' key.
     Y,
+    /// The 'Z' key.
     Z,
 
-    // Number keys
+    // --- Number Keys (Top Row) ---
+    /// The '0' key on the top row.
     Key0,
+    /// The '1' key on the top row.
     Key1,
+    /// The '2' key on the top row.
     Key2,
+    /// The '3' key on the top row.
     Key3,
+    /// The '4' key on the top row.
     Key4,
+    /// The '5' key on the top row.
     Key5,
+    /// The '6' key on the top row.
     Key6,
+    /// The '7' key on the top row.
     Key7,
+    /// The '8' key on the top row.
     Key8,
+    /// The '9' key on the top row.
     Key9,
 
-    // Function keys
+    // --- Function Keys ---
     F1,
     F2,
     F3,
@@ -57,13 +103,13 @@ pub enum KeyId {
     F11,
     F12,
 
-    // Arrow keys
+    // --- Arrow Keys ---
     Up,
     Down,
     Left,
     Right,
 
-    // Other keys
+    // --- Common Control & Whitespace Keys ---
     Space,
     Enter,
     Escape,
@@ -73,110 +119,37 @@ pub enum KeyId {
     Control,
     Alt,
 
-    // Punctuation and special characters
-    Oem1,      // ';:' for US
-    OemPlus,   // '+'
-    OemComma,  // ','
-    OemMinus,  // '-'
-    OemPeriod, // '.'
-    Oem2,      // '/?'
-    Oem3,      // '`~'
-    Oem4,      // '[{'
-    Oem5,      // '\|'
-    Oem6,      // ']}'
-    Oem7,      // "'"'
+    // --- Punctuation & Special Character Keys (OEM) ---
+    // These are named based on their Windows Virtual-Key Code equivalents
+    // for cross-platform consistency. The comments indicate the corresponding
+    // keys on a standard US-layout keyboard.
+    /// The `;:` (semicolon/colon) key.
+    Oem1,
+    /// The `=+` (equals/plus) key.
+    OemPlus,
+    /// The `,<` (comma/less-than) key.
+    OemComma,
+    /// The `-_` (minus/underscore) key.
+    OemMinus,
+    /// The `.>` (period/greater-than) key.
+    OemPeriod,
+    /// The `/?` (slash/question-mark) key.
+    Oem2,
+    /// The `` `~ `` (grave accent/tilde) key.
+    Oem3,
+    /// The `[{` (left bracket/brace) key.
+    Oem4,
+    /// The `\|` (backslash/pipe) key.
+    Oem5,
+    /// The `]}` (right bracket/brace) key.
+    Oem6,
+    /// The `''"` (single/double quote) key.
+    Oem7,
 
-    /// An unknown key with the given virtual key code.
+    /// An unknown or unmapped key.
+    ///
+    /// This variant holds the raw, platform-specific virtual key code. It serves
+    /// as a fallback for any key that is not explicitly represented by one of
+    /// the other variants, ensuring that no keyboard input is ever lost.
     Unknown(u16),
-}
-
-impl KeyId {
-    /// Converts a virtual key code into a `KeyId`.
-    pub fn from_vkey(vkey: u16) -> Self {
-        match VIRTUAL_KEY(vkey) {
-            VK_A => KeyId::A,
-            VK_B => KeyId::B,
-            VK_C => KeyId::C,
-            VK_D => KeyId::D,
-            VK_E => KeyId::E,
-            VK_F => KeyId::F,
-            VK_G => KeyId::G,
-            VK_H => KeyId::H,
-            VK_I => KeyId::I,
-            VK_J => KeyId::J,
-            VK_K => KeyId::K,
-            VK_L => KeyId::L,
-            VK_M => KeyId::M,
-            VK_N => KeyId::N,
-            VK_O => KeyId::O,
-            VK_P => KeyId::P,
-            VK_Q => KeyId::Q,
-            VK_R => KeyId::R,
-            VK_S => KeyId::S,
-            VK_T => KeyId::T,
-            VK_U => KeyId::U,
-            VK_V => KeyId::V,
-            VK_W => KeyId::W,
-            VK_X => KeyId::X,
-            VK_Y => KeyId::Y,
-            VK_Z => KeyId::Z,
-
-            // Number keys
-            VK_0 => KeyId::Key0,
-            VK_1 => KeyId::Key1,
-            VK_2 => KeyId::Key2,
-            VK_3 => KeyId::Key3,
-            VK_4 => KeyId::Key4,
-            VK_5 => KeyId::Key5,
-            VK_6 => KeyId::Key6,
-            VK_7 => KeyId::Key7,
-            VK_8 => KeyId::Key8,
-            VK_9 => KeyId::Key9,
-
-            // Function keys
-            VK_F1 => KeyId::F1,
-            VK_F2 => KeyId::F2,
-            VK_F3 => KeyId::F3,
-            VK_F4 => KeyId::F4,
-            VK_F5 => KeyId::F5,
-            VK_F6 => KeyId::F6,
-            VK_F7 => KeyId::F7,
-            VK_F8 => KeyId::F8,
-            VK_F9 => KeyId::F9,
-            VK_F10 => KeyId::F10,
-            VK_F11 => KeyId::F11,
-            VK_F12 => KeyId::F12,
-
-            // Arrow keys
-            VK_UP => KeyId::Up,
-            VK_DOWN => KeyId::Down,
-            VK_LEFT => KeyId::Left,
-            VK_RIGHT => KeyId::Right,
-
-            // Other keys
-            VK_SPACE => KeyId::Space,
-            VK_RETURN => KeyId::Enter,
-            VK_ESCAPE => KeyId::Escape,
-            VK_BACK => KeyId::Backspace,
-            VK_TAB => KeyId::Tab,
-            VK_SHIFT => KeyId::Shift,
-            VK_CONTROL => KeyId::Control,
-            VK_MENU => KeyId::Alt,
-
-            // Punctuation and special characters
-            VK_OEM_1 => KeyId::Oem1,
-            VK_OEM_PLUS => KeyId::OemPlus,
-            VK_OEM_COMMA => KeyId::OemComma,
-            VK_OEM_MINUS => KeyId::OemMinus,
-            VK_OEM_PERIOD => KeyId::OemPeriod,
-            VK_OEM_2 => KeyId::Oem2,
-            VK_OEM_3 => KeyId::Oem3,
-            VK_OEM_4 => KeyId::Oem4,
-            VK_OEM_5 => KeyId::Oem5,
-            VK_OEM_6 => KeyId::Oem6,
-            VK_OEM_7 => KeyId::Oem7,
-
-            _ => KeyId::Unknown(vkey),
-        }
-    }
 }

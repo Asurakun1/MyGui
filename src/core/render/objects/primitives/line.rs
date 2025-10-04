@@ -1,50 +1,65 @@
-use crate::core::render::drawable::Drawable;
-use crate::core::render::drawing_context::DrawingContext;
-use windows::core::Result;
-use windows_numerics::Vector2;
+//! # Line Primitive
+//!
+//! This module defines the `Line` struct, a `Drawable` primitive for rendering a
+//! line segment with a specified color and thickness.
 
-/// A `Drawable` object that represents a line segment.
+use crate::core::{
+    backend::renderer::Renderer,
+    render::{color::Color, drawable::Drawable},
+};
+
+/// A `Drawable` struct that represents a line segment.
+///
+/// This struct defines a line by its start point (`p0_x`, `p0_y`), its end point
+/// (`p1_x`, `p1_y`), its `stroke_width` (thickness), and its `color`.
+///
+/// Like other primitives, this struct is a simple data container that delegates
+/// the rendering logic to the `draw_line` method of a [`Renderer`].
 pub struct Line {
-    pub p0: Vector2,
-    pub p1: Vector2,
+    /// The x-coordinate of the line's starting point.
+    pub p0_x: f32,
+    /// The y-coordinate of the line's starting point.
+    pub p0_y: f32,
+    /// The x-coordinate of the line's ending point.
+    pub p1_x: f32,
+    /// The y-coordinate of the line's ending point.
+    pub p1_y: f32,
+    /// The thickness (stroke width) of the line.
     pub stroke_width: f32,
+    /// The color of the line.
+    pub color: Color,
 }
 
 impl Line {
-    /// Creates a new `Line` with the specified start and end points, and stroke width.
-    pub fn new(p0: Vector2, p1: Vector2, stroke_width: f32) -> Self {
-        Self { p0, p1, stroke_width }
-    }
-
-    /// Creates a new `Line` with the specified start and end coordinates, and stroke width.
-    pub fn new_with_xy(x0: f32, y0: f32, x1: f32, y1: f32, stroke_width: f32) -> Self {
-        Self {
-            p0: Vector2 { X: x0, Y: y0 },
-            p1: Vector2 { X: x1, Y: y1 },
-            stroke_width,
-        }
+    /// Creates a new `Line` with the specified start and end points, stroke width, and color.
+    ///
+    /// # Arguments
+    ///
+    /// * `p0_x` - The x-coordinate of the starting point.
+    /// * `p0_y` - The y-coordinate of the starting point.
+    /// * `p1_x` - The x-coordinate of the ending point.
+    /// * `p1_y` - The y-coordinate of the ending point.
+    /// * `stroke_width` - The thickness of the line.
+    /// * `color` - The `Color` of the line.
+    pub fn new(p0_x: f32, p0_y: f32, p1_x: f32, p1_y: f32, stroke_width: f32, color: Color) -> Self {
+        Self { p0_x, p0_y, p1_x, p1_y, stroke_width, color }
     }
 }
 
 impl Drawable for Line {
-    /// Draws the line to the render target using the provided `DrawingContext`.
+    /// Draws the line by delegating to the active `Renderer`.
     ///
-    /// # Safety
+    /// This method calls the `draw_line` method on the provided `Renderer`,
+    /// passing a reference to itself.
     ///
-    /// This function contains an `unsafe` block for calling the Direct2D `DrawLine`
-    /// method. The caller must ensure that the `drawing_context` contains valid
-    /// Direct2D resources.
-    fn draw(&self, context: &DrawingContext) -> Result<()> {
-        unsafe {
-            context.render_target.DrawLine(
-                self.p0,
-                self.p1,
-                context.brush,
-                self.stroke_width,
-                None,
-            );
-        }
-
-        Ok(())
+    /// # Arguments
+    ///
+    /// * `renderer` - The `Renderer` that will perform the drawing operation.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if the renderer's `draw_line` method fails.
+    fn draw(&self, renderer: &mut dyn Renderer) -> anyhow::Result<()> {
+        renderer.draw_line(self)
     }
 }

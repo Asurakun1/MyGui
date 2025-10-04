@@ -19,20 +19,19 @@ This contrasts with immediate-mode rendering, where the application must manuall
 
 ## Current Features
 
--   **Windowing:** A high-level abstraction over Win32 window creation, class registration, and the message loop.
--   **Retained-Mode Rendering:** A hardware-accelerated rendering pipeline using Direct2D and DirectWrite.
--   **Scene Graph:** A `Scene` object that manages a collection of `Drawable` trait objects.
--   **Extensible Event System:** A trait-based `EventHandler` system allows for a clean separation of application logic from window messages.
--   **Basic Text Rendering:** A `TextObject` for drawing text to the screen.
+-   **Windowing:** A high-level abstraction over Win32 window creation, class registration, and the message loop, now with a flexible `WindowBuilder` for easy configuration.
+-   **Platform-Agnostic Rendering:** A hardware-accelerated rendering pipeline using Direct2D and DirectWrite, abstracted behind a `Renderer` trait to allow for swappable backends.
+-   **Scene Graph:** A `Scene` object that manages a collection of `Drawable` trait objects, including basic shapes (`Rectangle`, `Ellipse`, `Line`), text (`TextObject`), and composable `Canvas` elements.
+-   **Extensible Event System:** A trait-based `EventHandler` system with a `RootEventHandler` that composes multiple specialized handlers (keyboard, mouse, render) for modular and flexible event processing.
+-   **Comprehensive Input Handling:** Detailed tracking of keyboard (including modifier keys) and mouse input (position, buttons, wheel) with configurable input modes.
 
 ## Roadmap (Upcoming Features)
 
 I am actively working on evolving this project into a more flexible and powerful library. Key priorities include:
 
--   **Flexible Window Configuration:** Introducing a `WindowBuilder` to allow for easy and idiomatic configuration of window properties (size, title, etc.).
--   **Composable Event System:** Allowing multiple `EventHandler`s to be registered, enabling better code organization for complex applications.
--   **Advanced Text Rendering:** Implementing proper text layout and measurement using `IDWriteTextLayout` for correct and efficient text rendering.
--   **Adherence to Rust Conventions:** Aligning the project with standard community practices (e.g., crate naming).
+-   **Advanced Text Rendering:** Implementing proper text layout and measurement using `IDWriteTextLayout` for correct and efficient text rendering. (This is partially done, but can be improved)
+-   **Widget System:** Defining a `Widget` trait that unifies appearance, behavior, and layout for building complex UI components.
+-   **Layout System:** Introducing a layout system to manage the positioning and sizing of UI elements automatically.
 
 For a detailed list of tasks, see [TASKS.md](TASKS.md).
 
@@ -44,7 +43,7 @@ This project uses Cargo, Rust's package manager and build system.
     ```bash
     cargo build
     ```
-*   **Run:** To build and run the executable, use:
+*   **Run:** To build and run the example, use:
     ```bash
-    cargo run
+    cargo run --example hello_world
     ```

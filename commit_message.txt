@@ -1,0 +1,8 @@
+refactor: Decouple event loop from windowing system
+
+This commit decouples the event loop from the windowing system by
+introducing a `PlatformEventLoop` trait. The `Win32EventLoop` provides
+the platform-specific implementation for Windows.
+
+The `Window` struct no longer has a `run` method. Instead, the
+application is responsible for creating and running the `EventLoop`.
