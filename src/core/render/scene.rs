@@ -1,20 +1,20 @@
 //! # Scene Management
 //!
-//! This module provides the `Scene` struct, which acts as a container for all
-//! `Drawable` objects, and the `HasScene` trait, which allows the framework to
-//! access the scene from the application's state.
+//! This module provides the `Scene` struct, which acts as the main container
+//! for all `Drawable` objects in the retained-mode rendering model. It also
+//! defines the `HasScene` trait for generic access to the scene.
 
-use crate::core::render::drawable::Drawable;
 use crate::core::backend::renderer::Renderer;
+use crate::core::render::drawable::Drawable;
 
 /// A trait for application state types that contain a `Scene`.
 ///
-/// This trait creates a generic interface for the rendering system to access the
-/// `Scene` without needing to know the concrete type of the application's state
-/// struct. It is a required trait bound for the application state (`T`) used by
-/// the `RenderEventHandler`.
+/// This "has-a" trait creates a generic interface for the rendering system to
+/// access the `Scene` without being coupled to the concrete type of the
+/// application's state struct. It is a required trait bound for the application
+/// state (`T`) used by the `RenderEventHandler`.
 ///
-/// # Example
+/// ## Example
 ///
 /// ```rust,no_run
 /// use my_gui::core::render::scene::{Scene, HasScene};
@@ -23,7 +23,6 @@ use crate::core::backend::renderer::Renderer;
 /// #[derive(Default)]
 /// struct MyApp {
 ///     scene: Scene,
-///     user_name: String,
 ///     // ... other state fields
 /// }
 ///
@@ -39,15 +38,16 @@ pub trait HasScene {
     fn scene(&self) -> &Scene;
 }
 
-/// Represents a scene graph containing a collection of `Drawable` objects.
+/// A scene graph containing a collection of `Drawable` objects.
 ///
-/// The `Scene` is the central container for all graphical elements that need to be
-/// rendered in a window. It maintains a list of `Drawable` trait objects, which
-/// allows it to hold a heterogeneous collection of different shapes, text, images,
-/// and custom widgets.
+/// The `Scene` is the central container for all graphical elements that are
+/// rendered in a window. It maintains a list of `Drawable` trait objects,
+/// allowing it to hold a heterogeneous collection of different shapes, text,
+/// images, and custom widgets.
 ///
-/// The `RenderEventHandler` uses the `Scene` to perform the main rendering work
-/// during a `Paint` event by calling the `draw_all` method.
+/// In the retained-mode model, this `Scene` is built once (or updated
+/// incrementally) and then passed to the rendering system, which is responsible
+/// for drawing it on every `Paint` event.
 pub struct Scene {
     /// A vector of heap-allocated, dynamically-dispatched drawable objects.
     /// Using `Box<dyn Drawable>` allows the `Scene` to store any type that
@@ -65,9 +65,8 @@ impl Scene {
 
     /// Adds a `Drawable` object to the scene.
     ///
-    /// The object is boxed and added to the scene's list of `Drawable` trait objects.
-    /// The object must have a `'static` lifetime, meaning it must not contain any
-    /// non-static references.
+    /// The object is boxed and added to the scene's list of `Drawable` trait
+    /// objects. The rendering order is determined by the insertion order.
     ///
     /// # Type Parameters
     ///
@@ -82,8 +81,8 @@ impl Scene {
 
     /// Draws all objects in the scene using the provided `Renderer`.
     ///
-    /// This method iterates through all the `Drawable` objects in the scene in the
-    /// order they were added and calls their respective `draw` methods.
+    /// This method iterates through all the `Drawable` objects in the scene in
+    /// the order they were added and calls their respective `draw` methods.
     ///
     /// # Arguments
     ///
@@ -91,8 +90,8 @@ impl Scene {
     ///
     /// # Errors
     ///
-    /// This function will return an error if any of the underlying `draw` calls fail.
-    /// The iteration will stop at the first error encountered.
+    /// This function will return an error if any of the underlying `draw` calls
+    /// fail. The iteration will stop at the first error encountered.
     pub fn draw_all(&self, renderer: &mut dyn Renderer) -> anyhow::Result<()> {
         for object in &self.objects {
             object.draw(renderer)?;
@@ -102,7 +101,7 @@ impl Scene {
 }
 
 impl Default for Scene {
-    /// Creates a default `Scene`, which is equivalent to `Scene::new()`.
+    /// Creates a default, empty `Scene`, equivalent to `Scene::new()`.
     fn default() -> Self {
         Self::new()
     }

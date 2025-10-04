@@ -1,19 +1,21 @@
-//! # Rendering Backend
+//! # Backend Abstraction Layer
 //!
-//! This module provides the abstraction layer for the rendering engine. It defines a
-//! platform-agnostic `Renderer` trait that decouples the rest of the framework from
-//! the specific graphics API being used (e.g., Direct2D, OpenGL, Vulkan).
+//! The `backend` module provides a crucial abstraction layer that separates the core
+//! GUI framework from the underlying graphics APIs. Its primary component is the
+//! [`Renderer`] trait, which defines a platform-agnostic set of 2D drawing commands.
 //!
-//! ## Key Components
+//! This design allows the framework to be extended with different rendering backends
+//! (like OpenGL, Vulkan, or Metal) without changing the application-level rendering logic.
+//! Currently, it includes a `Direct2DRenderer` for the Windows platform.
 //!
-//! - **`Renderer`**: A trait that defines a set of drawing commands (e.g., `draw_rectangle`,
-//!   `draw_text`). This is the primary interface that `Drawable` objects use to render
-//!   themselves.
+//! ## Key Components:
 //!
-//! - **`Direct2DRenderer`**: A concrete implementation of the `Renderer` trait that uses
-//!   the Direct2D API on Windows. This is currently the only backend implementation.
-//!
-//! - **`config`**: A submodule for backend-specific configuration.
+//! - **[`Renderer`]**: A trait defining a generic interface for all rendering operations,
+//!   such as drawing shapes, text, and managing transformations.
+//! - **[`Direct2DRenderer`]**: An implementation of the `Renderer` trait using the
+//!   Direct2D and DirectWrite APIs on Windows.
+//! - **[`RendererConfig`]**: A configuration enum to specify which rendering backend
+//!   to use when creating a window.
 
 pub mod config;
 pub mod direct2d_renderer;

@@ -1,7 +1,29 @@
+//! # Win32 Input Translation
+//!
+//! This module provides utility functions for translating platform-specific
+//! input data from the Win32 API into the framework's platform-agnostic types.
+
 use crate::core::event::key_id::KeyId;
 use windows::Win32::UI::Input::KeyboardAndMouse::*;
 
-/// Converts a virtual key code into a `KeyId`.
+/// Converts a Windows Virtual-Key (`VIRTUAL_KEY`) code into a platform-agnostic `KeyId`.
+///
+/// This function is crucial for abstracting away the underlying operating system's
+/// keyboard input representation. It takes a raw `u16` virtual key code from a
+/// Win32 keyboard message (like `WM_KEYDOWN`) and maps it to the corresponding
+/// `KeyId` variant.
+///
+/// If the virtual key code does not have a direct mapping in `KeyId`, it is
+/// wrapped in the `KeyId::Unknown` variant, preserving the original code for
+/// potential special handling by the application.
+///
+/// # Arguments
+///
+/// * `vkey` - The `u16` virtual key code from the Win32 API.
+///
+/// # Returns
+///
+/// The corresponding `KeyId` for the given virtual key code.
 pub fn from_vkey(vkey: u16) -> KeyId {
     match VIRTUAL_KEY(vkey) {
         VK_A => KeyId::A,
