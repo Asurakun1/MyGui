@@ -54,9 +54,9 @@ impl<T: 'static + HasInputState, E: EventHandler<T> + 'static> Win32Window<T, E>
 
         // Create the renderer. At this stage, it only initializes device-independent
         // resources like Direct2D/DirectWrite factories.
-        let renderer: Box<dyn Renderer> = match config.renderer_config {
-            RendererConfig::Direct2D => Box::new(
-                Direct2DRenderer::new(&config.font_face_name, config.font_size as f32)
+        let renderer: Box<dyn Renderer> = match &config.renderer_config {
+            RendererConfig::Direct2D(font_config) => Box::new(
+                Direct2DRenderer::new(&font_config.font_face_name, font_config.font_size as f32)
                     .context("Failed to create Direct2DRenderer")?,
             ),
         };

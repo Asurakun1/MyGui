@@ -4,6 +4,7 @@
 //! and configuring a new application window.
 
 use crate::core::{
+    backend::config::RendererConfig,
     event::event_handler::EventHandler,
     event::input_state::HasInputState,
     platform::window_backend::WindowBackend,
@@ -78,8 +79,8 @@ impl WindowBuilder {
     }
 
     /// Sets the title of the window, which is displayed in the title bar.
-    pub fn with_title(mut self, title: &str) -> Self {
-        self.config.title = title.to_string();
+    pub fn with_title(mut self, title: impl Into<String>) -> Self {
+        self.config.title = title.into();
         self
     }
 
@@ -97,13 +98,15 @@ impl WindowBuilder {
 
     /// Sets the default font size for text rendering.
     pub fn with_font_size(mut self, size: i32) -> Self {
-        self.config.font_size = size;
+        let RendererConfig::Direct2D(font_config) = &mut self.config.renderer_config;
+        font_config.font_size = size;
         self
     }
 
     /// Sets the default font face name for text rendering (e.g., "Arial").
-    pub fn with_font_face_name(mut self, name: &str) -> Self {
-        self.config.font_face_name = name.to_string();
+    pub fn with_font_face_name(mut self, name: impl Into<String>) -> Self {
+        let RendererConfig::Direct2D(font_config) = &mut self.config.renderer_config;
+        font_config.font_face_name = name.into();
         self
     }
 

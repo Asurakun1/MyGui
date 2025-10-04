@@ -73,4 +73,16 @@ pub trait EventHandler<T> {
     ///   used for immediate drawing operations, though rendering is typically
     ///   deferred to the [`RenderEventHandler`] in response to a `Paint` event.
     fn on_event(&mut self, _app: &mut T, _event: &Event, _renderer: &mut dyn Renderer) {}
+
+    /// Handles an error that occurred in the event loop.
+    ///
+    /// This method is called when an error occurs in the `wndproc` function.
+    /// The default implementation logs the error.
+    ///
+    /// # Parameters
+    ///
+    /// - `error`: The error that occurred.
+    fn on_error(&mut self, error: &anyhow::Error) {
+        log::error!("An error occurred in the event loop: {:?}", error);
+    }
 }

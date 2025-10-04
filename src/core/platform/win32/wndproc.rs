@@ -76,12 +76,12 @@ pub extern "system" fn wndproc<T: 'static + HasInputState, E: EventHandler<T> + 
         WM_PAINT => {
             // If the render target has been lost, recreate it before painting.
             if window.renderer.get_render_target_size().is_none() {
-                window
+                if let Err(e) = window
                     .renderer
                     .create_device_dependent_resources(RawWindowHandle::Win32(hwnd))
-                    .unwrap_or_else(|e| {
-                        log::error!("Failed to recreate device dependent resources: {:?}", e);
-                    });
+                {
+                    window.event_handler.on_error(&e);
+                }
             }
             Some(Event::Paint)
         }
@@ -90,7 +90,7 @@ pub extern "system" fn wndproc<T: 'static + HasInputState, E: EventHandler<T> + 
             let height = ((lparam.0 >> 16) & 0xFFFF) as u32;
             let new_size = glam::uvec2(width, height);
             if let Err(e) = window.renderer.resize_render_target(new_size) {
-                log::error!("Failed to resize render target: {:?}", e);
+                window.event_handler.on_error(&e);
             }
             Some(Event::WindowResize(new_size))
         }

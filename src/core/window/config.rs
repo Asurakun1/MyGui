@@ -50,12 +50,6 @@ pub struct WindowConfig {
     /// The initial height of the window's client area, in physical pixels.
     pub height: i32,
 
-    /// The default font size to be used for text rendering.
-    pub font_size: i32,
-
-    /// The name of the default font face (e.g., "Arial", "Segoe UI").
-    pub font_face_name: String,
-
     /// The rendering backend to be used for this window.
     pub renderer_config: RendererConfig,
 
@@ -68,8 +62,7 @@ impl Default for WindowConfig {
     ///
     /// - **Title**: "Hello, Windows!"
     /// - **Size**: 800x600
-    /// - **Font**: "MS Gothic" at 18pt
-    /// - **Renderer**: Direct2D
+    /// - **Renderer**: Direct2D with default font settings
     /// - **Input Mode**: RawAndTranslated
     fn default() -> Self {
         Self {
@@ -77,9 +70,7 @@ impl Default for WindowConfig {
             class_name: "window_class".to_string(),
             width: 800,
             height: 600,
-            font_size: 18,
-            font_face_name: "MS Gothic".to_string(),
-            renderer_config: RendererConfig::Direct2D,
+            renderer_config: RendererConfig::Direct2D(Default::default()),
             keyboard_input_mode: KeyboardInputMode::RawAndTranslated,
         }
     }

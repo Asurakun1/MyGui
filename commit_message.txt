@@ -1,0 +1,8 @@
+feat: Standardize API and configuration
+
+This commit standardizes the API and configuration of the framework by:
+
+1.  Changing the `with_title` and `with_font_face_name` methods in
+    `WindowBuilder` to use `impl Into<String>` for a more flexible API.
+2.  Moving the font settings from `WindowConfig` into a dedicated
+    `FontConfig` struct within `RendererConfig`.

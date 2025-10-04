@@ -394,21 +394,17 @@ impl Renderer for Direct2DRenderer {
     /// Propagates any errors from the underlying Direct2D calls.
     fn draw_rectangle(&mut self, rectangle: &Rectangle) -> anyhow::Result<()> {
         if let Some(render_target) = &self.render_target {
-            let rect = D2D_RECT_F {
-                left: rectangle.x,
-                top: rectangle.y,
-                right: rectangle.x + rectangle.width,
-                bottom: rectangle.y + rectangle.height,
-            };
+            if let Some(brush) = &self.brush {
+                let rect = D2D_RECT_F {
+                    left: rectangle.x,
+                    top: rectangle.y,
+                    right: rectangle.x + rectangle.width,
+                    bottom: rectangle.y + rectangle.height,
+                };
 
-            let brush = self.brush.get_or_insert_with(|| unsafe {
-                render_target
-                    .CreateSolidColorBrush(&D2D1_COLOR_F { r: rectangle.color.r, g: rectangle.color.g, b: rectangle.color.b, a: rectangle.color.a }, None)
-                    .expect("Failed to create ID2D1SolidColorBrush")
-            });
-
-            unsafe { brush.SetColor(&D2D1_COLOR_F { r: rectangle.color.r, g: rectangle.color.g, b: rectangle.color.b, a: rectangle.color.a }) };
-            unsafe { render_target.FillRectangle(&rect, &*brush) };
+                unsafe { brush.SetColor(&D2D1_COLOR_F { r: rectangle.color.r, g: rectangle.color.g, b: rectangle.color.b, a: rectangle.color.a }) };
+                unsafe { render_target.FillRectangle(&rect, brush) };
+            }
         }
         Ok(())
     }
@@ -426,23 +422,19 @@ impl Renderer for Direct2DRenderer {
     /// Propagates any errors from the underlying Direct2D calls.
     fn draw_ellipse(&mut self, ellipse: &Ellipse) -> anyhow::Result<()> {
         if let Some(render_target) = &self.render_target {
-            let d2d_ellipse = D2D1_ELLIPSE {
-                point: windows_numerics::Vector2 {
-                    X: ellipse.center_x,
-                    Y: ellipse.center_y,
-                }, // Use f32 coordinates
-                radiusX: ellipse.radius_x,
-                radiusY: ellipse.radius_y,
-            };
+            if let Some(brush) = &self.brush {
+                let d2d_ellipse = D2D1_ELLIPSE {
+                    point: windows_numerics::Vector2 {
+                        X: ellipse.center_x,
+                        Y: ellipse.center_y,
+                    }, // Use f32 coordinates
+                    radiusX: ellipse.radius_x,
+                    radiusY: ellipse.radius_y,
+                };
 
-            let brush = self.brush.get_or_insert_with(|| unsafe {
-                render_target
-                    .CreateSolidColorBrush(&D2D1_COLOR_F { r: ellipse.color.r, g: ellipse.color.g, b: ellipse.color.b, a: ellipse.color.a }, None)
-                    .expect("Failed to create ID2D1SolidColorBrush")
-            });
-
-            unsafe { brush.SetColor(&D2D1_COLOR_F { r: ellipse.color.r, g: ellipse.color.g, b: ellipse.color.b, a: ellipse.color.a }) };
-            unsafe { render_target.FillEllipse(&d2d_ellipse, &*brush) };
+                unsafe { brush.SetColor(&D2D1_COLOR_F { r: ellipse.color.r, g: ellipse.color.g, b: ellipse.color.b, a: ellipse.color.a }) };
+                unsafe { render_target.FillEllipse(&d2d_ellipse, brush) };
+            }
         }
         Ok(())
     }
@@ -460,27 +452,23 @@ impl Renderer for Direct2DRenderer {
     /// Propagates any errors from the underlying Direct2D calls.
     fn draw_line(&mut self, line: &Line) -> anyhow::Result<()> {
         if let Some(render_target) = &self.render_target {
-            let brush = self.brush.get_or_insert_with(|| unsafe {
-                render_target
-                    .CreateSolidColorBrush(&D2D1_COLOR_F { r: line.color.r, g: line.color.g, b: line.color.b, a: line.color.a }, None)
-                    .expect("Failed to create ID2D1SolidColorBrush")
-            });
-
-            unsafe { brush.SetColor(&D2D1_COLOR_F { r: line.color.r, g: line.color.g, b: line.color.b, a: line.color.a }) };
-            unsafe {
-                render_target.DrawLine(
-                    windows_numerics::Vector2 {
-                        X: line.p0_x,
-                        Y: line.p0_y,
-                    }, // Use f32 coordinates
-                    windows_numerics::Vector2 {
-                        X: line.p1_x,
-                        Y: line.p1_y,
-                    }, // Use f32 coordinates
-                    &*brush,
-                    line.stroke_width,
-                    None,
-                );
+            if let Some(brush) = &self.brush {
+                unsafe { brush.SetColor(&D2D1_COLOR_F { r: line.color.r, g: line.color.g, b: line.color.b, a: line.color.a }) };
+                unsafe {
+                    render_target.DrawLine(
+                        windows_numerics::Vector2 {
+                            X: line.p0_x,
+                            Y: line.p0_y,
+                        }, // Use f32 coordinates
+                        windows_numerics::Vector2 {
+                            X: line.p1_x,
+                            Y: line.p1_y,
+                        }, // Use f32 coordinates
+                        brush,
+                        line.stroke_width,
+                        None,
+                    );
+                }
             }
         }
         Ok(())
@@ -504,37 +492,31 @@ impl Renderer for Direct2DRenderer {
     /// Returns an error if the `CreateTextLayout` call fails.
     fn draw_text(&mut self, text: &TextObject) -> anyhow::Result<()> {
         if let Some(render_target) = &self.render_target {
-            let text_utf16: Vec<u16> = text.text.encode_utf16().collect();
+            if let Some(brush) = &self.brush {
+                let text_utf16: Vec<u16> = text.text.encode_utf16().collect();
 
-            let size = unsafe { render_target.GetSize() };
+                let size = unsafe { render_target.GetSize() };
 
-            // Create a text layout object. This is a temporary object that holds
-            // the text and its formatting properties.
-            let text_layout = unsafe {
-                self.dwrite_factory
-                    .CreateTextLayout(&text_utf16, &self.text_format, size.width, size.height)
-                    .context("Failed to create IDWriteTextLayout")?
-            };
+                let text_layout = unsafe {
+                    self.dwrite_factory
+                        .CreateTextLayout(&text_utf16, &self.text_format, size.width, size.height)
+                        .context("Failed to create IDWriteTextLayout")?
+                };
 
-            let origin = windows_numerics::Vector2 {
-                X: text.x,
-                Y: text.y,
-            };
+                let origin = windows_numerics::Vector2 {
+                    X: text.x,
+                    Y: text.y,
+                };
 
-            let brush = self.brush.get_or_insert_with(|| unsafe {
-                render_target
-                    .CreateSolidColorBrush(&D2D1_COLOR_F { r: text.color.r, g: text.color.g, b: text.color.b, a: text.color.a }, None)
-                    .expect("Failed to create ID2D1SolidColorBrush")
-            });
-
-            unsafe { brush.SetColor(&D2D1_COLOR_F { r: text.color.r, g: text.color.g, b: text.color.b, a: text.color.a }) };
-            unsafe {
-                render_target.DrawTextLayout(
-                    origin,
-                    &text_layout,
-                    &*brush,
-                    D2D1_DRAW_TEXT_OPTIONS_NONE,
-                );
+                unsafe { brush.SetColor(&D2D1_COLOR_F { r: text.color.r, g: text.color.g, b: text.color.b, a: text.color.a }) };
+                unsafe {
+                    render_target.DrawTextLayout(
+                        origin,
+                        &text_layout,
+                        brush,
+                        D2D1_DRAW_TEXT_OPTIONS_NONE,
+                    );
+                }
             }
         }
         Ok(())
