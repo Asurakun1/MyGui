@@ -3,8 +3,8 @@
 //! This module defines the `Canvas` struct, a powerful `Drawable` container that
 //! provides a local coordinate system and clipping for its child objects.
 
-use crate::core::{backend::renderer::Renderer, render::drawable::Drawable};
-use anyhow::Result;
+use crate::core::prelude::*;
+use crate::core::render::drawable::Drawable;
 use glam::Affine2;
 
 /// A `Drawable` container that defines a local coordinate system and clipping region.

@@ -63,10 +63,8 @@ pub mod config;
 
 pub use builder::WindowBuilder;
 
-use crate::core::event::event_handler::EventHandler;
-use crate::core::event::input_state::HasInputContext;
+use crate::core::prelude::*;
 use crate::core::platform::window_backend::WindowBackend;
-use crate::core::window::config::WindowConfig;
 
 /// Represents a native application window.
 ///

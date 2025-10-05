@@ -3,14 +3,9 @@
 //! This module provides the `WindowBuilder`, a fluent interface for creating
 //! and configuring a new application window.
 
-use crate::core::{
-    backend::config::RendererConfig,
-    event::event_handler::EventHandler,
-    event::input_state::HasInputContext,
-    platform::window_backend::WindowBackend,
-    window::config::WindowConfig,
-};
-use anyhow::{Context, Result};
+use crate::core::prelude::*;
+use crate::core::platform::window_backend::WindowBackend;
+use anyhow::Context;
 
 /// A builder for creating and configuring a window.
 ///

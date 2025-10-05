@@ -3,10 +3,8 @@
 //! This module defines the `Ellipse` struct, a `Drawable` primitive for rendering
 //! a solid-color ellipse or circle.
 
-use crate::core::{
-    backend::renderer::Renderer,
-    render::{color::Color, drawable::Drawable},
-};
+use crate::core::prelude::*;
+use crate::core::render::drawable::Drawable;
 
 /// A `Drawable` struct that represents a filled ellipse.
 ///

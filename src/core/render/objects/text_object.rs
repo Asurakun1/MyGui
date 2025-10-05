@@ -3,11 +3,8 @@
 //! This module defines the `TextObject`, a `Drawable` primitive for rendering
 //! a single line of text.
 
-use crate::core::{
-    backend::renderer::Renderer,
-    render::{color::Color, drawable::Drawable},
-};
-use anyhow::Result;
+use crate::core::prelude::*;
+use crate::core::render::drawable::Drawable;
 
 /// A `Drawable` struct for rendering a single line of text.
 ///

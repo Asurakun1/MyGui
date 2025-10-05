@@ -3,7 +3,7 @@
 //! This module defines the `Drawable` trait, the fundamental abstraction for any
 //! object that can be rendered on the screen.
 
-use crate::core::backend::renderer::Renderer;
+use crate::core::prelude::*;
 
 /// A trait for objects that can be drawn to a [`Renderer`].
 ///

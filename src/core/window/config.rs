@@ -3,7 +3,7 @@
 //! This module defines the structures used to configure a new window, primarily
 //! the `WindowConfig` struct and related enums.
 
-use crate::core::backend::config::RendererConfig;
+use crate::core::prelude::*;
 
 /// Specifies the desired keyboard input mode for the window.
 ///

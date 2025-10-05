@@ -3,10 +3,8 @@
 //! This module defines the `Line` struct, a `Drawable` primitive for rendering a
 //! line segment with a specified color and thickness.
 
-use crate::core::{
-    backend::renderer::Renderer,
-    render::{color::Color, drawable::Drawable},
-};
+use crate::core::prelude::*;
+use crate::core::render::drawable::Drawable;
 
 /// A `Drawable` struct that represents a line segment.
 ///

@@ -4,7 +4,7 @@
 //! for all `Drawable` objects in the retained-mode rendering model. It also
 //! defines the `HasScene` trait for generic access to the scene.
 
-use crate::core::backend::renderer::Renderer;
+use crate::core::prelude::*;
 use crate::core::render::drawable::Drawable;
 
 /// A trait for application state types that contain a `Scene`.
