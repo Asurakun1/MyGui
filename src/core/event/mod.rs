@@ -37,7 +37,7 @@ pub mod handlers;
 pub mod input_state;
 pub mod key_id;
 
-use crate::core::event::handlers::input_handler::{KeyboardEvent, MouseEvent};
+use crate::core::prelude::*;
 use glam::UVec2;
 
 /// A platform-agnostic enumeration of all possible GUI events.

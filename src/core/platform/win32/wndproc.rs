@@ -3,20 +3,13 @@
 //! This module contains the `wndproc`, the main window procedure function for
 //! handling all messages sent to a Win32 window.
 
+use crate::core::prelude::*;
 use crate::core::{
-    event::{
-        event_handler::EventHandler,
-        handlers::{
-            input_handler::{KeyboardEvent, MouseButton, MouseEvent},
-        },
-        input_state::HasInputContext,
-        Event,
-    },
+    event::handlers::input_handler::MouseButton,
     platform::{
         win32::{input::from_vkey, win32_window::Win32Window},
         RawWindowHandle,
     },
-    window::config::KeyboardInputMode,
 };
 use windows::{
     Win32::Foundation::*, Win32::UI::Input::KeyboardAndMouse::*, Win32::UI::WindowsAndMessaging::*,

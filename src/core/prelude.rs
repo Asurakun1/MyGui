@@ -12,6 +12,7 @@ pub use crate::core::{
     event::{
         Event,
         event_handler::EventHandler,
+        key_id::KeyId,
         
         handlers::{
             default_input_handler::DefaultInputHandler,

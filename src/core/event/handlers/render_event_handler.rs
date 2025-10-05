@@ -3,11 +3,7 @@
 //! This module provides the `RenderEventHandler`, a specialized handler
 //! responsible for orchestrating the drawing of the application's scene.
 
-use crate::core::{
-    backend::renderer::Renderer,
-    event::{event_handler::EventHandler, Event},
-    render::{color::Color, scene::HasScene},
-};
+use crate::core::prelude::*;
 use std::marker::PhantomData;
 
 /// An [`EventHandler`] responsible for rendering the application's scene graph.

@@ -3,7 +3,7 @@
 //! This module defines the `WindowBackend` trait, which serves as the core
 //! abstraction for creating and managing platform-specific windows.
 
-use crate::core::event::event_handler::EventHandler;
+use crate::core::prelude::*;
 
 /// Defines the interface for a platform-specific window implementation.
 ///

@@ -3,11 +3,10 @@
 //! This module provides the `Win32Window`, a concrete implementation of the
 //! `WindowBackend` trait for the Microsoft Windows platform.
 
+use crate::core::prelude::*;
 use crate::core::{
-    backend::{config::RendererConfig, direct2d_renderer::Direct2DRenderer, renderer::Renderer},
-    event::{event_handler::EventHandler, input_state::HasInputContext},
+    backend::direct2d_renderer::Direct2DRenderer,
     platform::{RawWindowHandle, win32::wndproc::wndproc, window_backend::WindowBackend},
-    window::config::WindowConfig,
 };
 use anyhow::Context;
 use windows::{

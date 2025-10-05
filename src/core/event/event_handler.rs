@@ -3,8 +3,7 @@
 //! This module defines the `EventHandler` trait, the fundamental building block
 //! of the event processing system in the framework.
 
-use crate::core::backend::renderer::Renderer;
-use crate::core::event::Event;
+use crate::core::prelude::*;
 
 /// A generic trait for handling window and input events.
 ///

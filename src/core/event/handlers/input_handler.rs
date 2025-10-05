@@ -3,10 +3,7 @@
 //! This module provides the primary handlers and data structures for processing
 //! raw keyboard and mouse input and tracking their state.
 
-use crate::core::{
-    backend::renderer::Renderer,
-    event::{event_handler::EventHandler, input_state::HasInputContext, key_id::KeyId, Event},
-};
+use crate::core::prelude::*;
 use std::collections::HashSet;
 
 // --- Keyboard ---

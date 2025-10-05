@@ -3,7 +3,7 @@
 //! This module provides utility functions for translating platform-specific
 //! input data from the Win32 API into the framework's platform-agnostic types.
 
-use crate::core::event::key_id::KeyId;
+use crate::core::prelude::*;
 use windows::Win32::UI::Input::KeyboardAndMouse::*;
 
 /// Converts a Windows Virtual-Key (`VIRTUAL_KEY`) code into a platform-agnostic `KeyId`.

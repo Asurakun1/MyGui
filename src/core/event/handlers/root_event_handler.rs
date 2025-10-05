@@ -3,10 +3,7 @@
 //! This module provides the `RootEventHandler`, which acts as the primary
 //! dispatcher in the event handling system.
 
-use crate::core::{
-    backend::renderer::Renderer,
-    event::{event_handler::EventHandler, Event},
-};
+use crate::core::prelude::*;
 
 /// The primary event handler that composes and delegates to other, more specialized handlers.
 ///
