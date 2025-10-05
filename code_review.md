@@ -50,7 +50,7 @@ While the codebase is strong, there are a few areas that could be improved:
 ## Status of Areas for Improvement
 
 - **`Win32Window::run` Method**: Completed
-- **Redundant `Window` Struct**: Pending
+- **Redundant `Window` Struct**: Completed
 - **Manual `wndproc` Pointer Management**: Pending
 
 ## 4. Code Style and Conventions

@@ -31,6 +31,7 @@ pub use crate::core::{
     },
     window::{
         Window,
+        WindowBuilder,
         config::{KeyboardInputMode, WindowConfig},
     },
 };

@@ -125,16 +125,11 @@ fn main() -> Result<()> {
     event_handler.add_handler(Box::new(DefaultInputHandler::new()));
     event_handler.add_handler(Box::new(CustomEventHandler)); // Add the custom handler
 
-    let config = WindowConfig {
-        title: "Hello, World!".to_string(),
-        width: 900,
-        height: 600,
-        renderer_config: RendererConfig::Direct2D(Default::default()), // Specify the renderer
-        keyboard_input_mode: KeyboardInputMode::Translated,
-        ..Default::default()
-    };
-
-    let window = Window::new(config, event_handler, app)?;
+    let window = WindowBuilder::new()
+        .with_title("Hello, World!")
+        .with_width(900)
+        .with_height(600)
+        .build(event_handler, app)?;
 
     window.run()
 }

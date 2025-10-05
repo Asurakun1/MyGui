@@ -89,14 +89,7 @@ where
 }
 
 impl<T: 'static + HasInputContext, E: 'static + EventHandler<T>> Window<T, E> {
-    /// Creates a new window using the specified configuration, event handler, and app state.
-    ///
-    /// While this method can be used directly, it is often more convenient to
-    /// use the [`WindowBuilder`] for a more fluent configuration experience.
-    pub fn new(from_config: WindowConfig, event_handler: E, app: T) -> Result<Self, anyhow::Error> {
-        let window_backend = WindowBuilder::from_config(from_config).build(event_handler, app)?;
-        Ok(Self { window_backend })
-    }
+
 
     /// Runs the window's main event loop.
     ///

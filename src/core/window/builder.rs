@@ -4,7 +4,7 @@
 //! and configuring a new application window.
 
 use crate::core::prelude::*;
-use crate::core::platform::window_backend::WindowBackend;
+
 use anyhow::Context;
 
 /// A builder for creating and configuring a window.
@@ -105,6 +105,16 @@ impl WindowBuilder {
         self
     }
 
+    pub fn with_renderer_config(mut self, config: RendererConfig) -> Self {
+        self.config.renderer_config = config;
+        self
+    }
+
+    pub fn with_keyboard_input_mode(mut self, mode: KeyboardInputMode) -> Self {
+        self.config.keyboard_input_mode = mode;
+        self
+    }
+
     /// Builds the window with the specified configuration, event handler, and app state.
     ///
     /// This method consumes the builder and returns a platform-specific window
@@ -130,13 +140,13 @@ impl WindowBuilder {
         &self,
         event_handler: E,
         app: T,
-    ) -> Result<Box<dyn WindowBackend<T, E>>> {
+    ) -> Result<Window<T, E>> {
         #[cfg(target_os = "windows")]
         {
             use crate::core::platform::win32::win32_window::Win32Window;
             let backend = Win32Window::new(&self.config, event_handler, app)
                 .context("Failed to create Win32 window backend")?;
-            Ok(backend)
+            Ok(Window { window_backend: backend })
         }
 
         #[cfg(not(target_os = "windows"))]
