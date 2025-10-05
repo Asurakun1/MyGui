@@ -210,12 +210,7 @@ pub extern "system" fn wndproc<T: 'static + HasInputContext, E: EventHandler<T> 
         // --- Window Lifecycle ---
         WM_DESTROY => Some(Event::WindowClose),
         WM_NCDESTROY => {
-            // This is the last message a window receives. We must clean up the
-            // Box<Win32Window> to prevent a memory leak.
-            let ptr = unsafe { SetWindowLongPtrW(hwnd, GWLP_USERDATA, 0) };
-            if ptr != 0 {
-                let _ = unsafe { Box::from_raw(ptr as *mut Win32Window<T, E>) };
-            }
+            // The Box<Win32Window> is cleaned up by the Drop trait when the run method returns.
             None
         }
 

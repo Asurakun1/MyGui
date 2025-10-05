@@ -47,6 +47,12 @@ While the codebase is strong, there are a few areas that could be improved:
 
 *   **Manual `wndproc` Pointer Management**: The `wndproc` function uses `SetWindowLongPtrW` and `GetWindowLongPtrW` to store a raw pointer to the `Win32Window` instance. While this is a standard Win32 technique, it is inherently `unsafe`. Modern libraries often use closures or other safer mechanisms to manage this state, although the current implementation is correct and well-contained. This is a minor point, as the current solution is pragmatic and works well.
 
+## Status of Areas for Improvement
+
+- **`Win32Window::run` Method**: Completed
+- **Redundant `Window` Struct**: Pending
+- **Manual `wndproc` Pointer Management**: Pending
+
 ## 4. Code Style and Conventions
 
 The code style is consistent and adheres to Rust conventions (`snake_case` for functions and variables, `PascalCase` for types). The formatting is clean and readable.

@@ -155,7 +155,7 @@ impl<T: 'static + HasInputContext, E: EventHandler<T> + 'static> WindowBackend<T
             };
         }
 
-        std::mem::forget(self);
+        
         Ok(())
     }
 }
