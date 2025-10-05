@@ -22,35 +22,38 @@
 //! ## Example
 //!
 //! ```rust,no_run
-//! use my_gui::core::window::WindowBuilder;
-//! use my_gui::core::event::handlers::root_event_handler::RootEventHandler;
-//! use my_gui::core::event::input_state::{InputContext, HasInputContext};
+//! use my_gui::prelude::*;
 //!
 //! // 1. Define the application's state.
 //! #[derive(Default)]
 //! struct MyApp {
 //!     input_context: InputContext,
+//!     scene: Scene,
 //! }
 //!
-//! // Implement the necessary state traits.
+//! // 2. Implement the necessary state-access traits.
 //! impl HasInputContext for MyApp {
 //!     fn input_context(&self) -> &InputContext { &self.input_context }
 //!     fn input_context_mut(&mut self) -> &mut InputContext { &mut self.input_context }
 //! }
 //!
+//! impl HasScene for MyApp {
+//!     fn scene(&self) -> &Scene { &self.scene }
+//! }
+//!
 //! fn main() -> anyhow::Result<()> {
-//!     // 2. Create the application state and the root event handler.
+//!     // 3. Create the application state and the root event handler.
 //!     let app = MyApp::default();
 //!     let event_handler = RootEventHandler::new();
 //!
-//!     // 3. Use the WindowBuilder to configure and build the window.
+//!     // 4. Use the WindowBuilder to configure and build the window.
 //!     let window = WindowBuilder::new()
 //!         .with_title("My Awesome App")
 //!         .with_width(800)
 //!         .with_height(600)
 //!         .build(event_handler, app)?;
 //!
-//!     // 4. Run the application's main event loop.
+//!     // 5. Run the application's main event loop.
 //!     window.run()
 //! }
 //! ```
@@ -65,18 +68,43 @@ use crate::core::event::input_state::HasInputContext;
 use crate::core::platform::window_backend::WindowBackend;
 use crate::core::window::config::WindowConfig;
 
+/// Represents a native application window.
+///
+/// This struct is the high-level, public-facing representation of a window. It
+/// encapsulates a platform-specific backend (`WindowBackend`) that handles the
+/// actual OS-level interactions.
+///
+/// An instance of `Window` is typically created using a [`WindowBuilder`].
+/// Once created, the `run` method is called to start the application's event loop.
+///
+/// # Type Parameters
+///
+/// - `T`: The application's state struct.
+/// - `E`: The application's root event handler.
 pub struct Window<T, E>
 where
     T: 'static,
     E: 'static,
 {
+    /// The platform-specific window implementation.
     pub window_backend: Box<dyn WindowBackend<T, E>>,
 }
 
 impl<T: 'static + HasInputContext, E: 'static + EventHandler<T>> Window<T, E> {
+    /// Creates a new window using the specified configuration, event handler, and app state.
+    ///
+    /// While this method can be used directly, it is often more convenient to
+    /// use the [`WindowBuilder`] for a more fluent configuration experience.
     pub fn new(from_config: WindowConfig, event_handler: E, app: T) -> Result<Self, anyhow::Error> {
-        let window_backend: Box<dyn WindowBackend<T, E>> =
-            WindowBuilder::from_config(from_config).build(event_handler, app)?;
-        Ok(Self { window_backend })
+        let window_backend = WindowBuilder::from_config(from_config).build(event_handler, app)?;
+        Ok(window_backend)
+    }
+
+    /// Runs the window's main event loop.
+    ///
+    /// This method delegates to the underlying platform backend to start processing
+    /// window messages. It blocks the current thread until the window is closed.
+    pub fn run(self) -> anyhow::Result<()> {
+        self.window_backend.run()
     }
 }

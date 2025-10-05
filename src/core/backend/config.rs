@@ -3,9 +3,12 @@
 //! This module defines configuration options for the rendering backend, allowing
 //! the user to select a specific graphics API implementation at startup.
 
+/// Holds configuration for the default font used by the renderer.
 #[derive(Debug, Clone, PartialEq)]
 pub struct FontConfig {
+    /// The name of the font family (e.g., "Arial", "Segoe UI").
     pub font_face_name: String,
+    /// The default size of the font, in pixels.
     pub font_size: i32,
 }
 

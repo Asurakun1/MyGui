@@ -16,12 +16,13 @@ use glam::{Affine2, UVec2};
 /// A platform-agnostic interface for 2D rendering operations.
 ///
 /// This trait abstracts the underlying graphics API, providing a unified set of
-/// commands for drawing shapes, text, and managing render state. `Drawable`
+/// commands for drawing shapes, text, and managing render state. [`Drawable`]
 /// objects use this trait to render themselves without needing to know the
 /// specifics of the graphics backend.
 ///
 /// The lifecycle of a `Renderer` is typically managed by the windowing backend,
-/// which handles its creation, resizing, and cleanup.
+/// which handles its creation, resizing, and cleanup. This ensures that rendering
+/// resources are correctly initialized and released in sync with the native window.
 pub trait Renderer {
     // --- Resource Management ---
 
@@ -30,19 +31,24 @@ pub trait Renderer {
     /// is first created or when the device has been lost and needs to be recreated.
     ///
     /// # Arguments
-    /// * `handle` - A raw window handle for the window being rendered to.
+    /// * `handle` - A raw window handle for the window being rendered to. This is
+    ///   necessary for the graphics API to connect to the native window.
     fn create_device_dependent_resources(&mut self, handle: RawWindowHandle) -> anyhow::Result<()>;
 
     /// Releases all device-dependent resources. This is called during cleanup
-    /// or in response to a device loss event.
+    /// or in response to a device loss event, ensuring that GPU memory and other
+    /// handles are properly freed.
     fn release_device_dependent_resources(&mut self);
 
     // --- Render Target Management ---
 
-    /// Returns the current size of the render target in pixels.
+    /// Returns the current size of the render target in pixels. This is useful
+    /// for layout calculations that depend on the dimensions of the drawing surface.
     fn get_render_target_size(&self) -> Option<UVec2>;
 
     /// Resizes the render target, typically in response to a window resize event.
+    /// This is a critical step to ensure the drawing surface matches the window's
+    /// client area, preventing stretching or clipping.
     ///
     /// # Arguments
     /// * `new_size` - The new size of the render target in pixels.
@@ -51,18 +57,23 @@ pub trait Renderer {
     // --- Drawing Cycle ---
 
     /// Begins a drawing session. This must be called before any other drawing
-    /// commands are issued. It prepares the render target for drawing.
+    /// commands are issued. It prepares the render target for drawing, effectively
+    /// locking it for the duration of the frame.
     fn begin_draw(&mut self);
 
-    /// Ends the drawing session and presents the final rendered frame.
+    /// Ends the drawing session and presents the final rendered frame. This flushes
+    /// all batched drawing commands to the GPU and, on platforms with a swap chain,
+    /// swaps the back buffer to the front, making the new frame visible.
     ///
     /// # Errors
     /// Returns an error if the drawing session cannot be ended gracefully, such
-    /// as in the case of a lost rendering device. Implementations should handle
+    -/// as in the case of a lost rendering device. Implementations should handle
+    +/// as in the case of a lost rendering device. Implementations should handle
     /// device loss by calling `release_device_dependent_resources`.
     fn end_draw(&mut self) -> anyhow::Result<()>;
 
-    /// Clears the entire render target with the specified color.
+    /// Clears the entire render target with the specified color. This is typically
+    /// the first operation after `begin_draw` to ensure a clean slate for the new frame.
     fn clear(&mut self, color: &Color);
 
     // --- State Management (Transforms and Clipping) ---
@@ -75,16 +86,18 @@ pub trait Renderer {
     fn push_axis_aligned_clip(&mut self, x: f32, y: f32, width: f32, height: f32);
 
     /// Pops the last clipping rectangle from the stack, restoring the previous one.
+    /// This must be paired with a corresponding `push_axis_aligned_clip` call.
     fn pop_axis_aligned_clip(&mut self);
 
     /// Sets the current transformation matrix for the renderer.
     ///
     /// All subsequent drawing operations will be transformed by this matrix. This
     /// is fundamental for implementing translation, scaling, and rotation for
-    /// objects like a `Canvas` or custom UI elements.
+    /// objects like a [`Canvas`] or custom UI elements.
     fn set_transform(&mut self, matrix: &Affine2);
 
-    /// Gets the current transformation matrix.
+    /// Gets the current transformation matrix. This is useful for constructing
+    /// nested transformations or for hit-testing calculations.
     fn get_transform(&self) -> Affine2;
 
     // --- Primitive Drawing ---
@@ -111,6 +124,7 @@ pub trait Renderer {
     fn draw_line(&mut self, line: &Line) -> anyhow::Result<()>;
 
     /// Draws a `TextObject`. The renderer is responsible for font selection,
-    /// layout, and rasterization.
+    /// layout, and rasterization using the platform's text rendering engine
+    /// (e.g., DirectWrite on Windows).
     fn draw_text(&mut self, text: &TextObject) -> anyhow::Result<()>;
 }
