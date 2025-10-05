@@ -6,7 +6,7 @@ The `my_gui` framework is a well-designed, retained-mode GUI library for Windows
 
 The main architectural components are:
 
-*   **Platform Abstraction**: The `platform` module successfully abstracts away the Win32 API, with clear traits (`WindowBackend`, `PlatformEventLoop`) and a dedicated `win32` implementation. This is a solid foundation for future cross-platform support.
+*   **Platform Abstraction**: The `platform` module successfully abstracts away the Win32 API, with a clear `WindowBackend` trait and a dedicated `win32` implementation. This is a solid foundation for future cross-platform support.
 *   **Rendering Abstraction**: The `backend` module, with its `Renderer` trait, effectively decouples the application's drawing logic from the specific graphics API (Direct2D). This is a major strength.
 *   **Retained-Mode Rendering**: The `render` module provides a clean implementation of the retained-mode paradigm with the `Drawable` trait, the `Scene` graph, and composable objects like `Canvas`. This makes rendering intuitive for the end-user.
 *   **Event-Driven System**: The `event` module offers a flexible, composable event handling system. The use of the `EventHandler` trait and the `RootEventHandler` allows for modular and reusable logic.

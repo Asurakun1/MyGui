@@ -31,7 +31,7 @@
   - **Idea**: Add support for macOS (using Metal/Cocoa) and Linux (using Vulkan/Wayland).
   - **Discussion Points**:
     - The abstraction layer is in place, but new backends will need to be created for each platform.
-    - This will involve creating new implementations of the `WindowBackend`, `Renderer`, and `EventLoopBackend` traits.
+    - This will involve creating new implementations of the `WindowBackend` and `Renderer` traits.
 
 - **Advanced State Management**:
   - **Idea**: Explore more advanced state management patterns for complex applications.
