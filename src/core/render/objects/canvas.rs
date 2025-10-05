@@ -85,8 +85,8 @@ impl Canvas {
     /// # Arguments
     ///
     /// * `object` - A `Box<dyn Drawable>` to be added to the canvas's list of children.
-    pub fn add_object(&mut self, object: Box<dyn Drawable>) {
-        self.objects.push(object);
+    pub fn add_object<T: Drawable + 'static>(&mut self, object: T) {
+        self.objects.push(Box::new(object));
     }
 
     /// Sets the position and size of the canvas.
