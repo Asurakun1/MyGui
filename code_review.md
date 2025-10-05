@@ -47,6 +47,8 @@ While the codebase is strong, there are a few areas that could be improved:
 
 *   **Manual `wndproc` Pointer Management**: The `wndproc` function uses `SetWindowLongPtrW` and `GetWindowLongPtrW` to store a raw pointer to the `Win32Window` instance. While this is a standard Win32 technique, it is inherently `unsafe`. Modern libraries often use closures or other safer mechanisms to manage this state, although the current implementation is correct and well-contained. This is a minor point, as the current solution is pragmatic and works well.
 
+    *Decision*: After consideration, the current implementation was deemed the most pragmatic solution. The `unsafe` code is well-contained, and the alternatives introduce significant complexity.
+
 ## Status of Areas for Improvement
 
 - **`Win32Window::run` Method**: Completed
