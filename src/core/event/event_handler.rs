@@ -14,14 +14,15 @@ use crate::core::event::Event;
 ///
 /// This trait is generic over a type `T`, which represents the application's
 /// shared state. This allows any event handler to access and modify the
-/// application state in a type-safe manner.
+/// application state in a type-safe manner, providing the context needed to
+/// react to events.
 ///
 /// ## Composition
 ///
 /// Handlers are designed to be composed. The [`RootEventHandler`] maintains a
-/// all of its children in sequence. This promotes a modular architecture where
-/// different handlers can manage separate concerns (e.g., rendering, input
-/// tracking, UI logic).
+/// list of child handlers and dispatches events to each of them in sequence.
+/// This promotes a modular architecture where different handlers can manage
+/// separate concerns (e.g., rendering, input tracking, UI logic).
 ///
 /// ## Example
 ///
