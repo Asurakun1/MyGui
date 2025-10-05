@@ -97,7 +97,7 @@ impl<T: 'static + HasInputContext, E: 'static + EventHandler<T>> Window<T, E> {
     /// use the [`WindowBuilder`] for a more fluent configuration experience.
     pub fn new(from_config: WindowConfig, event_handler: E, app: T) -> Result<Self, anyhow::Error> {
         let window_backend = WindowBuilder::from_config(from_config).build(event_handler, app)?;
-        Ok(window_backend)
+        Ok(Self { window_backend })
     }
 
     /// Runs the window's main event loop.

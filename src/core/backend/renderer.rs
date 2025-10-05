@@ -67,8 +67,7 @@ pub trait Renderer {
     ///
     /// # Errors
     /// Returns an error if the drawing session cannot be ended gracefully, such
-    -/// as in the case of a lost rendering device. Implementations should handle
-    +/// as in the case of a lost rendering device. Implementations should handle
+    /// as in the case of a lost rendering device. Implementations should handle
     /// device loss by calling `release_device_dependent_resources`.
     fn end_draw(&mut self) -> anyhow::Result<()>;
 
