@@ -25,7 +25,7 @@ pub use crate::core::{
         color::Color,
         objects::{
             canvas::Canvas,
-            primitives::{ellipse::Ellipse, rectangle::Rectangle},
+            primitives::{ellipse::Ellipse, line::Line, rectangle::Rectangle},
         },
         scene::{HasScene, Scene},
     },

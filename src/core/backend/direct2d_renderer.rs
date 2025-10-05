@@ -3,12 +3,8 @@
 //! This module provides a `Direct2DRenderer`, an implementation of the [`Renderer`]
 //! trait that uses the Direct2D and DirectWrite APIs on the Windows platform.
 
-use crate::core::backend::renderer::Renderer;
+use crate::core::prelude::*;
 use crate::core::platform::RawWindowHandle;
-use crate::core::render::color::Color;
-use crate::core::render::objects::primitives::{
-    ellipse::Ellipse, line::Line, rectangle::Rectangle,
-};
 use crate::core::render::objects::text_object::TextObject;
 use anyhow::Context;
 use glam::{Affine2, UVec2};

@@ -5,11 +5,8 @@
 //! interface, it decouples the application's rendering logic from the specific
 //! graphics API (e.g., Direct2D, OpenGL, Vulkan) used for implementation.
 
+use crate::core::prelude::*;
 use crate::core::platform::RawWindowHandle;
-use crate::core::render::color::Color;
-use crate::core::render::objects::primitives::{
-    ellipse::Ellipse, line::Line, rectangle::Rectangle,
-};
 use crate::core::render::objects::text_object::TextObject;
 use glam::{Affine2, UVec2};
 
