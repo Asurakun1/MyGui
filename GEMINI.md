@@ -20,7 +20,7 @@ The project uses Cargo, Rust's package manager and build system.
     *   `src/core`: Contains the core modules for windowing, event handling, and rendering.
         *   `window/`: Manages window creation (`WindowBuilder`) and configuration (`WindowConfig`).
         *   `event/`: Defines the event handling system, including the `EventHandler` trait and the `Event` enum.
-            *   `handlers/`: Contains specialized event handlers like `InputHandler`, and `RootEventHandler`.
+            *   `handlers/`: Contains specialized event handlers like `InputHandler`, `RenderEventHandler`, and `RootEventHandler`.
         *   `render/`: Contains the `Drawable` trait, the `Scene` graph, and drawing primitives (`Rectangle`, `Ellipse`, `Line`, `TextObject`).
         *   `platform/`: Holds platform-specific code, currently with a `win32` implementation for window creation and message handling (`wndproc`).
         *   `backend/`: Abstracts the rendering engine with a `Renderer` trait and provides a `Direct2DRenderer` implementation.
@@ -36,6 +36,7 @@ The project uses Cargo, Rust's package manager and build system.
     *   **Specialized Handlers**: The library provides a set of specialized handlers for common tasks, located in `src/core/event/handlers/`:
         *   `InputHandler`: Manages the state of the keyboard and mouse, including which keys are pressed, the state of modifier keys (`Shift`, `Ctrl`, `Alt`), mouse position, and button presses.
         *   `RenderEventHandler`: Handles the `Paint` event and is responsible for drawing the application's scene.
+        *   `DefaultInputHandler`: A composite handler that combines the `InputHandler` and `RenderEventHandler` for convenience.
     *   **Event Types**: The system dispatches different types of events, including:
         *   `KeyDown`/`KeyUp`: Raw physical key press events.
         *   `Character`: Translated Unicode character input.
