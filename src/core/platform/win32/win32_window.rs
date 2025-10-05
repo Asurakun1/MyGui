@@ -147,6 +147,8 @@ impl<T: 'static + HasInputContext, E: EventHandler<T> + 'static> WindowBackend<T
     for Win32Window<T, E>
 {
     fn run(self: Box<Self>) -> anyhow::Result<()> {
+        std::mem::forget(self);
+
         let mut message = MSG::default();
         while unsafe { GetMessageW(&mut message, None, 0, 0) }.into() {
             unsafe {
@@ -155,7 +157,6 @@ impl<T: 'static + HasInputContext, E: EventHandler<T> + 'static> WindowBackend<T
             };
         }
 
-        
         Ok(())
     }
 }

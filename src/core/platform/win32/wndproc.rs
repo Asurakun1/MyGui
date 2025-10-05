@@ -31,49 +31,56 @@ use windows::{
 ///     event handling logic.
 /// 4.  **Default Processing**: For messages that are not explicitly handled, it
 ///     forwards them to `DefWindowProcW` for default system processing.
-/// 5.  **Cleanup**: In response to `WM_NCDESTROY`, it cleans up the associated
-///     `Win32Window` instance, preventing memory leaks.
+/// 5.  **Cleanup**: In response to `WM_NCDESTROY`, it reclaims ownership of the
+///     `Win32Window` instance and allows Rust to drop it, preventing memory leaks.
 pub extern "system" fn wndproc<T: 'static + HasInputContext, E: EventHandler<T> + 'static>(
     hwnd: HWND,
     message: u32,
     wparam: WPARAM,
     lparam: LPARAM,
 ) -> LRESULT {
-    // Retrieve the pointer to the Win32Window instance.
-    // On WM_NCCREATE, it's passed in lparam. For all other messages,
-    // we retrieve it from the window's user data.
-    let window = unsafe {
-        if message == WM_NCCREATE {
-            let createstruct = lparam.0 as *const CREATESTRUCTW;
-            let window = (*createstruct).lpCreateParams as *mut Win32Window<T, E>;
-            SetWindowLongPtrW(hwnd, GWLP_USERDATA, window as _);
-            window
-        } else {
-            GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut Win32Window<T, E>
-        }
-    };
-
-    // If the window pointer is null, we can't do anything, so we pass
-    // the message to the default window procedure.
-    if window.is_null() {
+    // On WM_NCCREATE, associate the window state pointer with the HWND and return.
+    if message == WM_NCCREATE {
+        let createstruct = lparam.0 as *const CREATESTRUCTW;
+        let window = unsafe { (*createstruct).lpCreateParams as *mut Win32Window<T, E> };
+        unsafe { SetWindowLongPtrW(hwnd, GWLP_USERDATA, window as _) };
         return unsafe { DefWindowProcW(hwnd, message, wparam, lparam) };
     }
 
-    // Dereference the raw pointer to get a mutable reference to our window state.
-    let window = unsafe { &mut *window };
+    // Retrieve the pointer to our window state.
+    let window_ptr = unsafe { GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut Win32Window<T, E> };
+
+    // If the pointer is null, pass to default procedure.
+    if window_ptr.is_null() {
+        return unsafe { DefWindowProcW(hwnd, message, wparam, lparam) };
+    }
+
+    // On WM_NCDESTROY, reclaim the Box, let Rust drop it, and return.
+    // This is the final message the window will receive.
+    if message == WM_NCDESTROY {
+        let ptr = unsafe { SetWindowLongPtrW(hwnd, GWLP_USERDATA, 0) };
+        if ptr != 0 {
+            // Reconstitute the Box from the raw pointer. When this Box goes
+            // out of scope, Rust automatically calls its Drop implementation.
+            let _ = unsafe { Box::from_raw(ptr as *mut Win32Window<T, E>) };
+        }
+        return LRESULT(0);
+    }
+
+    // After handling lifecycle messages, we can safely dereference the pointer.
+    let window = unsafe { &mut *window_ptr };
 
     // Match the Win32 message and translate it into a framework Event.
     let event = match message {
         // --- Rendering and Resizing ---
         WM_PAINT => {
-            // If the render target has been lost, recreate it before painting.
             if window.renderer.get_render_target_size().is_none()
                 && let Err(e) = window
                     .renderer
                     .create_device_dependent_resources(RawWindowHandle::Win32(hwnd))
-                {
-                    window.event_handler.on_error(&e);
-                }
+            {
+                window.event_handler.on_error(&e);
+            }
             Some(Event::Paint)
         }
         WM_SIZE => {
@@ -153,14 +160,13 @@ pub extern "system" fn wndproc<T: 'static + HasInputContext, E: EventHandler<T> 
         }
 
         // --- Keyboard Input ---
-        // Keyboard handling is complex because we support different input modes.
         WM_KEYDOWN => {
             let mode = window.config.keyboard_input_mode;
             let vkey = wparam.0 as u16;
             let key_id = from_vkey(vkey);
 
-            // Dispatch a raw `KeyDown` event if the mode requires it.
-            if let (_, KeyboardInputMode::Raw | KeyboardInputMode::RawAndTranslated) = (key_id, mode) {
+            if let (_, KeyboardInputMode::Raw | KeyboardInputMode::RawAndTranslated) = (key_id, mode)
+            {
                 window.event_handler.on_event(
                     &mut window.app,
                     &Event::KeyDown(KeyboardEvent { key: key_id }),
@@ -168,8 +174,6 @@ pub extern "system" fn wndproc<T: 'static + HasInputContext, E: EventHandler<T> 
                 );
             }
 
-            // Dispatch a translated `Character` event if the mode requires it.
-            // This involves calling `ToUnicode` to let the OS handle IME, dead keys, etc.
             if mode == KeyboardInputMode::RawAndTranslated || mode == KeyboardInputMode::Translated
             {
                 let mut keyboard_state = [0u8; 256];
@@ -191,7 +195,6 @@ pub extern "system" fn wndproc<T: 'static + HasInputContext, E: EventHandler<T> 
                     }
                 }
             }
-            // `KeyDown` is handled specially, so we return early.
             return unsafe { DefWindowProcW(hwnd, message, wparam, lparam) };
         }
         WM_KEYUP => {
@@ -199,8 +202,8 @@ pub extern "system" fn wndproc<T: 'static + HasInputContext, E: EventHandler<T> 
             let vkey = wparam.0 as u16;
             let key_id = from_vkey(vkey);
 
-            // Only dispatch a raw `KeyUp` event if the mode requires it.
-            if let (_, KeyboardInputMode::Raw | KeyboardInputMode::RawAndTranslated) = (key_id, mode) {
+            if let (_, KeyboardInputMode::Raw | KeyboardInputMode::RawAndTranslated) = (key_id, mode)
+            {
                 Some(Event::KeyUp(KeyboardEvent { key: key_id }))
             } else {
                 None
@@ -209,12 +212,8 @@ pub extern "system" fn wndproc<T: 'static + HasInputContext, E: EventHandler<T> 
 
         // --- Window Lifecycle ---
         WM_DESTROY => Some(Event::WindowClose),
-        WM_NCDESTROY => {
-            // The Box<Win32Window> is cleaned up by the Drop trait when the run method returns.
-            None
-        }
+        // WM_NCDESTROY is now handled at the top of the function.
 
-        // For all other messages, we don't generate an event.
         _ => None,
     };
 
@@ -224,12 +223,11 @@ pub extern "system" fn wndproc<T: 'static + HasInputContext, E: EventHandler<T> 
             .event_handler
             .on_event(&mut window.app, &event, &mut *window.renderer);
 
-        // If the event was a window close, post the quit message to terminate the loop.
         if let Event::WindowClose = event {
             unsafe { PostQuitMessage(0) };
         }
     }
 
-    // Pass unhandled messages to the default window procedure.
     unsafe { DefWindowProcW(hwnd, message, wparam, lparam) }
 }
+
