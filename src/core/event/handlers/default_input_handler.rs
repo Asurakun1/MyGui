@@ -1,9 +1,8 @@
 use crate::{
     core::event::handlers::{
-        keyboard_handler::KeyboardInputHandler, mouse_handler::MouseInputHandler,
+        input_handler::{KeyboardInputHandler, MouseInputHandler},
         render_event_handler::RenderEventHandler,
-    },
-    prelude::{Event, EventHandler, HasInputContext, HasScene, Renderer},
+    },    prelude::{Event, EventHandler, HasInputContext, HasScene, Renderer},
 };
 pub struct DefaultInputHandler<T> {
     render_handler: RenderEventHandler<T>,

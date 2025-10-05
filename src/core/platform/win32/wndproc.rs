@@ -7,8 +7,7 @@ use crate::core::{
     event::{
         event_handler::EventHandler,
         handlers::{
-            keyboard_handler::KeyboardEvent,
-            mouse_handler::{MouseButton, MouseEvent},
+            input_handler::{KeyboardEvent, MouseButton, MouseEvent},
         },
         input_state::HasInputContext,
         Event,

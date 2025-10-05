@@ -21,8 +21,7 @@
 //! - **[`MouseInputHandler`]**: A stateful handler that tracks the mouse cursor's
 //!   position and button states, updating the global `MouseState`.
 
-pub mod keyboard_handler;
-pub mod mouse_handler;
+pub mod input_handler;
 pub mod render_event_handler;
 pub mod root_event_handler;
 pub mod default_input_handler;

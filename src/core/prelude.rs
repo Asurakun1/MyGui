@@ -15,8 +15,7 @@ pub use crate::core::{
         
         handlers::{
             default_input_handler::DefaultInputHandler,
-            keyboard_handler::KeyboardEvent,
-            mouse_handler::MouseEvent,
+            input_handler::{KeyboardEvent, MouseEvent},
             root_event_handler::RootEventHandler,
         },
         input_state::{HasInputContext, InputContext, InputState, MouseState},
