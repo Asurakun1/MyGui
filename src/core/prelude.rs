@@ -12,7 +12,7 @@ pub use crate::core::{
     event::{
         Event,
         event_handler::EventHandler,
-        event_loop::EventLoop,
+        
         handlers::{
             default_input_handler::DefaultInputHandler,
             keyboard_handler::KeyboardEvent,

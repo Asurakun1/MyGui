@@ -136,10 +136,5 @@ fn main() -> Result<()> {
 
     let window = Window::new(config, event_handler, app)?;
 
-    let mut event_loop = EventLoop::new();
-    event_loop.run()?;
-
-    std::mem::forget(window);
-
-    Ok(())
+    window.run()
 }
