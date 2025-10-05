@@ -1,4 +1,4 @@
-//! # Keyboard and Mouse Event Handling
+//! # Input Handling
 //!
 //! This module provides the primary handlers and data structures for processing
 //! raw keyboard and mouse input and tracking their state.

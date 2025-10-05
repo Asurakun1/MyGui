@@ -14,12 +14,9 @@
 //! - **[`RenderEventHandler`]**: A specialized handler that listens for the `Paint`
 //!   event and orchestrates the rendering of the application's scene graph.
 //!
-//! - **[`KeyboardInputHandler`]**: A stateful handler that tracks which keyboard
-//!   keys are currently pressed down. It also updates the global `InputState`
-//!   for modifier keys (Shift, Ctrl, Alt).
-//!
-//! - **[`MouseInputHandler`]**: A stateful handler that tracks the mouse cursor's
-//!   position and button states, updating the global `MouseState`.
+//! - **[`InputHandler`]**: A stateful handler that tracks which keyboard
+//!   keys are currently pressed down, the mouse cursor's position, and button states.
+//!   It also updates the global `InputState` and `MouseState`.
 
 pub mod input_handler;
 pub mod render_event_handler;

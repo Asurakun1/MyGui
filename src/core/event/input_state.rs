@@ -61,7 +61,7 @@
 
 /// Holds the real-time state of keyboard modifier keys.
 ///
-/// This struct is updated by the `KeyboardInputHandler` in response to `KeyDown`
+/// This struct is updated by the `InputHandler` in response to `KeyDown`
 /// and `KeyUp` events for modifier keys. It provides a snapshot of which
 /// modifiers are currently held down.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
@@ -76,7 +76,7 @@ pub struct InputState {
 
 /// Holds the real-time state of the mouse.
 ///
-/// This struct is updated by the `MouseInputHandler` in response to mouse events.
+/// This struct is updated by the `InputHandler` in response to mouse events.
 /// It tracks the cursor's current position relative to the window's client area
 /// and the state of the primary mouse buttons.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]

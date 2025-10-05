@@ -20,7 +20,7 @@ The project uses Cargo, Rust's package manager and build system.
     *   `src/core`: Contains the core modules for windowing, event handling, and rendering.
         *   `window/`: Manages window creation (`WindowBuilder`) and configuration (`WindowConfig`).
         *   `event/`: Defines the event handling system, including the `EventHandler` trait and the `Event` enum.
-            *   `handlers/`: Contains specialized event handlers like `KeyboardInputHandler`, `MouseInputHandler`, and `RootEventHandler`.
+            *   `handlers/`: Contains specialized event handlers like `InputHandler`, and `RootEventHandler`.
         *   `render/`: Contains the `Drawable` trait, the `Scene` graph, and drawing primitives (`Rectangle`, `Ellipse`, `Line`, `TextObject`).
         *   `platform/`: Holds platform-specific code, currently with a `win32` implementation for window creation and message handling (`wndproc`).
         *   `backend/`: Abstracts the rendering engine with a `Renderer` trait and provides a `Direct2DRenderer` implementation.
@@ -34,8 +34,7 @@ The project uses Cargo, Rust's package manager and build system.
     *   **`EventHandler` Trait:** Defines the interface for handling window messages. Methods will receive a mutable reference to the user-defined state `T` and a mutable reference to the `Renderer` trait object, allowing them to modify the state and perform drawing operations.
     *   **`RootEventHandler`:** The primary event handler that is passed to the `Window`. It composes multiple specialized event handlers.
     *   **Specialized Handlers**: The library provides a set of specialized handlers for common tasks, located in `src/core/event/handlers/`:
-        *   `KeyboardInputHandler`: Manages the state of the keyboard, including which keys are pressed and the state of modifier keys (`Shift`, `Ctrl`, `Alt`) in the `InputState` struct.
-        *   `MouseInputHandler`: Manages the state of the mouse, including position and button presses, in the `MouseState` struct.
+        *   `InputHandler`: Manages the state of the keyboard and mouse, including which keys are pressed, the state of modifier keys (`Shift`, `Ctrl`, `Alt`), mouse position, and button presses.
         *   `RenderEventHandler`: Handles the `Paint` event and is responsible for drawing the application's scene.
     *   **Event Types**: The system dispatches different types of events, including:
         *   `KeyDown`/`KeyUp`: Raw physical key press events.
