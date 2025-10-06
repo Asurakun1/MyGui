@@ -70,7 +70,8 @@ impl App {
 struct CustomEventHandler;
 
 impl EventHandler<App> for CustomEventHandler {
-    fn on_event(&mut self, app: &mut App, event: &Event, _renderer: &mut dyn Renderer) {
+    fn on_event(&mut self, app: &mut App, event: &Event, _renderer: &mut dyn Renderer) -> bool {
+        let mut result = false;
         match event {
             Event::KeyDown(KeyboardEvent { key }) => {
                 log::info!(
@@ -78,6 +79,7 @@ impl EventHandler<App> for CustomEventHandler {
                     key,
                     app.input_context().keyboard
                 );
+                result = true;
             }
             Event::KeyUp(KeyboardEvent { key }) => {
                 log::info!(
@@ -85,24 +87,36 @@ impl EventHandler<App> for CustomEventHandler {
                     key,
                     app.input_context().keyboard
                 );
+                result = true;
             }
             // Event::MouseMove(MouseEvent { x, y, .. }) => {
             //     log::info!("MouseMove: x: {}, y: {}", x, y);
             // }
             Event::MouseDown(MouseEvent { button, .. }) => {
                 log::info!("MouseDown: {:?}", button);
+                result = true;
             }
             Event::MouseUp(MouseEvent { button, .. }) => {
                 log::info!("MouseUp: {:?}", button);
+                result = true;
             }
             Event::MouseWheel(delta) => {
                 log::info!("MouseWheel: {:?}", delta);
+                result = true;
             }
             Event::Character(character) => {
                 log::info!("Character: {}", character);
+                result = true
+            }
+            Event::WindowClose => {
+                log::info!("WindowClose");
+                println!("Bye Bye!");
+                result = true;
             }
             _ => {}
         }
+
+        result
     }
 }
 

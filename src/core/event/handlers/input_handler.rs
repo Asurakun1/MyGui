@@ -22,15 +22,15 @@ impl KeyboardInputHandler {
 }
 
 impl<T: HasInputContext> EventHandler<T> for KeyboardInputHandler {
-    fn on_event(&mut self, app: &mut T, event: &Event, _renderer: &mut dyn Renderer) {
+    fn on_event(&mut self, app: &mut T, event: &Event, _renderer: &mut dyn Renderer) -> bool {
         match event {
             Event::KeyDown(KeyboardEvent { key }) => {
                 self.pressed_keys.insert(*key);
                 let input_state = &mut app.input_context_mut().keyboard;
                 match key {
-                    KeyId::Shift => input_state.shift = true,
-                    KeyId::Control => input_state.ctrl = true,
-                    KeyId::Alt => input_state.alt = true,
+                    KeyId::Shift => { input_state.shift = true; }
+                    KeyId::Control => { input_state.ctrl = true; }
+                    KeyId::Alt => { input_state.alt = true; }
                     _ => {}
                 }
             }
@@ -38,14 +38,15 @@ impl<T: HasInputContext> EventHandler<T> for KeyboardInputHandler {
                 self.pressed_keys.remove(key);
                 let input_state = &mut app.input_context_mut().keyboard;
                 match key {
-                    KeyId::Shift => input_state.shift = false,
-                    KeyId::Control => input_state.ctrl = false,
-                    KeyId::Alt => input_state.alt = false,
+                    KeyId::Shift => { input_state.shift = false; }
+                    KeyId::Control => { input_state.ctrl = false; }
+                    KeyId::Alt => { input_state.alt = false; }
                     _ => {}
                 }
             }
             _ => {}
         }
+        false
     }
 }
 
@@ -62,7 +63,7 @@ pub struct KeyboardEvent {
 pub struct MouseInputHandler;
 
 impl<T: HasInputContext> EventHandler<T> for MouseInputHandler {
-    fn on_event(&mut self, app: &mut T, event: &Event, _renderer: &mut dyn Renderer) {
+    fn on_event(&mut self, app: &mut T, event: &Event, _renderer: &mut dyn Renderer) -> bool {
         match event {
             Event::MouseMove(MouseEvent { x, y, .. }) => {
                 let mouse_state = &mut app.input_context_mut().mouse;
@@ -73,9 +74,9 @@ impl<T: HasInputContext> EventHandler<T> for MouseInputHandler {
                 let mouse_state = &mut app.input_context_mut().mouse;
                 if let Some(button) = button {
                     match button {
-                        MouseButton::Left => mouse_state.left_button = true,
-                        MouseButton::Right => mouse_state.right_button = true,
-                        MouseButton::Middle => mouse_state.middle_button = true,
+                        MouseButton::Left => { mouse_state.left_button = true; }
+                        MouseButton::Right => { mouse_state.right_button = true; }
+                        MouseButton::Middle => { mouse_state.middle_button = true; }
                         _ => {}
                     }
                 }
@@ -84,15 +85,16 @@ impl<T: HasInputContext> EventHandler<T> for MouseInputHandler {
                 let mouse_state = &mut app.input_context_mut().mouse;
                 if let Some(button) = button {
                     match button {
-                        MouseButton::Left => mouse_state.left_button = false,
-                        MouseButton::Right => mouse_state.right_button = false,
-                        MouseButton::Middle => mouse_state.middle_button = false,
+                        MouseButton::Left => { mouse_state.left_button = false; }
+                        MouseButton::Right => { mouse_state.right_button = false; }
+                        MouseButton::Middle => { mouse_state.middle_button = false; }
                         _ => {}
                     }
                 }
             }
             _ => {}
         }
+        false
     }
 }
 

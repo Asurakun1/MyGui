@@ -61,6 +61,10 @@ pub trait EventHandler<T> {
     /// implementation is a no-op, allowing implementors to only handle the
     /// events they are interested in.
     ///
+    /// The method now returns a `bool`:
+    /// - `true`: The event was consumed by this handler, and propagation should stop.
+    /// - `false`: The event was not consumed, and propagation should continue to the next handler.
+    ///
     /// # Parameters
     ///
     /// - `app`: A mutable reference to the application's state object (`T`).
@@ -70,7 +74,7 @@ pub trait EventHandler<T> {
     /// - `renderer`: A mutable reference to the window's [`crate::prelude::Renderer`]. This can be
     ///   used for immediate drawing operations, though rendering is typically
     ///   deferred to the [`crate::core::event::handlers::render_event_handler::RenderEventHandler`] in response to a `Paint` event.
-    fn on_event(&mut self, _app: &mut T, _event: &Event, _renderer: &mut dyn Renderer) {}
+    fn on_event(&mut self, _app: &mut T, _event: &Event, _renderer: &mut dyn Renderer) -> bool { false }
 
     /// Handles an error that occurred in the event loop.
     ///

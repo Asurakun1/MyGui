@@ -83,9 +83,12 @@ impl<T> EventHandler<T> for RootEventHandler<T> {
     /// This method iterates through its collection of handlers and calls `on_event`
     /// on each one in the order they were added, allowing each handler to process
     /// the event.
-    fn on_event(&mut self, app: &mut T, event: &Event, renderer: &mut dyn Renderer) {
+    fn on_event(&mut self, app: &mut T, event: &Event, renderer: &mut dyn Renderer) -> bool {
         for handler in &mut self.handlers {
-            handler.on_event(app, event, renderer);
+            if handler.on_event(app, event, renderer) {
+                return true;
+            }
         }
+        false
     }
 }

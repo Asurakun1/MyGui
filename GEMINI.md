@@ -30,11 +30,11 @@ The project uses Cargo, Rust's package manager and build system.
 *   **Application Architecture:** The project uses a generic, user-defined state management pattern.
     *   **User-Defined State:** The library is generic over a state type `T`. The user is responsible for defining a struct that holds all their application's state.
     *   **`Window` Struct:** Encapsulates window creation and the message loop. It will own an instance of the user-defined state `T` and the `RootEventHandler`. The `Window` is configured via `WindowConfig`, which now includes a `RendererConfig` to specify the desired rendering backend.
-*   **Event Handling:** A modular, composable event handling system is used.
-    *   **`EventHandler` Trait:** Defines the interface for handling window messages. Methods will receive a mutable reference to the user-defined state `T` and a mutable reference to the `Renderer` trait object, allowing them to modify the state and perform drawing operations.
-    *   **`RootEventHandler`:** The primary event handler that is passed to the `Window`. It composes multiple specialized event handlers.
-    *   **Specialized Handlers**: The library provides a set of specialized handlers for common tasks, located in `src/core/event/handlers/`:
-        *   `InputHandler`: Manages the state of the keyboard and mouse, including which keys are pressed, the state of modifier keys (`Shift`, `Ctrl`, `Alt`), mouse position, and button presses.
+    *   **Event Handling**: A modular, composable event handling system is used.
+        *   **`EventHandler` Trait**: Defines the interface for handling window messages. Methods will receive a mutable reference to the user-defined state `T` and a mutable reference to the `Renderer` trait object, allowing them to modify the state and perform drawing operations. The `on_event` method now returns a `bool` indicating whether the event was consumed.
+        *   **Event Propagation Control**: The `on_event` method of the `EventHandler` trait now returns a `bool`. If `true` is returned, it signifies that the event has been 'consumed' by the handler, and the `RootEventHandler` will stop propagating this event to any subsequent handlers in its chain. If `false` is returned, the event will continue to propagate to the next handler. This mechanism is crucial for building complex, interactive UIs where specific handlers should prevent further processing of an event.
+        *   **`RootEventHandler`**: The primary event handler that is passed to the `Window`. It composes multiple specialized event handlers. It now respects the `bool` return value from its child handlers to control event propagation.
+        *   **Specialized Handlers**: The library provides a set of specialized handlers for common tasks, located in `src/core/event/handlers/`:        *   `InputHandler`: Manages the state of the keyboard and mouse, including which keys are pressed, the state of modifier keys (`Shift`, `Ctrl`, `Alt`), mouse position, and button presses.
         *   `RenderEventHandler`: Handles the `Paint` event and is responsible for drawing the application's scene.
         *   `DefaultInputHandler`: A composite handler that combines the `InputHandler` and `RenderEventHandler` for convenience.
     *   **Event Types**: The system dispatches different types of events, including:
