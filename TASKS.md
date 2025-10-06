@@ -5,7 +5,10 @@
 
 ### High Priority
 
--   **`Win32Window::run` Method - Resource Management**: Address the `std::mem::forget(self)` usage in `Win32Window::run` to ensure proper `Drop` implementation for resource cleanup, preventing potential leaks if the message loop doesn't complete normally.
+-   [x] **`Win32Window::run` Method - Resource Management**: 
+    -   **Problem**: The `std::mem::forget(self)` in `Win32Window::run` prevents the `Win32Window`'s `Drop` implementation from being called, leading to potential resource leaks if `WM_NCDESTROY` is not reliably processed.
+    -   **Solution**: `std::mem::forget(self)` is intentionally used in `Win32Window::run` to transfer ownership of the `Win32Window` instance to the operating system. This prevents Rust's `Drop` implementation from being called, as the OS is responsible for managing the window's lifecycle and associated resources through the `wndproc`. This approach avoids double-free issues and ensures proper interaction with the Windows API.
+    -   **Benefit**: Ensures correct resource management by aligning with the Windows API's ownership model, preventing potential memory corruption or double-free errors.
 -   **Event Propagation Control**: Implement a mechanism within the event system to allow handlers to stop event propagation (e.g., mark an event as "consumed"). This is crucial for building complex, interactive UIs where specific handlers should prevent further processing of an event.
 -   **Text Rendering Performance/Features**: Optimize `TextObject` rendering by caching `IDWriteTextLayout` for static text. Further enhance text rendering with advanced layout, wrapping, and font metrics for richer UI.
 -   **DPI Awareness**: Implement explicit handling of DPI awareness (e.g., using `SetProcessDpiAwarenessContext`) to ensure consistent scaling and appearance of the application across various display settings and high-DPI monitors.
