@@ -1,33 +1,33 @@
 //! # 2D Retained-Mode Rendering Engine
 //!
 //! This module provides the core abstractions for rendering 2D graphics using a
-//! **retained-mode** approach. In this model, a persistent scene graph (a [`Scene`]
-//! containing [`Drawable`] objects) is constructed and "retained" by the framework,
+//! **retained-mode** approach. In this model, a persistent scene graph (a [`crate::prelude::Scene`]
+//! containing [`crate::prelude::Drawable`] objects) is constructed and "retained" by the framework,
 //! which then takes responsibility for rendering it efficiently.
 //!
 //! ## Core Concepts
 //!
 //! The rendering system is built on a few key abstractions:
 //!
-//! - **[`Drawable`]**: A fundamental trait representing any object that can be
-//!   drawn on the screen. It has a single method, `draw`, which takes a [`Renderer`]
+//! - **[`crate::prelude::Drawable`]**: A fundamental trait representing any object that can be
+//!   drawn on the screen. It has a single method, `draw`, which takes a [`crate::prelude::Renderer`]
 //!   and issues the necessary drawing commands.
 //!
-//! - **[`Scene`]**: A container that holds a heterogeneous collection of `Drawable`
+//! - **[`crate::prelude::Scene`]**: A container that holds a heterogeneous collection of `Drawable`
 //!   objects. This acts as the scene graph, managing all elements that need to
 //!   be rendered.
 //!
-//! - **[`Renderer`]**: A trait (defined in `core::backend`) that provides a
+//! - **[`crate::prelude::Renderer`]**: A trait (defined in `core::backend`) that provides a
 //!   platform-agnostic interface for all drawing operations.
 //!
-//! - **[`Color`]**: A simple struct for representing RGBA colors in a
+//! - **[`crate::prelude::Color`]**: A simple struct for representing RGBA colors in a
 //!   platform-independent way.
 //!
 //! ## How It Works
 //!
 //! 1.  You create graphical objects (e.g., shapes, text, custom widgets) that
-//!     implement the [`Drawable`] trait.
-//! 2.  You add these `Drawable` objects to a [`Scene`] instance.
+//!     implement the [`crate::prelude::Drawable`] trait.
+//! 2.  You add these `Drawable` objects to a [`crate::prelude::Scene`] instance.
 //! 3.  Your main application state struct must implement the `HasScene` trait to
 //!     provide the framework with access to your scene.
 //! 4.  When the window needs to be repainted (indicated by a `Paint` event), the

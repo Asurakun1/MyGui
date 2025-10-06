@@ -13,7 +13,7 @@ use glam::{Affine2, UVec2};
 /// A platform-agnostic interface for 2D rendering operations.
 ///
 /// This trait abstracts the underlying graphics API, providing a unified set of
-/// commands for drawing shapes, text, and managing render state. [`Drawable`]
+/// commands for drawing shapes, text, and managing render state. [`crate::prelude::Drawable`]
 /// objects use this trait to render themselves without needing to know the
 /// specifics of the graphics backend.
 ///
@@ -89,7 +89,7 @@ pub trait Renderer {
     ///
     /// All subsequent drawing operations will be transformed by this matrix. This
     /// is fundamental for implementing translation, scaling, and rotation for
-    /// objects like a [`Canvas`] or custom UI elements.
+    /// objects like a [`crate::prelude::Canvas`] or custom UI elements.
     fn set_transform(&mut self, matrix: &Affine2);
 
     /// Gets the current transformation matrix. This is useful for constructing

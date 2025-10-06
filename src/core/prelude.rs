@@ -23,6 +23,7 @@ pub use crate::core::{
     },
     render::{
         color::Color,
+        drawable::Drawable,
         objects::{
             canvas::Canvas,
             primitives::{ellipse::Ellipse, line::Line, rectangle::Rectangle},

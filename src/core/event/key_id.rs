@@ -5,7 +5,7 @@
 
 /// A unique, platform-agnostic identifier for a physical key on a keyboard.
 ///
-/// This enum is a core part of [`KeyboardEvent`] and is used to identify which
+/// This enum is a core part of [`crate::prelude::Event`] (specifically keyboard-related variants like `KeyDown` and `KeyUp`) and is used to identify which
 /// key was pressed or released, abstracting away the platform-specific details
 /// of virtual key codes.
 ///

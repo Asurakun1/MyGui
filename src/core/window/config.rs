@@ -12,30 +12,30 @@ use crate::core::prelude::*;
 /// only need raw key presses, while a text editor needs translated characters).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KeyboardInputMode {
-    /// Dispatch both raw [`KeyDown`]/[`KeyUp`] and translated [`Character`] events.
-    ///
-    /// This is the default mode and is suitable for most applications that need
-    /// to handle both direct key presses (for shortcuts or actions) and text input.
-    RawAndTranslated,
+/// Dispatch both raw [`crate::prelude::Event::KeyDown`]/[`crate::prelude::Event::KeyUp`] and translated [`crate::prelude::Event::Character`] events.
+///
+/// This is the default mode and is suitable for most applications that need
+/// to handle both direct key presses (for shortcuts or actions) and text input.
+RawAndTranslated,
 
-    /// Dispatch only raw [`KeyDown`]/[`KeyUp`] events.
-    ///
-    /// This mode is useful for applications that handle all keyboard input directly,
-    /// such as games or applications that implement their own complex key binding systems.
-    Raw,
+/// Dispatch only raw [`crate::prelude::Event::KeyDown`]/[`crate::prelude::Event::KeyUp`] events.
+///
+/// This mode is useful for applications that handle all keyboard input directly,
+/// such as games or applications that implement their own complex key binding systems.
+Raw,
 
-    /// Dispatch only translated [`Character`] events.
-    ///
-    /// This mode is useful for applications that are primarily focused on text
-    /// input and do not need to respond to raw key presses.
-    Translated,
+/// Dispatch only translated [`crate::prelude::Event::Character`] events.
+///
+/// This mode is useful for applications that are primarily focused on text
+/// input and do not need to respond to raw key presses.
+Translated,
 }
 
 /// Holds all configuration settings for creating a window.
 ///
-/// This struct is used by the [`WindowBuilder`] to gather all the necessary
+/// This struct is used by the [`crate::prelude::WindowBuilder`] to gather all the necessary
 /// parameters before creating a platform-specific window.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct WindowConfig {
     /// The title of the window, which is displayed in the title bar.
     pub title: String,

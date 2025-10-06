@@ -11,7 +11,7 @@
 //!   around native window handles (e.g., `HWND` on Windows). This allows the
 //!   rendering backend to interact with the window without platform-specific code.
 //!
-//! - **[`WindowBackend`]**: A trait that defines the generic interface for a
+//! - **[`crate::core::platform::window_backend::WindowBackend`]**: A trait that defines the generic interface for a
 //!   platform-specific window. It standardizes the window's lifecycle, including
 //!   creation and the execution of the main message loop.
 //!

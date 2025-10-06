@@ -8,7 +8,7 @@ use crate::core::prelude::*;
 /// A generic trait for handling window and input events.
 ///
 /// `EventHandler` provides a single method, `on_event`, which is called by the
-/// main event loop whenever a new [`Event`] occurs. This design decouples the
+/// main event loop whenever a new [`crate::prelude::Event`] occurs. This design decouples the
 /// application logic from the low-level, platform-specific message processing.
 ///
 /// This trait is generic over a type `T`, which represents the application's
@@ -18,7 +18,7 @@ use crate::core::prelude::*;
 ///
 /// ## Composition
 ///
-/// Handlers are designed to be composed. The [`RootEventHandler`] maintains a
+/// Handlers are designed to be composed. The [`crate::prelude::RootEventHandler`] maintains a
 /// list of child handlers and dispatches events to each of them in sequence.
 /// This promotes a modular architecture where different handlers can manage
 /// separate concerns (e.g., rendering, input tracking, UI logic).
@@ -57,7 +57,7 @@ pub trait EventHandler<T> {
     /// Processes a new event received from the window.
     ///
     /// This method is the central entry point for all event processing. It is
-    /// called for every [`Event`] that the window receives. The default
+    /// called for every [`crate::prelude::Event`] that the window receives. The default
     /// implementation is a no-op, allowing implementors to only handle the
     /// events they are interested in.
     ///
@@ -65,11 +65,11 @@ pub trait EventHandler<T> {
     ///
     /// - `app`: A mutable reference to the application's state object (`T`).
     ///   This provides the context needed to react to the event.
-    /// - `event`: A reference to the [`Event`] that occurred. A `match` statement
+    /// - `event`: A reference to the [`crate::prelude::Event`] that occurred. A `match` statement
     ///   is typically used here to dispatch to event-specific logic.
-    /// - `renderer`: A mutable reference to the window's [`Renderer`]. This can be
+    /// - `renderer`: A mutable reference to the window's [`crate::prelude::Renderer`]. This can be
     ///   used for immediate drawing operations, though rendering is typically
-    ///   deferred to the [`RenderEventHandler`] in response to a `Paint` event.
+    ///   deferred to the [`crate::core::event::handlers::render_event_handler::RenderEventHandler`] in response to a `Paint` event.
     fn on_event(&mut self, _app: &mut T, _event: &Event, _renderer: &mut dyn Renderer) {}
 
     /// Handles an error that occurred in the event loop.

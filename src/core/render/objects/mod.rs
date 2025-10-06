@@ -1,23 +1,20 @@
-//! # Built-in Drawable Objects
-//!
 //! This module provides a collection of pre-built structs that implement the
-//! [`Drawable`] trait, making it easy to add common graphical elements to a [`Scene`].
-//!
+//! [`crate::prelude::Drawable`] trait, making it easy to add common graphical elements to a [`crate::prelude::Scene`].
+//! 
 //! ## Available Objects
-//!
+//! 
 //! - **[`primitives`]**: A submodule containing basic geometric shapes.
 //!   - `Rectangle`: A solid-color rectangle.
 //!   - `Ellipse`: A solid-color ellipse.
 //!   - `Line`: A line segment with a specified thickness.
-//!
-//! - **[`TextObject`]**: A simple object for rendering a single line of text at a
+//! 
+//! - **[`crate::core::render::objects::text_object::TextObject`]**: A simple object for rendering a single line of text at a
 //!   specific position.
-//!
-//! - **[`Canvas`]**: A powerful container that acts as a drawable surface for other
+//! 
+//! - **[`crate::prelude::Canvas`]**: A powerful container that acts as a drawable surface for other
 //!   `Drawable` objects. A `Canvas` can be positioned and transformed, and it
 //!   clips its children, effectively creating a local coordinate system. This is
-//!   a key building block for creating complex UI components.
-//!
+//!   a key building block for creating complex UI components.//!
 //! ## Usage
 //!
 //! These objects can be instantiated, configured, and then added directly to a
