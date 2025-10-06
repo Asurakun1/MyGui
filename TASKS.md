@@ -3,13 +3,24 @@
 ---
 ## Future Enhancements
 
-  - **Idea**: Reorganize the project into a Cargo workspace to improve modularity and compile times.
-  - **Plan**:
-    - Create a `crates` directory.
-    - Create individual crates for `backend`, `event`, `platform`, `render`, and `window`.
-    - Move the existing code from `src/core` into the new crates.
-    - Update the main `Cargo.toml` to define the workspace.
-    - Update the main `my_gui` library to act as a facade, re-exporting the components from the new crates.
+### High Priority
+
+-   **`Win32Window::run` Method - Resource Management**: Address the `std::mem::forget(self)` usage in `Win32Window::run` to ensure proper `Drop` implementation for resource cleanup, preventing potential leaks if the message loop doesn't complete normally.
+-   **Event Propagation Control**: Implement a mechanism within the event system to allow handlers to stop event propagation (e.g., mark an event as "consumed"). This is crucial for building complex, interactive UIs where specific handlers should prevent further processing of an event.
+-   **Text Rendering Performance/Features**: Optimize `TextObject` rendering by caching `IDWriteTextLayout` for static text. Further enhance text rendering with advanced layout, wrapping, and font metrics for richer UI.
+-   **DPI Awareness**: Implement explicit handling of DPI awareness (e.g., using `SetProcessDpiAwarenessContext`) to ensure consistent scaling and appearance of the application across various display settings and high-DPI monitors.
+
+### Medium Priority
+
+-   **COM Management Centralization**: Centralize COM initialization and uninitialization, or ensure single-threaded COM usage, to enhance robustness and prevent potential conflicts arising from `CoInitializeEx` and `CoUninitialize` calls within `Direct2DRenderer`.
+-   **Event Prioritization**: Introduce a mechanism to prioritize event handlers, allowing certain handlers to process events before others. This would be beneficial for scenarios requiring specific event processing order.
+-   **Window Customization Options**: Expand `WindowConfig` to include more advanced customization options such as window style flags (e.g., resizable, minimizable, maximizable, borderless), initial window position, parent window, and transparency settings.
+
+### Low Priority
+
+-   **Redundant `Window` Struct Simplification**: Investigate simplifying the `Window` struct in `src/core/window/mod.rs` by potentially having `WindowBuilder::build` return the `Window` struct directly, rather than wrapping a `Box<dyn WindowBackend>`.
+-   **Extended Mouse Input**: Enhance `wndproc` to explicitly map and handle `WM_XBUTTONDOWN`/`WM_XBUTTONUP` messages for additional mouse buttons, expanding the framework's mouse input capabilities.
+
 
 - **Layout System**:
   - **Idea**: Introduce a layout system to manage the positioning and sizing of UI elements automatically, instead of relying on hardcoded coordinates.
