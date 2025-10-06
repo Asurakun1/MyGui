@@ -8,6 +8,63 @@
 
 This project aims to create a simple, modular, and idiomatic Rust framework over the raw Windows API. It provides a foundational layer for building lightweight GUI applications, focusing on a clean architecture and a flexible API.
 
+## Getting Started
+
+The easiest way to get started is to use the [`prelude`], which re-exports the
+most common types and traits.
+
+Here is a basic example of a complete application:
+
+```rust,no_run
+use my_gui::prelude::*;
+
+// 1. Define the application's state. It must hold the input context and scene.
+#[derive(Default)]
+struct MyApp {
+    input_context: InputContext,
+    scene: Scene,
+}
+
+// 2. Implement the required "has-a" traits to give the framework access
+//    to the input context and scene.
+impl HasInputContext for MyApp {
+    fn input_context(&self) -> &InputContext { &self.input_context }
+    fn input_context_mut(&mut self) -> &mut InputContext { &mut self.input_context }
+}
+
+impl HasScene for MyApp {
+    fn scene(&self) -> &Scene { &self.scene }
+}
+
+fn main() -> anyhow::Result<()> {
+    // 3. Create the application state.
+    let mut app = MyApp::default();
+
+    // 4. Add some drawable objects to the scene.
+    let rect = Rectangle::new(50.0, 50.0, 200.0, 100.0, Color::BLUE);
+    let text = TextObject::new("Hello, World!".to_string(), 60.0, 85.0, Color::WHITE);
+    app.scene.add_object(rect);
+    app.scene.add_object(text);
+
+    // 5. Create the root event handler and add the default handlers.
+    //    - `DefaultInputHandler`: Updates mouse and keyboard state.
+    //    - `RenderEventHandler`: Handles `Paint` events and draws the scene.
+    let mut event_handler = RootEventHandler::new();
+    event_handler.add_handler(DefaultInputHandler::new());
+    event_handler.add_handler(RenderEventHandler::new());
+
+    // 6. Use the WindowBuilder to configure and build the window.
+    let window = WindowBuilder::new()
+        .with_title("My GUI Application")
+        .with_width(800)
+        .with_height(600)
+        .build(event_handler, app)?;
+
+    // 7. Run the application's main event loop.
+    window.run()
+}
+```
+
 ## Core Concepts
 
 MyGui is built on a **retained-mode rendering** model. This means:
@@ -24,12 +81,13 @@ This contrasts with immediate-mode rendering, where the application must manuall
 -   **Scene Graph:** A `Scene` object that manages a collection of `Drawable` trait objects, including basic shapes (`Rectangle`, `Ellipse`, `Line`), text (`TextObject`), and composable `Canvas` elements.
 -   **Extensible Event System:** A trait-based `EventHandler` system with a `RootEventHandler` that composes multiple specialized handlers (keyboard, mouse, render) for modular and flexible event processing.
 -   **Comprehensive Input Handling:** Detailed tracking of keyboard (including modifier keys) and mouse input (position, buttons, wheel) with configurable input modes.
+-   **Basic Text Rendering:** Support for rendering single lines of text using `TextObject`.
 
 ## Roadmap (Upcoming Features)
 
 I am actively working on evolving this project into a more flexible and powerful library. Key priorities include:
 
--   **Advanced Text Rendering:** Implementing proper text layout and measurement using `IDWriteTextLayout` for correct and efficient text rendering. (This is partially done, but can be improved)
+-   **Advanced Text Rendering:** Further improvements to text layout and measurement for more complex and efficient text rendering.
 -   **Widget System:** Defining a `Widget` trait that unifies appearance, behavior, and layout for building complex UI components.
 -   **Layout System:** Introducing a layout system to manage the positioning and sizing of UI elements automatically.
 
