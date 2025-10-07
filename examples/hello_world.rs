@@ -16,6 +16,10 @@ impl HasScene for App {
     fn scene(&self) -> &Scene {
         &self.scene
     }
+
+    fn scene_mut(&mut self) -> &mut Scene {
+        &mut self.scene
+    }
 }
 
 impl HasInputContext for App {

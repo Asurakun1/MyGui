@@ -5,6 +5,8 @@
 //! interface, it decouples the application's rendering logic from the specific
 //! graphics API (e.g., Direct2D, OpenGL, Vulkan) used for implementation.
 
+use std::any::Any;
+
 use crate::core::prelude::*;
 use crate::core::platform::RawWindowHandle;
 use crate::core::render::objects::text_object::TextObject;
@@ -119,8 +121,29 @@ pub trait Renderer {
     /// * `line` - A reference to the `Line` struct containing the start/end points, stroke width, and color.
     fn draw_line(&mut self, line: &Line) -> anyhow::Result<()>;
 
-    /// Draws a `TextObject`. The renderer is responsible for font selection,
-    /// layout, and rasterization using the platform's text rendering engine
-    /// (e.g., DirectWrite on Windows).
-    fn draw_text(&mut self, text: &TextObject) -> anyhow::Result<()>;
+    // --- Text Rendering ---
+
+    /// Creates a backend-specific text layout object.
+    ///
+    /// This method takes a `TextObject` and generates a layout object (e.g.,
+    /// `IDWriteTextLayout` in Direct2D) that can be cached and reused.
+    ///
+    /// # Arguments
+    ///
+    /// * `text` - The `TextObject` to create the layout for.
+    ///
+    /// # Returns
+    ///
+    /// A `Box<dyn Any>` containing the backend-specific layout object.
+    fn create_text_layout(&self, text: &TextObject) -> anyhow::Result<Box<dyn Any>>;
+
+    /// Draws a `TextObject` using its cached layout.
+    ///
+    /// This method assumes that the `layout` field of the `TextObject` has already
+    /// been populated by a call to `create_text_layout`.
+    ///
+    /// # Arguments
+    ///
+    /// * `text` - The `TextObject` to draw.
+    fn draw_text_layout(&mut self, text: &TextObject) -> anyhow::Result<()>;
 }

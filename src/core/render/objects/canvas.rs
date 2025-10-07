@@ -129,7 +129,7 @@ impl Drawable for Canvas {
     /// # Errors
     ///
     /// This function will return an error if any of the contained objects fail to draw.
-    fn draw(&self, renderer: &mut dyn Renderer) -> Result<()> {
+    fn draw(&mut self, renderer: &mut dyn Renderer) -> Result<()> {
         // Save the current transformation state.
         let original_transform = renderer.get_transform();
 
@@ -141,7 +141,7 @@ impl Drawable for Canvas {
         renderer.push_axis_aligned_clip(0.0, 0.0, self.width, self.height);
 
         // Draw all child objects within the new transformed and clipped context.
-        for object in &self.objects {
+        for object in &mut self.objects {
             object.draw(renderer)?;
         }
 

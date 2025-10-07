@@ -3,6 +3,8 @@
 //! This module provides a `Direct2DRenderer`, an implementation of the [`Renderer`]
 //! trait that uses the Direct2D and DirectWrite APIs on the Windows platform.
 
+use std::any::Any;
+
 use crate::core::prelude::*;
 use crate::core::platform::RawWindowHandle;
 use crate::core::render::objects::text_object::TextObject;
@@ -467,48 +469,64 @@ impl Renderer for Direct2DRenderer {
         Ok(())
     }
 
-    /// Draws a string of text.
+    /// Creates a backend-specific text layout object.
     ///
-    /// This method performs the following steps:
-    /// 1. Encodes the UTF-8 string into UTF-16, as required by DirectWrite.
-    /// 2. Creates a temporary `IDWriteTextLayout` object, which handles complex
-    ///    text processing like word wrapping and font fallback.
-    /// 3. Sets the brush color.
-    /// 4. Issues the `DrawTextLayout` command.
+    /// This method takes a `TextObject` and generates a layout object (e.g.,
+    /// `IDWriteTextLayout` in Direct2D) that can be cached and reused.
     ///
     /// # Arguments
     ///
-    /// * `text` - A reference to the `TextObject` to draw.
+    /// * `text` - The `TextObject` to create the layout for.
     ///
-    /// # Errors
+    /// # Returns
     ///
-    /// Returns an error if the `CreateTextLayout` call fails.
-    fn draw_text(&mut self, text: &TextObject) -> anyhow::Result<()> {
+    /// A `Box<dyn Any>` containing the backend-specific layout object.
+    fn create_text_layout(&self, text: &TextObject) -> anyhow::Result<Box<dyn Any>> {
+        let text_utf16: Vec<u16> = text.text.encode_utf16().collect();
+        let render_target_size = self.get_render_target_size().unwrap_or_default();
+
+        let text_layout = unsafe {
+            self.dwrite_factory.CreateTextLayout(
+                &text_utf16,
+                &self.text_format,
+                render_target_size.x as f32,
+                render_target_size.y as f32,
+            )?
+        };
+
+        Ok(Box::new(text_layout))
+    }
+
+    /// Draws a `TextObject` using its cached layout.
+    ///
+    /// This method assumes that the `layout` field of the `TextObject` has already
+    /// been populated by a call to `create_text_layout`.
+    ///
+    /// # Arguments
+    ///
+    /// * `text` - The `TextObject` to draw.
+    fn draw_text_layout(&mut self, text: &TextObject) -> anyhow::Result<()> {
         if let Some(render_target) = &self.render_target
-            && let Some(brush) = &self.brush {
-                let text_utf16: Vec<u16> = text.text.encode_utf16().collect();
+            && let Some(brush) = &self.brush
+            && let Some(layout_any) = &text.layout {
+                if let Some(text_layout) = layout_any.downcast_ref::<IDWriteTextLayout>() {
+                    let origin = windows_numerics::Vector2 { X: text.x, Y: text.y };
 
-                let size = unsafe { render_target.GetSize() };
+                    unsafe {
+                        brush.SetColor(&D2D1_COLOR_F {
+                            r: text.color.r,
+                            g: text.color.g,
+                            b: text.color.b,
+                            a: text.color.a,
+                        });
 
-                let text_layout = unsafe {
-                    self.dwrite_factory
-                        .CreateTextLayout(&text_utf16, &self.text_format, size.width, size.height)
-                        .context("Failed to create IDWriteTextLayout")?
-                };
-
-                let origin = windows_numerics::Vector2 {
-                    X: text.x,
-                    Y: text.y,
-                };
-
-                unsafe { brush.SetColor(&D2D1_COLOR_F { r: text.color.r, g: text.color.g, b: text.color.b, a: text.color.a }) };
-                unsafe {
-                    render_target.DrawTextLayout(
-                        origin,
-                        &text_layout,
-                        brush,
-                        D2D1_DRAW_TEXT_OPTIONS_NONE,
-                    );
+                        render_target.DrawTextLayout(
+                            origin,
+                            text_layout,
+                            brush,
+                            D2D1_DRAW_TEXT_OPTIONS_NONE,
+                        );
+                    }
                 }
             }
         Ok(())

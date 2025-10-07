@@ -62,7 +62,7 @@ impl<T: HasScene> EventHandler<T> for RenderEventHandler<T> {
             renderer.clear(&Color::BLACK);
 
             // Draw all objects in the scene graph.
-            if let Err(e) = app.scene().draw_all(renderer) {
+            if let Err(e) = app.scene_mut().draw_all(renderer) {
                 // In a real application, this should be logged more robustly.
                 log::error!("Failed to draw scene: {:?}", e);
             }

@@ -36,6 +36,9 @@ use crate::core::render::drawable::Drawable;
 pub trait HasScene {
     /// Returns an immutable reference to the `Scene`.
     fn scene(&self) -> &Scene;
+
+    /// Returns a mutable reference to the `Scene`.
+    fn scene_mut(&mut self) -> &mut Scene;
 }
 
 /// A scene graph containing a collection of `Drawable` objects.
@@ -92,8 +95,8 @@ impl Scene {
     ///
     /// This function will return an error if any of the underlying `draw` calls
     /// fail. The iteration will stop at the first error encountered.
-    pub fn draw_all(&self, renderer: &mut dyn Renderer) -> anyhow::Result<()> {
-        for object in &self.objects {
+    pub fn draw_all(&mut self, renderer: &mut dyn Renderer) -> anyhow::Result<()> {
+        for object in &mut self.objects {
             object.draw(renderer)?;
         }
         Ok(())

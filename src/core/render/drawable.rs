@@ -68,5 +68,5 @@ pub trait Drawable {
     ///
     /// An `anyhow::Result<()>` which should be `Ok(())` if drawing was successful,
     /// or contain an error if any of the underlying rendering operations failed.
-    fn draw(&self, renderer: &mut dyn Renderer) -> anyhow::Result<()>;
+    fn draw(&mut self, renderer: &mut dyn Renderer) -> anyhow::Result<()>;
 }

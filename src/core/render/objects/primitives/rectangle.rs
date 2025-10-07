@@ -56,7 +56,7 @@ impl Drawable for Rectangle {
     ///
     /// This function will return an error if the renderer's `draw_rectangle`
     /// method fails.
-    fn draw(&self, renderer: &mut dyn Renderer) -> anyhow::Result<()> {
+    fn draw(&mut self, renderer: &mut dyn Renderer) -> anyhow::Result<()> {
         renderer.draw_rectangle(self)
     }
 }

@@ -3,6 +3,8 @@
 //! This module defines the `TextObject`, a `Drawable` primitive for rendering
 //! a single line of text.
 
+use std::any::Any;
+
 use crate::core::prelude::*;
 use crate::core::render::drawable::Drawable;
 
@@ -25,6 +27,8 @@ pub struct TextObject {
     pub y: f32,
     /// The color of the text.
     pub color: Color,
+    /// A cached, backend-specific text layout object.
+    pub layout: Option<Box<dyn Any>>,
 }
 
 impl TextObject {
@@ -37,15 +41,20 @@ impl TextObject {
     /// * `y` - The y-coordinate where the text rendering will begin.
     /// * `color` - The `Color` of the text.
     pub fn new(text: String, x: f32, y: f32, color: Color) -> Self {
-        Self { text, x, y, color }
+        Self { text, x, y, color, layout: None }
     }
 }
 
 impl Drawable for TextObject {
     /// Draws the text by delegating to the active `Renderer`.
     ///
-    /// This method calls the `draw_text` method on the provided `Renderer`,
-    /// passing a reference to itself.
+    /// This method implements a caching strategy for the text layout. On the first
+    /// call, it creates a backend-specific text layout object using
+    /// [`Renderer::create_text_layout`] and stores it. On subsequent calls, it
+    /// reuses the cached layout, significantly improving performance for static text.
+    ///
+    /// If the text content of this `TextObject` is changed, the `layout` field
+    /// should be set to `None` to force a recreation of the layout.
     ///
     /// # Arguments
     ///
@@ -53,8 +62,12 @@ impl Drawable for TextObject {
     ///
     /// # Errors
     ///
-    /// This function will return an error if the renderer's `draw_text` method fails.
-    fn draw(&self, renderer: &mut dyn Renderer) -> Result<()> {
-        renderer.draw_text(self)
+    /// This function will return an error if the layout creation or drawing fails.
+    fn draw(&mut self, renderer: &mut dyn Renderer) -> Result<()> {
+        if self.layout.is_none() {
+            let layout = renderer.create_text_layout(self)?;
+            self.layout = Some(layout);
+        }
+        renderer.draw_text_layout(self)
     }
 }
