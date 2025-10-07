@@ -11,7 +11,7 @@ pub use crate::core::{
     backend::renderer::Renderer,
     event::{
         Event,
-        event_handler::EventHandler,
+        event_handler::{EventHandler, EventResult},
         key_id::KeyId,
         
         handlers::{

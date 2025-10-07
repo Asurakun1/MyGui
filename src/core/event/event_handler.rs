@@ -5,6 +5,18 @@
 
 use crate::core::prelude::*;
 
+/// An enum that indicates the result of an event handling operation.
+///
+/// This is returned by `EventHandler::on_event` to control the flow of events
+/// in the event propagation chain.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EventResult {
+    /// Indicates that the event was handled and should not be propagated further.
+    Consumed,
+    /// Indicates that the event was not handled and should be passed to the next handler.
+    NotConsumed,
+}
+
 /// A generic trait for handling window and input events.
 ///
 /// `EventHandler` provides a single method, `on_event`, which is called by the
@@ -74,7 +86,7 @@ pub trait EventHandler<T> {
     /// - `renderer`: A mutable reference to the window's [`crate::prelude::Renderer`]. This can be
     ///   used for immediate drawing operations, though rendering is typically
     ///   deferred to the [`crate::core::event::handlers::render_event_handler::RenderEventHandler`] in response to a `Paint` event.
-    fn on_event(&mut self, _app: &mut T, _event: &Event, _renderer: &mut dyn Renderer) -> bool { false }
+    fn on_event(&mut self, _app: &mut T, _event: &Event, _renderer: &mut dyn Renderer) -> EventResult { EventResult::NotConsumed }
 
     /// Handles an error that occurred in the event loop.
     ///

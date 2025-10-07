@@ -74,8 +74,8 @@ impl App {
 struct CustomEventHandler;
 
 impl EventHandler<App> for CustomEventHandler {
-    fn on_event(&mut self, app: &mut App, event: &Event, _renderer: &mut dyn Renderer) -> bool {
-        let mut result = false;
+    fn on_event(&mut self, app: &mut App, event: &Event, _renderer: &mut dyn Renderer) -> EventResult {
+        let mut result = EventResult::NotConsumed;
         match event {
             Event::KeyDown(KeyboardEvent { key }) => {
                 log::info!(
@@ -83,7 +83,7 @@ impl EventHandler<App> for CustomEventHandler {
                     key,
                     app.input_context().keyboard
                 );
-                result = true;
+                result = EventResult::Consumed;
             }
             Event::KeyUp(KeyboardEvent { key }) => {
                 log::info!(
@@ -91,31 +91,31 @@ impl EventHandler<App> for CustomEventHandler {
                     key,
                     app.input_context().keyboard
                 );
-                result = true;
+                result = EventResult::Consumed;
             }
             // Event::MouseMove(MouseEvent { x, y, .. }) => {
             //     log::info!("MouseMove: x: {}, y: {}", x, y);
             // }
             Event::MouseDown(MouseEvent { button, .. }) => {
                 log::info!("MouseDown: {:?}", button);
-                result = true;
+                result = EventResult::Consumed;
             }
             Event::MouseUp(MouseEvent { button, .. }) => {
                 log::info!("MouseUp: {:?}", button);
-                result = true;
+                result = EventResult::Consumed;
             }
             Event::MouseWheel(delta) => {
                 log::info!("MouseWheel: {:?}", delta);
-                result = true;
+                result = EventResult::Consumed;
             }
             Event::Character(character) => {
                 log::info!("Character: {}", character);
-                result = true
+                result = EventResult::Consumed
             }
             Event::WindowClose => {
                 log::info!("WindowClose");
                 println!("Bye Bye!");
-                result = true;
+                result = EventResult::Consumed;
             }
             _ => {}
         }

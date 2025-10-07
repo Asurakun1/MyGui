@@ -54,7 +54,7 @@ impl<T: HasScene> EventHandler<T> for RenderEventHandler<T> {
     /// - `app`: A mutable reference to the application state, which must implement `HasScene`.
     /// - `event`: The event being processed.
     /// - `renderer`: The renderer used to perform drawing operations.
-    fn on_event(&mut self, app: &mut T, event: &Event, renderer: &mut dyn Renderer) -> bool {
+    fn on_event(&mut self, app: &mut T, event: &Event, renderer: &mut dyn Renderer) -> EventResult {
         if let Event::Paint = event {
             renderer.begin_draw();
 
@@ -72,6 +72,6 @@ impl<T: HasScene> EventHandler<T> for RenderEventHandler<T> {
                 log::error!("EndDraw failed: {:?}", e);
             }
         }
-        false
+        EventResult::NotConsumed
     }
 }

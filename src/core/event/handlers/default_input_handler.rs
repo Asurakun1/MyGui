@@ -26,10 +26,10 @@ impl<T: 'static + HasScene + HasInputContext> DefaultInputHandler<T> {
 }
 
 impl<T: 'static + HasScene + HasInputContext> EventHandler<T> for DefaultInputHandler<T> {
-    fn on_event(&mut self, state: &mut T, event: &Event, renderer: &mut dyn Renderer) -> bool {
+    fn on_event(&mut self, state: &mut T, event: &Event, renderer: &mut dyn Renderer) -> EventResult {
         self.render_handler.on_event(state, event, renderer);
         self.keyboard_handler.on_event(state, event, renderer);
         self.mouse_handler.on_event(state, event, renderer);
-        false
+        EventResult::NotConsumed
     }
 }

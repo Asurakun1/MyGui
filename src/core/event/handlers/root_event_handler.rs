@@ -83,12 +83,12 @@ impl<T> EventHandler<T> for RootEventHandler<T> {
     /// This method iterates through its collection of handlers and calls `on_event`
     /// on each one in the order they were added, allowing each handler to process
     /// the event.
-    fn on_event(&mut self, app: &mut T, event: &Event, renderer: &mut dyn Renderer) -> bool {
+    fn on_event(&mut self, app: &mut T, event: &Event, renderer: &mut dyn Renderer) -> EventResult {
         for handler in &mut self.handlers {
-            if handler.on_event(app, event, renderer) {
-                return true;
+            if handler.on_event(app, event, renderer) == EventResult::Consumed {
+                return EventResult::Consumed;
             }
         }
-        false
+        EventResult::NotConsumed
     }
 }

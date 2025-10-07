@@ -11,7 +11,7 @@
     -   **Benefit**: Ensures correct resource management by aligning with the Windows API's ownership model, preventing potential memory corruption or double-free errors.
 -   [x] **Event Propagation Control**: Implement a mechanism within the event system to allow handlers to stop event propagation (e.g., mark an event as "consumed"). This is crucial for building complex, interactive UIs where specific handlers should prevent further processing of an event.
 -   [x] **Text Rendering Performance/Features**: Optimize `TextObject` rendering by caching `IDWriteTextLayout` for static text. Further enhance text rendering with advanced layout, wrapping, and font metrics for richer UI.
--   **Refactor Event Consumption Return Type**: Change the `EventHandler::on_event` method's return type from `bool` to an enumeration (e.g., `EventResult::Consumed`, `EventResult::NotConsumed`) for improved readability and expressiveness.
+-   [x] **Refactor Event Consumption Return Type**: Change the `EventHandler::on_event` method's return type from `bool` to an enumeration (e.g., `EventResult::Consumed`, `EventResult::NotConsumed`) for improved readability and expressiveness.
 -   **DPI Awareness**: Implement explicit handling of DPI awareness (e.g., using `SetProcessDpiAwarenessContext`) to ensure consistent scaling and appearance of the application across various display settings and high-DPI monitors.
 
 ### Medium Priority

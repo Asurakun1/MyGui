@@ -22,7 +22,7 @@ impl KeyboardInputHandler {
 }
 
 impl<T: HasInputContext> EventHandler<T> for KeyboardInputHandler {
-    fn on_event(&mut self, app: &mut T, event: &Event, _renderer: &mut dyn Renderer) -> bool {
+    fn on_event(&mut self, app: &mut T, event: &Event, _renderer: &mut dyn Renderer) -> EventResult {
         match event {
             Event::KeyDown(KeyboardEvent { key }) => {
                 self.pressed_keys.insert(*key);
@@ -46,7 +46,7 @@ impl<T: HasInputContext> EventHandler<T> for KeyboardInputHandler {
             }
             _ => {}
         }
-        false
+        EventResult::NotConsumed
     }
 }
 
@@ -63,7 +63,7 @@ pub struct KeyboardEvent {
 pub struct MouseInputHandler;
 
 impl<T: HasInputContext> EventHandler<T> for MouseInputHandler {
-    fn on_event(&mut self, app: &mut T, event: &Event, _renderer: &mut dyn Renderer) -> bool {
+    fn on_event(&mut self, app: &mut T, event: &Event, _renderer: &mut dyn Renderer) -> EventResult {
         match event {
             Event::MouseMove(MouseEvent { x, y, .. }) => {
                 let mouse_state = &mut app.input_context_mut().mouse;
@@ -94,7 +94,7 @@ impl<T: HasInputContext> EventHandler<T> for MouseInputHandler {
             }
             _ => {}
         }
-        false
+        EventResult::NotConsumed
     }
 }
 
