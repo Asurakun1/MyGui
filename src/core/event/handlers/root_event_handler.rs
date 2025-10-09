@@ -7,66 +7,57 @@ use crate::core::prelude::*;
 
 /// The primary event handler that composes and delegates to other, more specialized handlers.
 ///
-/// This struct acts as the root of the event handling hierarchy. It maintains a
-/// collection of child `EventHandler` implementors and forwards events to them
-/// in the order they were added. This "composition over inheritance" design
-/// allows for a clean separation of concerns, where different aspects of event
-/// handling (e.g., rendering, input tracking, UI logic) can be managed by
-/// separate, reusable components.
+/// This struct holds a collection of child `EventHandler`s and dispatches events
+/// to them based on a priority system. Handlers with a higher priority number
+/// are called first. This allows for fine-grained control over the flow of events,
+/// which is crucial for building complex UIs with features like modal dialogs or pop-ups.
 ///
-/// The `RootEventHandler` is the top-level handler that is passed to the
-/// `WindowBuilder` when creating a window.
+/// ## Priority System
 ///
-/// ## Example
+/// - **Higher numbers mean higher priority.** A handler with priority `100` will run before one with priority `0`.
+/// - Handlers with the same priority are run in the order they were added.
+/// - **`0`** is the default priority.
+/// - **Positive numbers** are recommended for high-priority handlers that might consume events first (e.g., UI widgets).
+/// - **Negative numbers** are recommended for low-priority handlers that should run last (e.g., loggers).
 ///
-/// ```rust,no_run
-/// use my_gui::core::event::handlers::{
-///     root_event_handler::RootEventHandler,
-///     render_event_handler::RenderEventHandler,
-///     // other handlers...
-/// };
-/// use my_gui::core::event::{Event, event_handler::EventHandler};
+/// ## Event Consumption
 ///
-/// // Define application state
-/// #[derive(Default)]
-/// struct MyApp;
-///
-/// // Create a custom handler for application logic
-/// struct AppLogicHandler;
-/// impl EventHandler<MyApp> for AppLogicHandler {
-///     /* ... */
-/// }
-///
-/// // Create a root handler and compose the built-in and custom handlers
-/// let mut root_handler = RootEventHandler::new();
-/// root_handler.add_handler(Box::new(RenderEventHandler::default())); // Handles drawing
-/// // root_handler.add_handler(Box::new(KeyboardInputHandler::default())); // Handles keyboard state
-/// // root_handler.add_handler(Box::new(MouseInputHandler));      // Handles mouse state
-/// root_handler.add_handler(Box::new(AppLogicHandler));         // Handles custom logic
-///
-/// // This `root_handler` would then be passed to the `WindowBuilder`.
-/// ```
+/// If any handler in the chain returns `EventResult::Consumed`, the propagation stops immediately,
+/// and no lower-priority handlers will receive the event.
 pub struct RootEventHandler<T> {
-    handlers: Vec<Box<dyn EventHandler<T>>>,
+    handlers: Vec<(i32, Box<dyn EventHandler<T>>)>,
+    is_sorted: bool,
 }
 
 impl<T> RootEventHandler<T> {
     /// Creates a new, empty `RootEventHandler`.
     pub fn new() -> Self {
-        Self { handlers: Vec::new() }
+        Self {
+            handlers: Vec::new(),
+            is_sorted: true,
+        }
     }
 
-    /// Adds a new [`EventHandler`] to the collection.
+    /// Adds a new [`EventHandler`] to the collection with a default priority of `0`.
     ///
-    /// The provided handler will be boxed and added to the end of the delegation
-    /// list. Events will be propagated to this handler after all previously
-    /// added handlers have processed the event.
+    /// For more control, use `add_handler_with_priority`.
     ///
     /// # Arguments
     ///
-    /// * `handler` - A `Box<dyn EventHandler<T>>` to be added to the delegation list.
+    /// * `handler` - A `Box<dyn EventHandler<T>>` to be added.
     pub fn add_handler(&mut self, handler: Box<dyn EventHandler<T>>) {
-        self.handlers.push(handler);
+        self.add_handler_with_priority(0, handler);
+    }
+
+    /// Adds a new [`EventHandler`] to the collection with a specific priority.
+    ///
+    /// # Arguments
+    ///
+    /// * `priority` - An `i32` representing the handler's priority. Higher numbers run first.
+    /// * `handler` - A `Box<dyn EventHandler<T>>` to be added.
+    pub fn add_handler_with_priority(&mut self, priority: i32, handler: Box<dyn EventHandler<T>>) {
+        self.handlers.push((priority, handler));
+        self.is_sorted = false; // Mark the list as dirty, needing a sort.
     }
 }
 
@@ -78,13 +69,21 @@ impl<T> Default for RootEventHandler<T> {
 }
 
 impl<T> EventHandler<T> for RootEventHandler<T> {
-    /// Delegates the incoming event to all registered child handlers.
+    /// Delegates the incoming event to all registered child handlers in priority order.
     ///
-    /// This method iterates through its collection of handlers and calls `on_event`
-    /// on each one in the order they were added, allowing each handler to process
-    /// the event.
+    /// Before dispatching, this method will sort the handlers if any new handlers have been
+    /// added since the last event. It then iterates through the sorted handlers, calling
+    /// `on_event` on each one. If a handler consumes the event, propagation stops.
     fn on_event(&mut self, app: &mut T, event: &Event, renderer: &mut dyn Renderer) -> EventResult {
-        for handler in &mut self.handlers {
+        // If new handlers have been added, the list will be unsorted. Sort it now.
+        if !self.is_sorted {
+            // Sort by priority in descending order. Higher numbers run first.
+            // `sort_by_key` is stable, so handlers with the same priority maintain their insertion order.
+            self.handlers.sort_by_key(|(priority, _)| -priority);
+            self.is_sorted = true;
+        }
+
+        for (_priority, handler) in &mut self.handlers {
             if handler.on_event(app, event, renderer) == EventResult::Consumed {
                 return EventResult::Consumed;
             }

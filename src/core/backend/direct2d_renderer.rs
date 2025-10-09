@@ -5,15 +5,14 @@
 
 use std::any::Any;
 
-use crate::core::prelude::*;
 use crate::core::platform::RawWindowHandle;
+use crate::core::prelude::*;
 use crate::core::render::objects::text_object::TextObject;
 use anyhow::Context;
 use glam::{Affine2, UVec2};
 use windows::{
-    core::*, Win32::Foundation::*, Win32::Graphics::Direct2D::Common::*,
-    Win32::Graphics::Direct2D::*, Win32::Graphics::DirectWrite::*, Win32::System::Com::*,
-    Win32::UI::WindowsAndMessaging::GetClientRect,
+    Win32::Foundation::*, Win32::Graphics::Direct2D::Common::*, Win32::Graphics::Direct2D::*,
+    Win32::Graphics::DirectWrite::*, Win32::UI::WindowsAndMessaging::GetClientRect, core::*,
 };
 
 /// A Direct2D implementation of the [`Renderer`] trait.
@@ -46,8 +45,6 @@ pub struct Direct2DRenderer {
     pub brush: Option<ID2D1SolidColorBrush>,
 }
 
-
-
 impl Direct2DRenderer {
     /// Creates a new `Direct2DRenderer` and initializes device-independent resources.
     ///
@@ -69,7 +66,6 @@ impl Direct2DRenderer {
     /// Returns an error if COM initialization fails or if any of the factory or
     /// text format creation calls fail.
     pub fn new(font_face_name: &str, font_size: f32) -> anyhow::Result<Self> {
-
         // Enable debug logging for Direct2D in debug builds.
         let d2d_factory_options = D2D1_FACTORY_OPTIONS {
             debugLevel: if cfg!(debug_assertions) {
@@ -141,7 +137,9 @@ impl Renderer for Direct2DRenderer {
 
         // Get the initial size of the window's client area.
         let mut rect = RECT::default();
-        unsafe { GetClientRect(hwnd, &mut rect).context("Failed to get client rectangle for window")? };
+        unsafe {
+            GetClientRect(hwnd, &mut rect).context("Failed to get client rectangle for window")?
+        };
 
         let render_target_properties = D2D1_RENDER_TARGET_PROPERTIES::default();
 
@@ -281,7 +279,14 @@ impl Renderer for Direct2DRenderer {
     /// * `color` - The `Color` to use for clearing the background.
     fn clear(&mut self, color: &Color) {
         if let Some(render_target) = &self.render_target {
-            unsafe { render_target.Clear(Some(&D2D1_COLOR_F { r: color.r, g: color.g, b: color.b, a: color.a })) };
+            unsafe {
+                render_target.Clear(Some(&D2D1_COLOR_F {
+                    r: color.r,
+                    g: color.g,
+                    b: color.b,
+                    a: color.a,
+                }))
+            };
         }
     }
 
@@ -303,10 +308,7 @@ impl Renderer for Direct2DRenderer {
                 bottom: y + height,
             };
             unsafe {
-                render_target.PushAxisAlignedClip(
-                    &rect,
-                    D2D1_ANTIALIAS_MODE_PER_PRIMITIVE,
-                );
+                render_target.PushAxisAlignedClip(&rect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
             }
         }
     }
@@ -356,7 +358,12 @@ impl Renderer for Direct2DRenderer {
             let mut d2d_matrix = windows_numerics::Matrix3x2::default();
             unsafe { render_target.GetTransform(&mut d2d_matrix) };
             Affine2::from_cols_array(&[
-                d2d_matrix.M11, d2d_matrix.M12, d2d_matrix.M21, d2d_matrix.M22, d2d_matrix.M31, d2d_matrix.M32,
+                d2d_matrix.M11,
+                d2d_matrix.M12,
+                d2d_matrix.M21,
+                d2d_matrix.M22,
+                d2d_matrix.M31,
+                d2d_matrix.M32,
             ])
         } else {
             Affine2::default()
@@ -377,17 +384,25 @@ impl Renderer for Direct2DRenderer {
     /// Propagates any errors from the underlying Direct2D calls.
     fn draw_rectangle(&mut self, rectangle: &Rectangle) -> anyhow::Result<()> {
         if let Some(render_target) = &self.render_target
-            && let Some(brush) = &self.brush {
-                let rect = D2D_RECT_F {
-                    left: rectangle.x,
-                    top: rectangle.y,
-                    right: rectangle.x + rectangle.width,
-                    bottom: rectangle.y + rectangle.height,
-                };
+            && let Some(brush) = &self.brush
+        {
+            let rect = D2D_RECT_F {
+                left: rectangle.x,
+                top: rectangle.y,
+                right: rectangle.x + rectangle.width,
+                bottom: rectangle.y + rectangle.height,
+            };
 
-                unsafe { brush.SetColor(&D2D1_COLOR_F { r: rectangle.color.r, g: rectangle.color.g, b: rectangle.color.b, a: rectangle.color.a }) };
-                unsafe { render_target.FillRectangle(&rect, brush) };
-            }
+            unsafe {
+                brush.SetColor(&D2D1_COLOR_F {
+                    r: rectangle.color.r,
+                    g: rectangle.color.g,
+                    b: rectangle.color.b,
+                    a: rectangle.color.a,
+                })
+            };
+            unsafe { render_target.FillRectangle(&rect, brush) };
+        }
         Ok(())
     }
 
@@ -404,19 +419,27 @@ impl Renderer for Direct2DRenderer {
     /// Propagates any errors from the underlying Direct2D calls.
     fn draw_ellipse(&mut self, ellipse: &Ellipse) -> anyhow::Result<()> {
         if let Some(render_target) = &self.render_target
-            && let Some(brush) = &self.brush {
-                let d2d_ellipse = D2D1_ELLIPSE {
-                    point: windows_numerics::Vector2 {
-                        X: ellipse.center_x,
-                        Y: ellipse.center_y,
-                    }, // Use f32 coordinates
-                    radiusX: ellipse.radius_x,
-                    radiusY: ellipse.radius_y,
-                };
+            && let Some(brush) = &self.brush
+        {
+            let d2d_ellipse = D2D1_ELLIPSE {
+                point: windows_numerics::Vector2 {
+                    X: ellipse.center_x,
+                    Y: ellipse.center_y,
+                }, // Use f32 coordinates
+                radiusX: ellipse.radius_x,
+                radiusY: ellipse.radius_y,
+            };
 
-                unsafe { brush.SetColor(&D2D1_COLOR_F { r: ellipse.color.r, g: ellipse.color.g, b: ellipse.color.b, a: ellipse.color.a }) };
-                unsafe { render_target.FillEllipse(&d2d_ellipse, brush) };
-            }
+            unsafe {
+                brush.SetColor(&D2D1_COLOR_F {
+                    r: ellipse.color.r,
+                    g: ellipse.color.g,
+                    b: ellipse.color.b,
+                    a: ellipse.color.a,
+                })
+            };
+            unsafe { render_target.FillEllipse(&d2d_ellipse, brush) };
+        }
         Ok(())
     }
 
@@ -433,24 +456,32 @@ impl Renderer for Direct2DRenderer {
     /// Propagates any errors from the underlying Direct2D calls.
     fn draw_line(&mut self, line: &Line) -> anyhow::Result<()> {
         if let Some(render_target) = &self.render_target
-            && let Some(brush) = &self.brush {
-                unsafe { brush.SetColor(&D2D1_COLOR_F { r: line.color.r, g: line.color.g, b: line.color.b, a: line.color.a }) };
-                unsafe {
-                    render_target.DrawLine(
-                        windows_numerics::Vector2 {
-                            X: line.p0_x,
-                            Y: line.p0_y,
-                        }, // Use f32 coordinates
-                        windows_numerics::Vector2 {
-                            X: line.p1_x,
-                            Y: line.p1_y,
-                        }, // Use f32 coordinates
-                        brush,
-                        line.stroke_width,
-                        None,
-                    );
-                }
+            && let Some(brush) = &self.brush
+        {
+            unsafe {
+                brush.SetColor(&D2D1_COLOR_F {
+                    r: line.color.r,
+                    g: line.color.g,
+                    b: line.color.b,
+                    a: line.color.a,
+                })
+            };
+            unsafe {
+                render_target.DrawLine(
+                    windows_numerics::Vector2 {
+                        X: line.p0_x,
+                        Y: line.p0_y,
+                    }, // Use f32 coordinates
+                    windows_numerics::Vector2 {
+                        X: line.p1_x,
+                        Y: line.p1_y,
+                    }, // Use f32 coordinates
+                    brush,
+                    line.stroke_width,
+                    None,
+                );
             }
+        }
         Ok(())
     }
 
@@ -493,27 +524,30 @@ impl Renderer for Direct2DRenderer {
     fn draw_text_layout(&mut self, text: &TextObject) -> anyhow::Result<()> {
         if let Some(render_target) = &self.render_target
             && let Some(brush) = &self.brush
-            && let Some(layout_any) = &text.layout {
-                if let Some(text_layout) = layout_any.downcast_ref::<IDWriteTextLayout>() {
-                    let origin = windows_numerics::Vector2 { X: text.x, Y: text.y };
+            && let Some(layout_any) = &text.layout
+            && let Some(text_layout) = layout_any.downcast_ref::<IDWriteTextLayout>()
+        {
+            let origin = windows_numerics::Vector2 {
+                X: text.x,
+                Y: text.y,
+            };
 
-                    unsafe {
-                        brush.SetColor(&D2D1_COLOR_F {
-                            r: text.color.r,
-                            g: text.color.g,
-                            b: text.color.b,
-                            a: text.color.a,
-                        });
+            unsafe {
+                brush.SetColor(&D2D1_COLOR_F {
+                    r: text.color.r,
+                    g: text.color.g,
+                    b: text.color.b,
+                    a: text.color.a,
+                });
 
-                        render_target.DrawTextLayout(
-                            origin,
-                            text_layout,
-                            brush,
-                            D2D1_DRAW_TEXT_OPTIONS_NONE,
-                        );
-                    }
-                }
+                render_target.DrawTextLayout(
+                    origin,
+                    text_layout,
+                    brush,
+                    D2D1_DRAW_TEXT_OPTIONS_NONE,
+                );
             }
+        }
         Ok(())
     }
 }

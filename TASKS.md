@@ -7,8 +7,6 @@
 
 ### Medium Priority
 
--   **COM Management Centralization**: Centralize COM initialization and uninitialization, or ensure single-threaded COM usage, to enhance robustness and prevent potential conflicts arising from `CoInitializeEx` and `CoUninitialize` calls within `Direct2DRenderer`.
--   **Event Prioritization**: Introduce a mechanism to prioritize event handlers, allowing certain handlers to process events before others. This would be beneficial for scenarios requiring specific event processing order.
 -   **Window Customization Options**: Expand `WindowConfig` to include more advanced customization options such as window style flags (e.g., resizable, minimizable, maximizable, borderless), initial window position, parent window, and transparency settings.
 
 ### Low Priority
@@ -47,6 +45,8 @@
 
 ## Completed
 
+- [x] **Event Prioritization**
+- [x] **COM Management Centralization**
 - [x] **`Win32Window::run` Method - Resource Management**
 - [x] **Event Propagation Control**
 - [x] **Text Rendering Performance/Features**
