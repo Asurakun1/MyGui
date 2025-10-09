@@ -44,7 +44,12 @@ impl HasScene for App {
 struct ControlHandler;
 
 impl EventHandler<App> for ControlHandler {
-    fn on_event(&mut self, app: &mut App, event: &Event, _renderer: &mut dyn Renderer) -> bool {
+    fn on_event(
+        &mut self,
+        app: &mut App,
+        event: &Event,
+        _renderer: &mut dyn Renderer,
+    ) -> EventResult {
         match event {
             Event::KeyDown(KeyboardEvent { key }) => {
                 // Check for F1 to toggle the consumption lock
@@ -54,7 +59,7 @@ impl EventHandler<App> for ControlHandler {
                         "ControlHandler: Consumption lock toggled. Now: {}",
                         app.is_consumption_locked
                     );
-                    return true; // Consume F1 event itself
+                    EventResult::Consumed; // Consume F1 event itself
                 }
 
                 if app.is_consumption_locked {
@@ -62,16 +67,16 @@ impl EventHandler<App> for ControlHandler {
                         "ControlHandler: Consumption lock is ON. Key {:?} CONSUMED.",
                         key
                     );
-                    true // Consume all other KeyDown events when lock is ON
+                    EventResult::Consumed // Consume all other KeyDown events when lock is ON
                 } else {
                     println!(
                         "ControlHandler: Consumption lock is OFF. Key {:?} NOT CONSUMED.",
                         key
                     );
-                    false // Allow all other KeyDown events to propagate when lock is OFF
+                    EventResult::NotConsumed // Allow all other KeyDown events to propagate when lock is OFF
                 }
             }
-            _ => false, // Do not consume other event types
+            _ => EventResult::NotConsumed, // Do not consume other event types
         }
     }
 }
@@ -80,13 +85,18 @@ impl EventHandler<App> for ControlHandler {
 struct ObservingHandler;
 
 impl EventHandler<App> for ObservingHandler {
-    fn on_event(&mut self, _app: &mut App, event: &Event, _renderer: &mut dyn Renderer) -> bool {
+    fn on_event(
+        &mut self,
+        _app: &mut App,
+        event: &Event,
+        _renderer: &mut dyn Renderer,
+    ) -> EventResult {
         match event {
             Event::KeyDown(KeyboardEvent { key }) => {
                 println!("ObservingHandler: Key {:?} detected.", key);
-                false // Always allow propagation
+                EventResult::NotConsumed // Always allow propagation
             }
-            _ => false, // Do not consume other event types
+            _ => EventResult::NotConsumed, // Do not consume other event types
         }
     }
 }

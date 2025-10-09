@@ -4,6 +4,7 @@
 //! and configuring a new application window.
 
 use crate::core::prelude::*;
+use crate::core::window::config::DpiAwareness;
 
 use anyhow::Context;
 
@@ -115,6 +116,14 @@ impl WindowBuilder {
         self
     }
 
+    /// Sets the DPI awareness level for the application.
+    ///
+    /// The default is `DpiAwareness::PerMonitorAwareV2`.
+    pub fn with_dpi_awareness(mut self, awareness: DpiAwareness) -> Self {
+        self.config.dpi_awareness = awareness;
+        self
+    }
+
     /// Builds the window with the specified configuration, event handler, and app state.
     ///
     /// This method consumes the builder and returns a platform-specific window
@@ -144,9 +153,36 @@ impl WindowBuilder {
         #[cfg(target_os = "windows")]
         {
             use crate::core::platform::win32::win32_window::Win32Window;
+
+            use windows::Win32::UI::HiDpi::{
+                DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE,
+                DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2, DPI_AWARENESS_CONTEXT_SYSTEM_AWARE,
+                DPI_AWARENESS_CONTEXT_UNAWARE, SetProcessDpiAwarenessContext,
+            };
+
+            // Set the DPI awareness for the process based on the configuration.
+            // This should be done before any windows are created.
+            let dpi_context = match self.config.dpi_awareness {
+                DpiAwareness::Unaware => DPI_AWARENESS_CONTEXT_UNAWARE,
+                DpiAwareness::SystemAware => DPI_AWARENESS_CONTEXT_SYSTEM_AWARE,
+                DpiAwareness::PerMonitorAware => DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE,
+                DpiAwareness::PerMonitorAwareV2 => DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2,
+            };
+
+            // Only set the context if it's not the default/unspecified value.
+            if dpi_context != DPI_AWARENESS_CONTEXT_UNAWARE {
+                unsafe {
+                    // We ignore the result, as there's not much we can do if it fails,
+                    // and it's not critical for the app to run.
+                    let _ = SetProcessDpiAwarenessContext(dpi_context);
+                }
+            }
+
             let backend = Win32Window::new(&self.config, event_handler, app)
                 .context("Failed to create Win32 window backend")?;
-            Ok(Window { window_backend: backend })
+            Ok(Window {
+                window_backend: backend,
+            })
         }
 
         #[cfg(not(target_os = "windows"))]
