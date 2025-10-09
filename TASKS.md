@@ -5,15 +5,6 @@
 
 ### High Priority
 
--   [x] **`Win32Window::run` Method - Resource Management**: 
-    -   **Problem**: The `std::mem::forget(self)` in `Win32Window::run` prevents the `Win32Window`'s `Drop` implementation from being called, leading to potential resource leaks if `WM_NCDESTROY` is not reliably processed.
-    -   **Solution**: `std::mem::forget(self)` is intentionally used in `Win32Window::run` to transfer ownership of the `Win32Window` instance to the operating system. This prevents Rust's `Drop` implementation from being called, as the OS is responsible for managing the window's lifecycle and associated resources through the `wndproc`. This approach avoids double-free issues and ensures proper interaction with the Windows API.
-    -   **Benefit**: Ensures correct resource management by aligning with the Windows API's ownership model, preventing potential memory corruption or double-free errors.
--   [x] **Event Propagation Control**: Implement a mechanism within the event system to allow handlers to stop event propagation (e.g., mark an event as "consumed"). This is crucial for building complex, interactive UIs where specific handlers should prevent further processing of an event.
--   [x] **Text Rendering Performance/Features**: Optimize `TextObject` rendering by caching `IDWriteTextLayout` for static text. Further enhance text rendering with advanced layout, wrapping, and font metrics for richer UI.
--   [x] **Refactor Event Consumption Return Type**: Change the `EventHandler::on_event` method's return type from `bool` to an enumeration (e.g., `EventResult::Consumed`, `EventResult::NotConsumed`) for improved readability and expressiveness.
--   **DPI Awareness**: Implement explicit handling of DPI awareness (e.g., using `SetProcessDpiAwarenessContext`) to ensure consistent scaling and appearance of the application across various display settings and high-DPI monitors.
-
 ### Medium Priority
 
 -   **COM Management Centralization**: Centralize COM initialization and uninitialization, or ensure single-threaded COM usage, to enhance robustness and prevent potential conflicts arising from `CoInitializeEx` and `CoUninitialize` calls within `Direct2DRenderer`.
@@ -56,6 +47,11 @@
 
 ## Completed
 
+- [x] **`Win32Window::run` Method - Resource Management**
+- [x] **Event Propagation Control**
+- [x] **Text Rendering Performance/Features**
+- [x] **Refactor Event Consumption Return Type**
+- [x] **DPI Awareness**
 - [x] **Improve Error Handling Consistency**
 - [x] **Standardize API and Configuration**
 - [x] **Decouple Event Loop and Add Prelude**

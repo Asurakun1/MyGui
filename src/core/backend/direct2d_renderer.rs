@@ -46,16 +46,7 @@ pub struct Direct2DRenderer {
     pub brush: Option<ID2D1SolidColorBrush>,
 }
 
-impl Drop for Direct2DRenderer {
-    /// Uninitializes COM when the renderer is dropped.
-    ///
-    /// This is essential to clean up COM resources allocated by the thread.
-    fn drop(&mut self) {
-        unsafe {
-            windows::Win32::System::Com::CoUninitialize();
-        }
-    }
-}
+
 
 impl Direct2DRenderer {
     /// Creates a new `Direct2DRenderer` and initializes device-independent resources.
@@ -78,12 +69,6 @@ impl Direct2DRenderer {
     /// Returns an error if COM initialization fails or if any of the factory or
     /// text format creation calls fail.
     pub fn new(font_face_name: &str, font_size: f32) -> anyhow::Result<Self> {
-        // COM must be initialized on the thread that will be using Direct2D.
-        unsafe {
-            CoInitializeEx(None, COINIT_APARTMENTTHREADED)
-                .ok()
-                .context("Failed to initialize COM for Direct2DRenderer")?;
-        }
 
         // Enable debug logging for Direct2D in debug builds.
         let d2d_factory_options = D2D1_FACTORY_OPTIONS {

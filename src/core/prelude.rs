@@ -21,6 +21,7 @@ pub use crate::core::{
         },
         input_state::{HasInputContext, InputContext, InputState, MouseState},
     },
+    platform::win32::com::ComInitializer,
     render::{
         color::Color,
         drawable::Drawable,
@@ -33,7 +34,7 @@ pub use crate::core::{
     window::{
         Window,
         WindowBuilder,
-        config::{KeyboardInputMode, WindowConfig},
+        config::{KeyboardInputMode, WindowConfig, DpiAwareness},
     },
 };
 

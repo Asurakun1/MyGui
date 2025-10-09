@@ -74,7 +74,12 @@ impl App {
 struct CustomEventHandler;
 
 impl EventHandler<App> for CustomEventHandler {
-    fn on_event(&mut self, app: &mut App, event: &Event, _renderer: &mut dyn Renderer) -> EventResult {
+    fn on_event(
+        &mut self,
+        app: &mut App,
+        event: &Event,
+        _renderer: &mut dyn Renderer,
+    ) -> EventResult {
         let mut result = EventResult::NotConsumed;
         match event {
             Event::KeyDown(KeyboardEvent { key }) => {
@@ -127,6 +132,7 @@ impl EventHandler<App> for CustomEventHandler {
 // ... (rest of the file is the same until main)
 
 fn main() -> Result<()> {
+    let _app = Application::new()?;
     env_logger::init();
     log::info!("Hello, World!");
     // Now returns anyhow::Result

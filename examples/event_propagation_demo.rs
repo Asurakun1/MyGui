@@ -59,7 +59,7 @@ impl EventHandler<App> for ControlHandler {
                         "ControlHandler: Consumption lock toggled. Now: {}",
                         app.is_consumption_locked
                     );
-                    EventResult::Consumed; // Consume F1 event itself
+                    return EventResult::Consumed; // Consume F1 event itself
                 }
 
                 if app.is_consumption_locked {
@@ -102,6 +102,7 @@ impl EventHandler<App> for ObservingHandler {
 }
 
 fn main() -> Result<()> {
+    let _app = Application::new()?;
     // env_logger::init(); // Not needed for println!
     println!("Starting Event Propagation Demo - Global Consumption Lock.");
     println!("Press F1 to toggle the global consumption lock.");
