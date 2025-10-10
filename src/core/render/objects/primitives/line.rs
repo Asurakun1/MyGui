@@ -60,4 +60,12 @@ impl Drawable for Line {
     fn draw(&mut self, renderer: &mut dyn Renderer) -> anyhow::Result<()> {
         renderer.draw_line(self)
     }
+
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
 }

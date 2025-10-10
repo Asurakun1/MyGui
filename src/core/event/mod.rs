@@ -39,6 +39,7 @@ pub mod key_id;
 
 use crate::core::prelude::*;
 use glam::UVec2;
+use std::time::Duration;
 
 /// A platform-agnostic enumeration of all possible GUI events.
 ///
@@ -103,7 +104,14 @@ pub enum Event {
     /// backward (toward the user).
     MouseWheel(f32),
 
-    // --- Rendering Events ---
+    // --- Application/Rendering Events ---
+    /// Dispatched on every frame in `RunMode::Continuous`.
+    ///
+    /// This event signals that the application should update its state for the
+    /// next frame. It contains the delta time since the last `Update` event,
+    /// which is essential for framerate-independent animations and physics.
+    Update(Duration),
+
     /// The window's content needs to be repainted.
     ///
     /// This event is triggered by the OS whenever the window's client area is

@@ -66,20 +66,27 @@ impl Scene {
         }
     }
 
-    /// Adds a `Drawable` object to the scene.
+    /// Adds a `Drawable` object to the scene and returns its index.
     ///
-    /// The object is boxed and added to the scene's list of `Drawable` trait
-    /// objects. The rendering order is determined by the insertion order.
+    /// The object is boxed and added to the scene's list. The returned index
+    /// can be used later to retrieve the object with `get_object` or `get_object_mut`.
     ///
-    /// # Type Parameters
+    /// # Returns
     ///
-    /// * `T`: Any type that implements `Drawable` and has a `'static` lifetime.
-    ///
-    /// # Arguments
-    ///
-    /// * `object`: The drawable object to add to the scene.
-    pub fn add_object<T: Drawable + 'static>(&mut self, object: T) {
+    /// The index (`usize`) of the newly added object.
+    pub fn add_object<T: Drawable + 'static>(&mut self, object: T) -> usize {
         self.objects.push(Box::new(object));
+        self.objects.len() - 1
+    }
+
+    /// Returns a mutable reference to a `Drawable` object by its index.
+    pub fn get_object_mut(&mut self, index: usize) -> Option<&mut Box<dyn Drawable>> {
+        self.objects.get_mut(index)
+    }
+
+    /// Returns an immutable reference to a `Drawable` object by its index.
+    pub fn get_object(&self, index: usize) -> Option<&Box<dyn Drawable>> {
+        self.objects.get(index)
     }
 
     /// Draws all objects in the scene using the provided `Renderer`.

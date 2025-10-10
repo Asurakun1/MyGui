@@ -7,7 +7,7 @@
 
 ### Medium Priority
 
--   **Window Customization Options**: Expand `WindowConfig` to include more advanced customization options such as window style flags (e.g., resizable, minimizable, maximizable, borderless), initial window position, parent window, and transparency settings.
+-   **Fixed Timestep/Game Loop**: Give users the option to run the application with a continuous loop that updates at a fixed timestep (e.g., 60 FPS) instead of the default blocking event loop.
 
 ### Low Priority
 
@@ -45,6 +45,7 @@
 
 ## Completed
 
+- [x] **Window Customization Options**
 - [x] **Event Prioritization**
 - [x] **COM Management Centralization**
 - [x] **`Win32Window::run` Method - Resource Management**

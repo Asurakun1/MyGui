@@ -43,6 +43,15 @@ impl TextObject {
     pub fn new(text: String, x: f32, y: f32, color: Color) -> Self {
         Self { text, x, y, color, layout: None }
     }
+
+    /// Sets the text content of the `TextObject`.
+    ///
+    /// This method also invalidates the cached layout, ensuring that the text will be
+    /// re-laid out on the next `draw` call.
+    pub fn set_text(&mut self, text: String) {
+        self.text = text;
+        self.layout = None;
+    }
 }
 
 impl Drawable for TextObject {
@@ -69,5 +78,13 @@ impl Drawable for TextObject {
             self.layout = Some(layout);
         }
         renderer.draw_text_layout(self)
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }

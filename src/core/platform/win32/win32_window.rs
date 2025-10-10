@@ -7,7 +7,9 @@ use crate::core::prelude::*;
 use crate::core::{
     backend::direct2d_renderer::Direct2DRenderer,
     platform::{RawWindowHandle, win32::wndproc::wndproc, window_backend::WindowBackend},
+    window::config::RunMode,
 };
+
 use anyhow::Context;
 use windows::{
     Win32::{
@@ -68,6 +70,21 @@ impl<T: 'static + HasInputContext, E: EventHandler<T> + 'static> Win32Window<T, 
             config: config.clone(),
         });
 
+        // Determine window style based on configuration
+        let mut style = WS_OVERLAPPEDWINDOW;
+        if !config.resizable {
+            style &= !WS_THICKFRAME;
+        }
+        if !config.minimizable {
+            style &= !WS_MINIMIZEBOX;
+        }
+        if !config.maximizable {
+            style &= !WS_MAXIMIZEBOX;
+        }
+
+        // Determine window position
+        let (x, y) = config.position.unwrap_or((CW_USEDEFAULT, CW_USEDEFAULT));
+
         // Create the native window. The last parameter is a pointer to our `Win32Window`
         // instance, which allows us to associate it with the HWND in the `wndproc`.
         let hwnd = unsafe {
@@ -75,9 +92,9 @@ impl<T: 'static + HasInputContext, E: EventHandler<T> + 'static> Win32Window<T, 
                 WINDOW_EX_STYLE::default(),
                 &HSTRING::from(config.class_name.as_str()),
                 &HSTRING::from(config.title.as_str()),
-                WS_OVERLAPPEDWINDOW,
-                CW_USEDEFAULT,
-                CW_USEDEFAULT,
+                style,
+                x,
+                y,
                 config.width,
                 config.height,
                 None,
@@ -146,15 +163,80 @@ impl<T: 'static + HasInputContext, E: EventHandler<T> + 'static> Win32Window<T, 
 impl<T: 'static + HasInputContext, E: EventHandler<T> + 'static> WindowBackend<T, E>
     for Win32Window<T, E>
 {
-    fn run(self: Box<Self>) -> anyhow::Result<()> {
-        std::mem::forget(self);
+    fn run(mut self: Box<Self>) -> anyhow::Result<()> {
+        // The `run` method takes ownership of the `Win32Window` instance.
+        // When running in blocking mode, we `mem::forget` the Box to prevent
+        // the `Drop` implementation from being called, as the window's lifetime
+        // is managed by the OS message loop.
+        // In continuous mode, the loop is managed by our code, and we allow
+        // the Box to be dropped naturally when the loop exits.
 
-        let mut message = MSG::default();
-        while unsafe { GetMessageW(&mut message, None, 0, 0) }.into() {
-            unsafe {
-                let _ = TranslateMessage(&message);
-                DispatchMessageW(&message);
-            };
+        match self.config.run_mode {
+            RunMode::Blocking => {
+                // Transfer ownership to the OS message loop.
+                std::mem::forget(self);
+                // Standard blocking message loop.
+                let mut message = MSG::default();
+                // `GetMessageW` blocks until a message is available.
+                while unsafe { GetMessageW(&mut message, None, 0, 0) }.as_bool() {
+                    unsafe {
+                        let _ = TranslateMessage(&message);
+                        DispatchMessageW(&message);
+                    };
+                }
+            }
+            RunMode::Continuous { target_fps } => {
+                let target_frame_duration = if target_fps > 0 {
+                    std::time::Duration::from_secs_f64(1.0 / target_fps as f64)
+                } else {
+                    std::time::Duration::from_secs(0) // Run as fast as possible
+                };
+                let mut last_update = std::time::Instant::now();
+
+                // Non-blocking game loop.
+                'main_loop: loop {
+                    let frame_start = std::time::Instant::now();
+
+                    // Process all pending messages without blocking.
+                    let mut message = MSG::default();
+                    while unsafe { PeekMessageW(&mut message, None, 0, 0, PM_REMOVE) }.as_bool() {
+                        if message.message == WM_QUIT {
+                            break 'main_loop; // Exit the loop.
+                        }
+                        unsafe {
+                            let _ = TranslateMessage(&message);
+                            DispatchMessageW(&message);
+                        };
+                    }
+
+                    // --- Game Loop Logic ---
+                    let now = std::time::Instant::now();
+                    let delta_time = now.duration_since(last_update);
+                    last_update = now;
+
+                    // Dispatch the Update event for state changes.
+                    self.event_handler.on_event(
+                        &mut self.app,
+                        &crate::core::event::Event::Update(delta_time),
+                        self.renderer.as_mut(),
+                    );
+
+                    // Trigger a redraw.
+                    unsafe {
+                        let _ = InvalidateRect(Some(self.hwnd), None, false);
+                    };
+                    // --- End Game Loop Logic ---
+
+                    // Cap the frame rate.
+                    let frame_time = frame_start.elapsed();
+                    if frame_time < target_frame_duration {
+                        std::thread::sleep(target_frame_duration - frame_time);
+                    }
+                }
+                // Transfer ownership to the OS message loop.
+
+                std::mem::forget(self);
+            }
         }
 
         Ok(())

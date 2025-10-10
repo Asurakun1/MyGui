@@ -4,7 +4,7 @@
 //! and configuring a new application window.
 
 use crate::core::prelude::*;
-use crate::core::window::config::DpiAwareness;
+use crate::core::window::config::{DpiAwareness, RunMode};
 
 use anyhow::Context;
 
@@ -113,6 +113,39 @@ impl WindowBuilder {
 
     pub fn with_keyboard_input_mode(mut self, mode: KeyboardInputMode) -> Self {
         self.config.keyboard_input_mode = mode;
+        self
+    }
+
+    /// Sets whether the window can be resized by the user.
+    pub fn with_resizable(mut self, resizable: bool) -> Self {
+        self.config.resizable = resizable;
+        self
+    }
+
+    /// Sets whether the window should have a minimize button.
+    pub fn with_minimizable(mut self, minimizable: bool) -> Self {
+        self.config.minimizable = minimizable;
+        self
+    }
+
+    /// Sets whether the window should have a maximize button.
+    pub fn with_maximizable(mut self, maximizable: bool) -> Self {
+        self.config.maximizable = maximizable;
+        self
+    }
+
+    /// Sets the initial top-left position of the window.
+    /// If not set, the OS will decide the position.
+    pub fn with_position(mut self, x: i32, y: i32) -> Self {
+        self.config.position = Some((x, y));
+        self
+    }
+
+    /// Sets the execution mode of the event loop.
+    ///
+    /// The default is `RunMode::Blocking`.
+    pub fn with_run_mode(mut self, mode: RunMode) -> Self {
+        self.config.run_mode = mode;
         self
     }
 

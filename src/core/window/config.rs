@@ -46,6 +46,17 @@ pub enum DpiAwareness {
     PerMonitorAwareV2,
 }
 
+/// Defines the execution mode of the window's event loop.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RunMode {
+    /// The event loop is blocking. The application will sleep until an OS message
+    /// is received. This is highly power-efficient and suitable for static UIs.
+    Blocking,
+    /// The event loop runs continuously at the specified target frames per second.
+    /// This is suitable for applications with animations or simulations.
+    Continuous { target_fps: u32 },
+}
+
 /// Holds all configuration settings for creating a window.
 ///
 /// This struct is used by the [`crate::prelude::WindowBuilder`] to gather all the necessary
@@ -73,16 +84,25 @@ pub struct WindowConfig {
 
     /// The DPI awareness level for the application.
     pub dpi_awareness: DpiAwareness,
+
+    /// The initial position of the window. If `None`, the OS will decide.
+    pub position: Option<(i32, i32)>,
+
+    /// Whether the window can be resized by the user.
+    pub resizable: bool,
+
+    /// Whether the window should have a minimize button.
+    pub minimizable: bool,
+
+    /// Whether the window should have a maximize button.
+    pub maximizable: bool,
+
+    /// The execution mode of the event loop.
+    pub run_mode: RunMode,
 }
 
 impl Default for WindowConfig {
     /// Creates a `WindowConfig` with default settings suitable for a basic application.
-    ///
-    /// - **Title**: "Hello, Windows!"
-    /// - **Size**: 800x600
-    /// - **Renderer**: Direct2D with default font settings
-    /// - **Input Mode**: RawAndTranslated
-    /// - **DPI Awareness**: PerMonitorAwareV2
     fn default() -> Self {
         Self {
             title: "Hello, Windows!".to_string(),
@@ -92,6 +112,11 @@ impl Default for WindowConfig {
             renderer_config: RendererConfig::Direct2D(Default::default()),
             keyboard_input_mode: KeyboardInputMode::RawAndTranslated,
             dpi_awareness: DpiAwareness::PerMonitorAwareV2,
+            position: None,
+            resizable: true,
+            minimizable: true,
+            maximizable: true,
+            run_mode: RunMode::Blocking,
         }
     }
 }

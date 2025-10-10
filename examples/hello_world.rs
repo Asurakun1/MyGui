@@ -143,9 +143,11 @@ fn main() -> Result<()> {
     event_handler.add_handler(Box::new(CustomEventHandler)); // Add the custom handler
 
     let window = WindowBuilder::new()
-        .with_title("Hello, World!")
+        .with_title("Hello, World! (Not Resizable)")
         .with_width(900)
         .with_height(600)
+        .with_resizable(false)
+        .with_maximizable(false)
         .build(event_handler, app)?;
 
     window.run()

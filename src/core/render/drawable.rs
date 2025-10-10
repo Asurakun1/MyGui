@@ -4,6 +4,7 @@
 //! object that can be rendered on the screen.
 
 use crate::core::prelude::*;
+use std::any::Any;
 
 /// A trait for objects that can be drawn to a [`Renderer`].
 ///
@@ -24,6 +25,7 @@ use crate::core::prelude::*;
 /// use my_gui::core::render::objects::primitives::Rectangle;
 /// use my_gui::core::render::color::Color;
 /// use anyhow::Result;
+/// use std::any::Any;
 ///
 /// // Define a custom drawable object, like a progress bar.
 /// struct ProgressBar {
@@ -36,7 +38,7 @@ use crate::core::prelude::*;
 ///
 /// // Implement the Drawable trait for the custom object.
 /// impl Drawable for ProgressBar {
-///     fn draw(&self, renderer: &mut dyn Renderer) -> Result<()> {
+///     fn draw(&mut self, renderer: &mut dyn Renderer) -> Result<()> {
 ///         // Draw the background of the progress bar.
 ///         let background_rect = Rectangle::new(self.x, self.y, self.width, self.height, Color::new(0.8, 0.8, 0.8, 1.0));
 ///         renderer.draw_rectangle(&background_rect)?;
@@ -47,6 +49,14 @@ use crate::core::prelude::*;
 ///         renderer.draw_rectangle(&progress_rect)?;
 ///
 ///         Ok(())
+///     }
+///
+///     fn as_any_mut(&mut self) -> &mut dyn Any {
+///         self
+///     }
+///
+///     fn as_any(&self) -> &dyn Any {
+///         self
 ///     }
 /// }
 ///
@@ -69,4 +79,14 @@ pub trait Drawable {
     /// An `anyhow::Result<()>` which should be `Ok(())` if drawing was successful,
     /// or contain an error if any of the underlying rendering operations failed.
     fn draw(&mut self, renderer: &mut dyn Renderer) -> anyhow::Result<()>;
+
+    /// Returns this object as a mutable `Any` trait object.
+    ///
+    /// This is used for downcasting from a `&mut dyn Drawable` to a concrete type.
+    fn as_any_mut(&mut self) -> &mut dyn Any;
+
+    /// Returns this object as an `Any` trait object.
+    ///
+    /// This is used for downcasting from a `&dyn Drawable` to a concrete type.
+    fn as_any(&self) -> &dyn Any;
 }
