@@ -4,12 +4,11 @@
 //! handling all messages sent to a Win32 window.
 
 use crate::core::prelude::*;
+use crate::core::platform::win32::input::from_vkey;
 use crate::core::{
     event::handlers::input_handler::MouseButton,
-    platform::{
-        win32::{input::from_vkey, win32_window::Win32Window},
-        RawWindowHandle,
-    },
+    platform::RawWindowHandle,
+    window::Window,
 };
 use windows::{
     Win32::Foundation::*, Win32::UI::Input::KeyboardAndMouse::*, Win32::UI::WindowsAndMessaging::*,
@@ -42,13 +41,13 @@ pub extern "system" fn wndproc<T: 'static + HasInputContext, E: EventHandler<T> 
     // On WM_NCCREATE, associate the window state pointer with the HWND and return.
     if message == WM_NCCREATE {
         let createstruct = lparam.0 as *const CREATESTRUCTW;
-        let window = unsafe { (*createstruct).lpCreateParams as *mut Win32Window<T, E> };
+        let window = unsafe { (*createstruct).lpCreateParams as *mut Window<T, E> };
         unsafe { SetWindowLongPtrW(hwnd, GWLP_USERDATA, window as _) };
         return unsafe { DefWindowProcW(hwnd, message, wparam, lparam) };
     }
 
     // Retrieve the pointer to our window state.
-    let window_ptr = unsafe { GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut Win32Window<T, E> };
+    let window_ptr = unsafe { GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut Window<T, E> };
 
     // If the pointer is null, pass to default procedure.
     if window_ptr.is_null() {
@@ -62,7 +61,7 @@ pub extern "system" fn wndproc<T: 'static + HasInputContext, E: EventHandler<T> 
         if ptr != 0 {
             // Reconstitute the Box from the raw pointer. When this Box goes
             // out of scope, Rust automatically calls its Drop implementation.
-            let _ = unsafe { Box::from_raw(ptr as *mut Win32Window<T, E>) };
+            let _ = unsafe { Box::from_raw(ptr as *mut Window<T, E>) };
         }
         return LRESULT(0);
     }

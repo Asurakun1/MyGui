@@ -19,31 +19,47 @@ use anyhow::Context;
 /// ## Example
 ///
 /// ```rust,no_run
-/// use my_gui::core::window::WindowBuilder;
-/// use my_gui::core::event::handlers::root_event_handler::RootEventHandler;
-/// use my_gui::core::event::input_state::{InputContext, HasInputContext};
+/// use my_gui::prelude::*;
 ///
-/// // Define a simple application state
+/// // 1. Define the application's state.
 /// #[derive(Default)]
 /// struct MyApp {
 ///     input_context: InputContext,
+///     scene: Scene,
 /// }
 ///
+/// // 2. Implement the required "has-a" traits to give the framework access.
 /// impl HasInputContext for MyApp {
 ///     fn input_context(&self) -> &InputContext { &self.input_context }
 ///     fn input_context_mut(&mut self) -> &mut InputContext { &mut self.input_context }
 /// }
 ///
-/// fn main() -> anyhow::Result<()> {
-///     let app = MyApp::default();
-///     let event_handler = RootEventHandler::new();
+/// impl HasScene for MyApp {
+///     fn scene(&self) -> &Scene { &self.scene }
+///     fn scene_mut(&mut self) -> &mut Scene { &mut self.scene }
+/// }
 ///
+/// fn main() -> anyhow::Result<()> {
+///     // (Recommended) Initialize application-wide resources.
+///     // On Windows, this initializes COM.
+///     let _app = Application::new()?;
+///
+///     // 3. Create the application state.
+///     let app = MyApp::default();
+///
+///     // 4. Create the root event handler and add the default input handler,
+///     //    which manages input state and scene rendering.
+///     let mut event_handler = RootEventHandler::new();
+///     event_handler.add_handler(Box::new(DefaultInputHandler::new()));
+///
+///     // 5. Use the WindowBuilder to configure and build the window.
 ///     let window = WindowBuilder::new()
-///         .with_title("My App")
-///         .with_width(1024)
-///         .with_height(768)
+///         .with_title("My GUI Application")
+///         .with_width(800)
+///         .with_height(600)
 ///         .build(event_handler, app)?;
 ///
+///     // 6. Run the application's main event loop.
 ///     window.run()
 /// }
 /// ```
@@ -159,9 +175,9 @@ impl WindowBuilder {
 
     /// Builds the window with the specified configuration, event handler, and app state.
     ///
-    /// This method consumes the builder and returns a platform-specific window
-    /// backend wrapped in a `Box<dyn WindowBackend>`. The concrete backend is
-    /// determined at compile time by the target operating system.
+    /// This method consumes the builder and returns a fully constructed, platform-specific
+    /// `Window` object inside a `Box`. The concrete implementation of the `Window`
+    /// is determined at compile time by the target operating system.
     ///
     /// # Type Parameters
     ///
@@ -182,11 +198,9 @@ impl WindowBuilder {
         &self,
         event_handler: E,
         app: T,
-    ) -> Result<Window<T, E>> {
+    ) -> Result<Box<Window<T, E>>> {
         #[cfg(target_os = "windows")]
         {
-            use crate::core::platform::win32::win32_window::Win32Window;
-
             use windows::Win32::UI::HiDpi::{
                 DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE,
                 DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2, DPI_AWARENESS_CONTEXT_SYSTEM_AWARE,
@@ -211,11 +225,8 @@ impl WindowBuilder {
                 }
             }
 
-            let backend = Win32Window::new(&self.config, event_handler, app)
-                .context("Failed to create Win32 window backend")?;
-            Ok(Window {
-                window_backend: backend,
-            })
+            Window::new(&self.config, event_handler, app)
+                .context("Failed to create Win32 window")
         }
 
         #[cfg(not(target_os = "windows"))]

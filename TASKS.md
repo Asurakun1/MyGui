@@ -7,11 +7,8 @@
 
 ### Medium Priority
 
--   **Fixed Timestep/Game Loop**: Give users the option to run the application with a continuous loop that updates at a fixed timestep (e.g., 60 FPS) instead of the default blocking event loop.
-
 ### Low Priority
 
--   **Redundant `Window` Struct Simplification**: Investigate simplifying the `Window` struct in `src/core/window/mod.rs` by potentially having `WindowBuilder::build` return the `Window` struct directly, rather than wrapping a `Box<dyn WindowBackend>`.
 -   **Extended Mouse Input**: Enhance `wndproc` to explicitly map and handle `WM_XBUTTONDOWN`/`WM_XBUTTONUP` messages for additional mouse buttons, expanding the framework's mouse input capabilities.
 
 
@@ -45,6 +42,8 @@
 
 ## Completed
 
+- [x] **Redundant `Window` Struct Simplification**
+- [x] **Fixed Timestep/Game Loop**
 - [x] **Window Customization Options**
 - [x] **Event Prioritization**
 - [x] **COM Management Centralization**
