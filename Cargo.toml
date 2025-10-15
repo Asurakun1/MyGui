@@ -15,6 +15,7 @@ windows = { version = "0.62.0", features = ["Win32_Foundation", "Win32_Graphics_
 anyhow = "1.0.100"
 log = "0.4"
 env_logger = "0.10"
+taffy = "0.9.1"
 
 [package.metadata.docs.rs]
 targets = ["x86_64-pc-windows-msvc"]

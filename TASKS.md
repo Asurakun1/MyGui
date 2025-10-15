@@ -42,6 +42,17 @@
 
 ## Completed
 
+- [x] **Hello World Taffy Binding**:
+    -   **Goal**: Create a simple "Hello, World!" example demonstrating how to use the `taffy` crate to manage the layout of `Drawable` objects.
+    -   **Tasks**:
+        - [x] Add the `taffy` crate as a dependency.
+        - [x] Create a new example file (`hello_taffy.rs`).
+        - [x] In the example, create a `TaffyTree` and add nodes with layout styles.
+        - [x] Associate `Drawable` objects (e.g., `Rectangle`, `TextObject`) with the `taffy` nodes.
+        - [x] Compute the layout using `taffy`.
+        - [x] Use the computed layout to set the position and size of the `Drawable` objects before drawing them.
+        - [x] This will serve as a proof-of-concept for a future, more integrated layout system.
+
 - [x] **Redundant `Window` Struct Simplification**
 - [x] **Fixed Timestep/Game Loop**
 - [x] **Window Customization Options**
