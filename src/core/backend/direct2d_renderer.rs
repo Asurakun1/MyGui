@@ -499,14 +499,13 @@ impl Renderer for Direct2DRenderer {
     /// A `Box<dyn Any>` containing the backend-specific layout object.
     fn create_text_layout(&self, text: &TextObject) -> anyhow::Result<Box<dyn Any>> {
         let text_utf16: Vec<u16> = text.text.encode_utf16().collect();
-        let render_target_size = self.get_render_target_size().unwrap_or_default();
 
         let text_layout = unsafe {
             self.dwrite_factory.CreateTextLayout(
                 &text_utf16,
                 &self.text_format,
-                render_target_size.x as f32,
-                render_target_size.y as f32,
+                text.width,
+                text.height,
             )?
         };
 

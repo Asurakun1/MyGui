@@ -25,6 +25,10 @@ pub struct TextObject {
     pub x: f32,
     /// The y-coordinate of the top-left corner of the text's layout box.
     pub y: f32,
+    /// The width of the text's layout box.
+    pub width: f32,
+    /// The height of the text's layout box.
+    pub height: f32,
     /// The color of the text.
     pub color: Color,
     /// A cached, backend-specific text layout object.
@@ -32,22 +36,12 @@ pub struct TextObject {
 }
 
 impl TextObject {
-    /// Creates a new `TextObject` with the specified text, position, and color.
-    ///
-    /// # Arguments
-    ///
-    /// * `text` - The `String` to be rendered.
-    /// * `x` - The x-coordinate where the text rendering will begin.
-    /// * `y` - The y-coordinate where the text rendering will begin.
-    /// * `color` - The `Color` of the text.
-    pub fn new(text: String, x: f32, y: f32, color: Color) -> Self {
-        Self { text, x, y, color, layout: None }
+    /// Creates a new `TextObject` with the specified text, position, size, and color.
+    pub fn new(text: String, x: f32, y: f32, width: f32, height: f32, color: Color) -> Self {
+        Self { text, x, y, width, height, color, layout: None }
     }
 
     /// Sets the text content of the `TextObject`.
-    ///
-    /// This method also invalidates the cached layout, ensuring that the text will be
-    /// re-laid out on the next `draw` call.
     pub fn set_text(&mut self, text: String) {
         self.text = text;
         self.layout = None;
@@ -55,6 +49,14 @@ impl TextObject {
 }
 
 impl Drawable for TextObject {
+    fn set_bounding_box(&mut self, x: f32, y: f32, width: f32, height: f32) {
+        self.x = x;
+        self.y = y;
+        self.width = width;
+        self.height = height;
+        self.layout = None; // Invalidate layout when bounding box changes
+    }
+
     /// Draws the text by delegating to the active `Renderer`.
     ///
     /// This method implements a caching strategy for the text layout. On the first

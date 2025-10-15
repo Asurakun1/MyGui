@@ -43,6 +43,13 @@ impl Rectangle {
 }
 
 impl Drawable for Rectangle {
+    fn set_bounding_box(&mut self, x: f32, y: f32, width: f32, height: f32) {
+        self.x = x;
+        self.y = y;
+        self.width = width;
+        self.height = height;
+    }
+
     /// Draws the rectangle by delegating to the active `Renderer`.
     ///
     /// This method calls the `draw_rectangle` method on the provided `Renderer`,

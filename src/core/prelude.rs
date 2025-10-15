@@ -6,7 +6,7 @@
 
 pub use anyhow::Result;
 
-pub use crate::core::{
+pub use crate::core::{layout::prelude::*, event::handlers::layout_event_handler::LayoutEventHandler, render::objects::text_object::TextObject, 
     backend::config::RendererConfig,
     backend::renderer::Renderer,
     event::{

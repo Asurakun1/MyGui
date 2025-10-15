@@ -63,6 +63,9 @@ use std::any::Any;
 /// // Now, an instance of ProgressBar can be added to a Scene and will be drawn automatically.
 /// ```
 pub trait Drawable {
+    /// Sets the bounding box of the object.
+    fn set_bounding_box(&mut self, x: f32, y: f32, width: f32, height: f32);
+
     /// Draws the object using the provided [`Renderer`].
     ///
     /// This method should contain all the logic necessary to render the object.

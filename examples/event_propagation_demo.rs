@@ -10,13 +10,27 @@
 //! `ObservingHandler` is used to demonstrate whether events are propagating or being consumed.
 
 use my_gui::prelude::*;
+use taffy::TaffyTree;
 
 // 1. Define a simple application state with a flag for the consumption lock.
-#[derive(Default)]
 pub struct App {
     pub input_context: InputContext,
     pub is_consumption_locked: bool,
-    pub scene: Scene,
+    pub layout_tree: LayoutTree,
+}
+
+impl Default for App {
+    fn default() -> Self {
+        Self {
+            input_context: InputContext::default(),
+            is_consumption_locked: false,
+            layout_tree: LayoutTree {
+                taffy: TaffyTree::new(),
+                root: None,
+                is_dirty: true,
+            },
+        }
+    }
 }
 
 impl HasInputContext for App {
@@ -29,14 +43,14 @@ impl HasInputContext for App {
     }
 }
 
-// Implement HasScene for App
-impl HasScene for App {
-    fn scene(&self) -> &Scene {
-        &self.scene
+// Implement HasLayoutTree for App
+impl HasLayoutTree for App {
+    fn layout_tree(&self) -> &LayoutTree {
+        &self.layout_tree
     }
 
-    fn scene_mut(&mut self) -> &mut Scene {
-        &mut self.scene
+    fn layout_tree_mut(&mut self) -> &mut LayoutTree {
+        &mut self.layout_tree
     }
 }
 
@@ -119,6 +133,7 @@ fn main() -> Result<()> {
     event_handler.add_handler(Box::new(ControlHandler));
     // Add the observing handler
     event_handler.add_handler(Box::new(ObservingHandler));
+    event_handler.add_handler(Box::new(LayoutEventHandler));
 
     let window = WindowBuilder::new()
         .with_title("Event Propagation Demo - Global Consumption Lock")

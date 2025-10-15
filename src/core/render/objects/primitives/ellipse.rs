@@ -49,6 +49,13 @@ impl Ellipse {
 }
 
 impl Drawable for Ellipse {
+    fn set_bounding_box(&mut self, x: f32, y: f32, width: f32, height: f32) {
+        self.center_x = x + width / 2.0;
+        self.center_y = y + height / 2.0;
+        self.radius_x = width / 2.0;
+        self.radius_y = height / 2.0;
+    }
+
     /// Draws the ellipse by delegating to the active `Renderer`.
     ///
     /// This method calls the `draw_ellipse` method on the provided `Renderer`,

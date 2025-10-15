@@ -111,6 +111,13 @@ impl Canvas {
 }
 
 impl Drawable for Canvas {
+    fn set_bounding_box(&mut self, x: f32, y: f32, width: f32, height: f32) {
+        self.x = x;
+        self.y = y;
+        self.width = width;
+        self.height = height;
+    }
+
     /// Draws the canvas and all its contained objects.
     ///
     /// This method orchestrates the core functionality of the `Canvas`. It performs

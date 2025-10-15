@@ -4,23 +4,13 @@
 //! `taffy` crate to create a simple layout.
 use env_logger;
 use my_gui::prelude::*;
+use my_gui::core::event::handlers::layout_event_handler::LayoutEventHandler;
 use taffy::prelude::*;
 
 // 1. Define the application state.
 pub struct App {
-    pub scene: Scene,
     pub input_context: InputContext,
-    pub taffy: TaffyTree,
-}
-
-impl HasScene for App {
-    fn scene(&self) -> &Scene {
-        &self.scene
-    }
-
-    fn scene_mut(&mut self) -> &mut Scene {
-        &mut self.scene
-    }
+    pub layout_tree: LayoutTree,
 }
 
 impl HasInputContext for App {
@@ -33,9 +23,13 @@ impl HasInputContext for App {
     }
 }
 
-impl Default for App {
-    fn default() -> Self {
-        Self::new()
+impl HasLayoutTree for App {
+    fn layout_tree(&self) -> &LayoutTree {
+        &self.layout_tree
+    }
+
+    fn layout_tree_mut(&mut self) -> &mut LayoutTree {
+        &mut self.layout_tree
     }
 }
 
@@ -54,6 +48,14 @@ impl App {
             ..Default::default()
         };
 
+        let root_node = taffy.new_leaf(root_style).unwrap();
+
+        let mut root = LayoutNode {
+            taffy_node: root_node,
+            drawable: Some(Box::new(Rectangle::new(0.0, 0.0, 0.0, 0.0, Color::BLACK))), // Placeholder
+            children: vec![],
+        };
+
         // Create a child node with a fixed size
         let child_style = Style {
             size: Size {
@@ -63,35 +65,25 @@ impl App {
             ..Default::default()
         };
 
-        let child = taffy.new_leaf(child_style).unwrap();
-        let root = taffy.new_with_children(root_style, &[child]).unwrap();
+        let child_node = taffy.new_leaf(child_style).unwrap();
+        let child = LayoutNode {
+            taffy_node: child_node,
+            drawable: Some(Box::new(Rectangle::new(0.0, 0.0, 200.0, 100.0, Color::BLUE))),
+            children: vec![],
+        };
 
-        // Compute the layout
-        taffy
-            .compute_layout(
-                root,
-                Size { width: AvailableSpace::Definite(900.0), height: AvailableSpace::Definite(600.0) },
-            )
-            .unwrap();
+        taffy.add_child(root.taffy_node, child.taffy_node).unwrap();
+        root.children.push(child);
 
-        let child_layout = taffy.layout(child).unwrap();
-
-        // Create a rectangle drawable and position it using the computed layout
-        let rect = Rectangle::new(
-            child_layout.location.x,
-            child_layout.location.y,
-            child_layout.size.width,
-            child_layout.size.height,
-            Color::BLUE,
-        );
-
-        let mut scene = Scene::new();
-        scene.add_object(rect);
+        let layout_tree = LayoutTree {
+            taffy,
+            root: Some(root),
+            is_dirty: true,
+        };
 
         Self {
-            scene,
             input_context: InputContext::default(),
-            taffy,
+            layout_tree,
         }
     }
 }
@@ -105,6 +97,7 @@ fn main() -> Result<()> {
 
     let mut event_handler: RootEventHandler<App> = RootEventHandler::new();
     event_handler.add_handler(Box::new(DefaultInputHandler::new()));
+    event_handler.add_handler(Box::new(LayoutEventHandler));
 
     let window = WindowBuilder::new()
         .with_title("Hello, Taffy!")

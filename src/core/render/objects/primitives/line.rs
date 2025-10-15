@@ -45,6 +45,13 @@ impl Line {
 }
 
 impl Drawable for Line {
+    fn set_bounding_box(&mut self, x: f32, y: f32, width: f32, height: f32) {
+        self.p0_x = x;
+        self.p0_y = y;
+        self.p1_x = x + width;
+        self.p1_y = y + height;
+    }
+
     /// Draws the line by delegating to the active `Renderer`.
     ///
     /// This method calls the `draw_line` method on the provided `Renderer`,
