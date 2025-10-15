@@ -67,18 +67,20 @@ fn main() -> anyhow::Result<()> {
 
 ## Core Concepts
 
-MyGui is built on a **retained-mode rendering** model. This means:
+MyGui is built on a **retained-mode rendering** model, complemented by a flexible **layout system**. This means:
 
 1.  **You define a scene:** You tell the framework *what* to draw by building a `Scene` populated with `Drawable` objects (like text, shapes, etc.).
-2.  **The framework handles rendering:** The framework "retains" this scene graph and is responsible for automatically redrawing it whenever the window needs to be repainted (e.g., when it's resized or uncovered). 
+2.  **The framework handles rendering:** The framework "retains" this scene graph and is responsible for automatically redrawing it whenever the window needs to be repainted (e.g., when it's resized or uncovered).
+3.  **Layout is managed automatically:** The integrated `taffy` crate allows you to define the structural relationships and styling of your UI elements. The framework then automatically computes their positions and sizes, ensuring your UI adapts correctly to different window dimensions and content changes.
 
-This contrasts with immediate-mode rendering, where the application must manually issue draw calls every single frame.
+This contrasts with immediate-mode rendering, where the application must manually issue draw calls every single frame, and with manual layout management, where you would explicitly calculate and set the position and size of every UI element.
 
 ## Current Features
 
 -   **Windowing:** A high-level abstraction over Win32 window creation, class registration, and the message loop, now with a flexible `WindowBuilder` for easy configuration.
 -   **Platform-Agnostic Rendering:** A hardware-accelerated rendering pipeline using Direct2D and DirectWrite, abstracted behind a `Renderer` trait to allow for swappable backends.
--   **Scene Graph:** A `Scene` object that manages a collection of `Drawable` trait objects, including basic shapes (`Rectangle`, `Ellipse`, `Line`), text (`TextObject`), and composable `Canvas` elements.
+-   **Scene Graph:** A `Scene` object that manages a collection of `Drawable` trait objects, including basic shapes (`Rectangle`, `Ellipse`, `Line`), text (`TextObject`), and composable `Canvas` elements, integrated with a `LayoutTree` for positional management.
+-   **Layout System:** Integration with the `taffy` crate for flexible UI layout management, allowing for automatic positioning and sizing of `Drawable` objects within a `LayoutTree` composed of `LayoutNode`s.
 -   **Extensible Event System:** A trait-based `EventHandler` system with a `RootEventHandler` that composes multiple specialized handlers (keyboard, mouse, render) for modular and flexible event processing.
 -   **Comprehensive Input Handling:** Detailed tracking of keyboard (including modifier keys) and mouse input (position, buttons, wheel) with configurable input modes.
 -   **Basic Text Rendering:** Support for rendering single lines of text using `TextObject`.
@@ -89,7 +91,6 @@ I am actively working on evolving this project into a more flexible and powerful
 
 -   **Advanced Text Rendering:** Further improvements to text layout and measurement for more complex and efficient text rendering.
 -   **Widget System:** Defining a `Widget` trait that unifies appearance, behavior, and layout for building complex UI components.
--   **Layout System:** Introducing a layout system to manage the positioning and sizing of UI elements automatically.
 
 For a detailed list of tasks, see [TASKS.md](TASKS.md).
 

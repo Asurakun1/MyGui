@@ -6,13 +6,16 @@
 use crate::core::prelude::*;
 use std::any::Any;
 
-/// A trait for objects that can be drawn to a [`Renderer`].
+/// A trait for objects that can be drawn to a [`Renderer`] and whose position and size
+/// can be managed by the layout system.
 ///
-/// This trait is the central component of the rendering engine. Any struct that
+/// This trait is a central component of the rendering and layout engine. Any struct that
 /// implements `Drawable` can be added to a [`Scene`] and will be automatically
-/// rendered as part of the main `Paint` event loop. This design makes the
-/// framework highly extensible, as custom widgets and graphical objects can be
-/// created and rendered seamlessly alongside built-in ones.
+/// rendered as part of the main `Paint` event loop. With the integration of the layout
+/// system, the `set_bounding_box` method allows the layout engine to control the
+/// position and size of drawable objects based on computed layout results.
+/// This design makes the framework highly extensible, as custom widgets and graphical
+/// objects can be created and rendered seamlessly alongside built-in ones.
 ///
 /// The `draw` method encapsulates the specific logic for how an object should be
 /// rendered, using the provided [`Renderer`] to perform the actual drawing operations.
@@ -38,6 +41,13 @@ use std::any::Any;
 ///
 /// // Implement the Drawable trait for the custom object.
 /// impl Drawable for ProgressBar {
+///     fn set_bounding_box(&mut self, x: f32, y: f32, width: f32, height: f32) {
+///         self.x = x;
+///         self.y = y;
+///         self.width = width;
+///         self.height = height;
+///     }
+///
 ///     fn draw(&mut self, renderer: &mut dyn Renderer) -> Result<()> {
 ///         // Draw the background of the progress bar.
 ///         let background_rect = Rectangle::new(self.x, self.y, self.width, self.height, Color::new(0.8, 0.8, 0.8, 1.0));

@@ -1,9 +1,16 @@
+//! This module defines the `Scene` struct, which acts as a container for all
+//! drawable objects in the application. It integrates with the layout system
+//! to manage the positioning and sizing of these objects.
+
 use crate::core::layout::prelude::{LayoutNode, LayoutTree};
 use crate::core::prelude::*;
 use taffy::prelude::{AvailableSpace, Size, TaffyTree};
 
+/// A trait for types that contain a `Scene`.
 pub trait HasScene {
+    /// Returns an immutable reference to the `Scene`.
     fn scene(&self) -> &Scene;
+    /// Returns a mutable reference to the `Scene`.
     fn scene_mut(&mut self) -> &mut Scene;
 }
 
@@ -32,6 +39,8 @@ pub struct Scene {
 
 impl Scene {
     /// Creates a new `Scene` with a default `LayoutTree`.
+    ///
+    /// The `LayoutTree` is initialized with a new `TaffyTree` and an empty root.
     pub fn new() -> Self {
         Self {
             layout_tree: LayoutTree {
@@ -44,8 +53,10 @@ impl Scene {
 
     /// Draws all objects in the scene using the provided `Renderer`.
     ///
-    /// This method traverses the `LayoutTree` and calls the `draw` method on
-    /// each `Drawable` object after updating its bounding box based on the
+    /// This method first checks if the `LayoutTree` is dirty. If it is, it computes
+    /// the layout for all nodes in the tree based on the current render target size.
+    /// After layout computation, it traverses the `LayoutTree` and calls the `draw`
+    /// method on each `Drawable` object after updating its bounding box based on the
     /// computed layout.
     ///
     /// # Arguments
@@ -82,6 +93,22 @@ impl Default for Scene {
     }
 }
 
+/// Recursively draws a `LayoutNode` and its children.
+///
+/// This function retrieves the computed layout for the current node from the
+/// `TaffyTree`, updates the bounding box of the associated `Drawable` (if any),
+/// and then calls its `draw` method. It then proceeds to recursively draw all
+/// child nodes.
+///
+/// # Arguments
+///
+/// * `node`: A mutable reference to the current `LayoutNode` to draw.
+/// * `taffy`: An immutable reference to the `TaffyTree` for layout information.
+/// * `renderer`: A mutable reference to the `Renderer` for drawing operations.
+///
+/// # Errors
+///
+/// Returns an error if `taffy.layout` fails or if any `drawable.draw` call fails.
 fn draw_node(node: &mut LayoutNode, taffy: &TaffyTree, renderer: &mut dyn Renderer) -> anyhow::Result<()> {
     let layout = taffy.layout(node.taffy_node)?;
     if let Some(drawable) = &mut node.drawable {
