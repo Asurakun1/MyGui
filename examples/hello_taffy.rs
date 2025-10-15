@@ -3,14 +3,14 @@
 //! This is a simple example of how to use the `my_gui` framework with the
 //! `taffy` crate to create a simple layout.
 use env_logger;
-use my_gui::prelude::*;
 use my_gui::core::event::handlers::layout_event_handler::LayoutEventHandler;
+use my_gui::prelude::*;
 use taffy::prelude::*;
 
 // 1. Define the application state.
 pub struct App {
     pub input_context: InputContext,
-    pub layout_tree: LayoutTree,
+    pub scene: Scene,
 }
 
 impl HasInputContext for App {
@@ -23,13 +23,13 @@ impl HasInputContext for App {
     }
 }
 
-impl HasLayoutTree for App {
-    fn layout_tree(&self) -> &LayoutTree {
-        &self.layout_tree
+impl HasScene for App {
+    fn scene(&self) -> &Scene {
+        &self.scene
     }
 
-    fn layout_tree_mut(&mut self) -> &mut LayoutTree {
-        &mut self.layout_tree
+    fn scene_mut(&mut self) -> &mut Scene {
+        &mut self.scene
     }
 }
 
@@ -44,7 +44,7 @@ impl App {
                 height: Dimension::percent(1.0),
             },
             justify_content: Some(JustifyContent::Center), // Center children horizontally
-            align_items: Some(AlignItems::Center),     // Center children vertically
+            align_items: Some(AlignItems::Center),         // Center children vertically
             ..Default::default()
         };
 
@@ -68,7 +68,13 @@ impl App {
         let child_node = taffy.new_leaf(child_style).unwrap();
         let child = LayoutNode {
             taffy_node: child_node,
-            drawable: Some(Box::new(Rectangle::new(0.0, 0.0, 200.0, 100.0, Color::BLUE))),
+            drawable: Some(Box::new(Rectangle::new(
+                0.0,
+                0.0,
+                200.0,
+                100.0,
+                Color::BLUE,
+            ))),
             children: vec![],
         };
 
@@ -81,9 +87,13 @@ impl App {
             is_dirty: true,
         };
 
+        let scene = Scene {
+            layout_tree,
+        };
+
         Self {
             input_context: InputContext::default(),
-            layout_tree,
+            scene,
         }
     }
 }

@@ -10,13 +10,12 @@
 //! `ObservingHandler` is used to demonstrate whether events are propagating or being consumed.
 
 use my_gui::prelude::*;
-use taffy::TaffyTree;
 
 // 1. Define a simple application state with a flag for the consumption lock.
 pub struct App {
     pub input_context: InputContext,
     pub is_consumption_locked: bool,
-    pub layout_tree: LayoutTree,
+    pub scene: Scene,
 }
 
 impl Default for App {
@@ -24,12 +23,18 @@ impl Default for App {
         Self {
             input_context: InputContext::default(),
             is_consumption_locked: false,
-            layout_tree: LayoutTree {
-                taffy: TaffyTree::new(),
-                root: None,
-                is_dirty: true,
-            },
+            scene: Scene::default(),
         }
+    }
+}
+
+impl HasScene for App {
+    fn scene(&self) -> &Scene {
+        &self.scene
+    }
+
+    fn scene_mut(&mut self) -> &mut Scene {
+        &mut self.scene
     }
 }
 
@@ -40,17 +45,6 @@ impl HasInputContext for App {
 
     fn input_context_mut(&mut self) -> &mut InputContext {
         &mut self.input_context
-    }
-}
-
-// Implement HasLayoutTree for App
-impl HasLayoutTree for App {
-    fn layout_tree(&self) -> &LayoutTree {
-        &self.layout_tree
-    }
-
-    fn layout_tree_mut(&mut self) -> &mut LayoutTree {
-        &mut self.layout_tree
     }
 }
 

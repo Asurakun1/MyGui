@@ -4,11 +4,11 @@
 //! "Hello, World!" application.
 use env_logger;
 use my_gui::prelude::*;
-use taffy::prelude::{AlignItems, Dimension, FlexDirection, JustifyContent, Size, Style, TaffyTree};
+use taffy::prelude::*;
 // 1. Define the application state.
 pub struct App {
     pub input_context: InputContext,
-    pub layout_tree: LayoutTree,
+    pub scene: Scene,
 }
 
 impl HasInputContext for App {
@@ -21,13 +21,13 @@ impl HasInputContext for App {
     }
 }
 
-impl HasLayoutTree for App {
-    fn layout_tree(&self) -> &LayoutTree {
-        &self.layout_tree
+impl HasScene for App {
+    fn scene(&self) -> &Scene {
+        &self.scene
     }
 
-    fn layout_tree_mut(&mut self) -> &mut LayoutTree {
-        &mut self.layout_tree
+    fn scene_mut(&mut self) -> &mut Scene {
+        &mut self.scene
     }
 }
 
@@ -136,14 +136,16 @@ impl App {
         let line_node = taffy.new_leaf(line_style).unwrap();
         let line = LayoutNode {
             taffy_node: line_node,
-            drawable: Some(Box::new(my_gui::core::render::objects::primitives::Line::new(
-                0.0,
-                0.0,
-                590.0,
-                30.0,
-                2.0,
-                Color::GREEN,
-            ))),
+            drawable: Some(Box::new(
+                my_gui::core::render::objects::primitives::Line::new(
+                    0.0,
+                    0.0,
+                    590.0,
+                    30.0,
+                    2.0,
+                    Color::GREEN,
+                ),
+            )),
             children: vec![],
         };
         root.children.push(line);
@@ -174,9 +176,13 @@ impl App {
             is_dirty: true,
         };
 
+        let scene = Scene {
+            layout_tree,
+        };
+
         Self {
             input_context: InputContext::default(),
-            layout_tree,
+            scene,
         }
     }
 }

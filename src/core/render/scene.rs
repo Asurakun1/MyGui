@@ -1,98 +1,52 @@
-//! # Scene Management
-//!
-//! This module provides the `Scene` struct, which acts as the main container
-//! for all `Drawable` objects in the retained-mode rendering model. It also
-//! defines the `HasScene` trait for generic access to the scene.
-
+use crate::core::layout::prelude::{LayoutNode, LayoutTree};
 use crate::core::prelude::*;
-use crate::core::render::drawable::Drawable;
+use taffy::prelude::{AvailableSpace, Size, TaffyTree};
 
-/// A trait for application state types that contain a `Scene`.
-///
-/// This "has-a" trait creates a generic interface for the rendering system to
-/// access the `Scene` without being coupled to the concrete type of the
-/// application's state struct. It is a required trait bound for the application
-/// state (`T`) used by the `RenderEventHandler`.
-///
-/// ## Example
-///
-/// ```rust,no_run
-/// use my_gui::core::render::scene::{Scene, HasScene};
-///
-/// // Your application's main state struct.
-/// #[derive(Default)]
-/// struct MyApp {
-///     scene: Scene,
-///     // ... other state fields
-/// }
-///
-/// // Implement `HasScene` to provide access to the scene field.
-/// impl HasScene for MyApp {
-///     fn scene(&self) -> &Scene {
-///         &self.scene
-///     }
-/// }
-/// ```
 pub trait HasScene {
-    /// Returns an immutable reference to the `Scene`.
     fn scene(&self) -> &Scene;
-
-    /// Returns a mutable reference to the `Scene`.
     fn scene_mut(&mut self) -> &mut Scene;
 }
 
-/// A scene graph containing a collection of `Drawable` objects.
+impl HasLayoutTree for Scene {
+    fn layout_tree(&self) -> &LayoutTree {
+        &self.layout_tree
+    }
+
+    fn layout_tree_mut(&mut self) -> &mut LayoutTree {
+        &mut self.layout_tree
+    }
+}
+
+/// A scene graph containing a collection of `Drawable` objects managed by a `LayoutTree`.
 ///
 /// The `Scene` is the central container for all graphical elements that are
-/// rendered in a window. It maintains a list of `Drawable` trait objects,
-/// allowing it to hold a heterogeneous collection of different shapes, text,
-/// images, and custom widgets.
+/// rendered in a window. It now uses a `LayoutTree` to manage the position
+/// and size of `Drawable` objects, enabling a declarative and responsive UI.
 ///
 /// In the retained-mode model, this `Scene` is built once (or updated
 /// incrementally) and then passed to the rendering system, which is responsible
 /// for drawing it on every `Paint` event.
 pub struct Scene {
-    /// A vector of heap-allocated, dynamically-dispatched drawable objects.
-    /// Using `Box<dyn Drawable>` allows the `Scene` to store any type that
-    /// implements the `Drawable` trait.
-    objects: Vec<Box<dyn Drawable>>,
+    pub layout_tree: LayoutTree,
 }
 
 impl Scene {
-    /// Creates a new, empty `Scene`.
+    /// Creates a new `Scene` with a default `LayoutTree`.
     pub fn new() -> Self {
         Self {
-            objects: Vec::new(),
+            layout_tree: LayoutTree {
+                taffy: TaffyTree::new(),
+                root: None,
+                is_dirty: true,
+            },
         }
-    }
-
-    /// Adds a `Drawable` object to the scene and returns its index.
-    ///
-    /// The object is boxed and added to the scene's list. The returned index
-    /// can be used later to retrieve the object with `get_object` or `get_object_mut`.
-    ///
-    /// # Returns
-    ///
-    /// The index (`usize`) of the newly added object.
-    pub fn add_object<T: Drawable + 'static>(&mut self, object: T) -> usize {
-        self.objects.push(Box::new(object));
-        self.objects.len() - 1
-    }
-
-    /// Returns a mutable reference to a `Drawable` object by its index.
-    pub fn get_object_mut(&mut self, index: usize) -> Option<&mut Box<dyn Drawable>> {
-        self.objects.get_mut(index)
-    }
-
-    /// Returns an immutable reference to a `Drawable` object by its index.
-    pub fn get_object(&self, index: usize) -> Option<&Box<dyn Drawable>> {
-        self.objects.get(index)
     }
 
     /// Draws all objects in the scene using the provided `Renderer`.
     ///
-    /// This method iterates through all the `Drawable` objects in the scene in
-    /// the order they were added and calls their respective `draw` methods.
+    /// This method traverses the `LayoutTree` and calls the `draw` method on
+    /// each `Drawable` object after updating its bounding box based on the
+    /// computed layout.
     ///
     /// # Arguments
     ///
@@ -103,8 +57,19 @@ impl Scene {
     /// This function will return an error if any of the underlying `draw` calls
     /// fail. The iteration will stop at the first error encountered.
     pub fn draw_all(&mut self, renderer: &mut dyn Renderer) -> anyhow::Result<()> {
-        for object in &mut self.objects {
-            object.draw(renderer)?;
+        if self.layout_tree.is_dirty {
+            if let Some(root) = &self.layout_tree.root {
+                let size = renderer.get_render_target_size().unwrap_or_default();
+                self.layout_tree.taffy.compute_layout(
+                    root.taffy_node,
+                    Size { width: AvailableSpace::Definite(size.x as f32), height: AvailableSpace::Definite(size.y as f32) },
+                ).unwrap();
+            }
+            self.layout_tree.is_dirty = false;
+        }
+
+        if let Some(root) = &mut self.layout_tree.root {
+            draw_node(root, &self.layout_tree.taffy, renderer)?;
         }
         Ok(())
     }
@@ -115,4 +80,18 @@ impl Default for Scene {
     fn default() -> Self {
         Self::new()
     }
+}
+
+fn draw_node(node: &mut LayoutNode, taffy: &TaffyTree, renderer: &mut dyn Renderer) -> anyhow::Result<()> {
+    let layout = taffy.layout(node.taffy_node)?;
+    if let Some(drawable) = &mut node.drawable {
+        drawable.set_bounding_box(layout.location.x, layout.location.y, layout.size.width, layout.size.height);
+        drawable.draw(renderer)?;
+    }
+
+    for child in &mut node.children {
+        draw_node(child, taffy, renderer)?;
+    }
+
+    Ok(())
 }
