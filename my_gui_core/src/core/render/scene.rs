@@ -85,8 +85,13 @@ impl Scene {
     }
 
     /// Returns an immutable reference to a `Drawable` object by its index.
-    pub fn get_object(&self, index: usize) -> Option<&Box<dyn Drawable>> {
-        self.objects.get(index)
+    pub fn get_object(&self, index: usize) -> Option<&dyn Drawable> {
+        self.objects.get(index).map(|v| &**v)
+    }
+
+    /// Returns the number of objects in the scene.
+    pub fn object_count(&self) -> usize {
+        self.objects.len()
     }
 
     /// Draws all objects in the scene using the provided `Renderer`.

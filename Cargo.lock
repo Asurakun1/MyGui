@@ -98,6 +98,7 @@ dependencies = [
  "glam",
  "log",
  "my_gui_core",
+ "my_gui_widgets",
  "taffy",
  "thiserror",
  "windows",
@@ -115,6 +116,14 @@ dependencies = [
  "thiserror",
  "windows",
  "windows-numerics",
+]
+
+[[package]]
+name = "my_gui_widgets"
+version = "0.1.0"
+dependencies = [
+ "my_gui_core",
+ "taffy",
 ]
 
 [[package]]

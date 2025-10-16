@@ -6,7 +6,6 @@ use env_logger;
 use my_gui::prelude::*;
 
 mod app_state;
-mod layout;
 mod draw_objects;
 use app_state::App;
 

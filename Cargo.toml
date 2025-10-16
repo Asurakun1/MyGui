@@ -1,6 +1,6 @@
 [workspace]
 members = [
-    "my_gui_core",
+    "my_gui_core", "my_gui_widgets",
 ]
 [workspace.dependencies]
 glam = "0.24.0"
@@ -10,6 +10,8 @@ windows-numerics = "0.3.0"
 thiserror = "2.0.16"
 log = "0.4"
 env_logger = "0.10"
+taffy = "0.9.1"
+my_gui_core = { path = "./my_gui_core" }
 
 [package]
 name = "my_gui"
@@ -21,7 +23,8 @@ repository = "https://github.com/Asurakun1/MyGui"
 homepage = "https://github.com/Asurakun1/MyGui"
 
 [dependencies]
-my_gui_core = { path = "./my_gui_core" }
+my_gui_core = { workspace = true}
+my_gui_widgets = { path = "./my_gui_widgets" }
 glam = { workspace = true }
 thiserror = {workspace = true}
 windows-numerics = {workspace = true}
@@ -29,7 +32,7 @@ windows = { workspace = true }
 anyhow = { workspace = true }
 log = { workspace = true }
 env_logger = { workspace = true }
-taffy = "0.9.1"
+taffy = {workspace=true}
 
 [package.metadata.docs.rs]
 targets = ["x86_64-pc-windows-msvc"]
