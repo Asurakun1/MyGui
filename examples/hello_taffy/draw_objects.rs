@@ -23,6 +23,8 @@ pub fn create_scene_objects(child_layouts: &[&Layout]) -> Scene {
                 2 => Color::BLUE,
                 _ => Color::BLACK, // Should not happen with 3 objects
             },
+            Some(Color::WHITE), // Border color
+            Some(child_layout.border.left), // Border thickness from Taffy layout
         );
         scene.add_object(rect);
     }

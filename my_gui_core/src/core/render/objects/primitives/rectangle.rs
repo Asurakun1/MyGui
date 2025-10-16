@@ -25,10 +25,14 @@ pub struct Rectangle {
     pub height: f32,
     /// The fill color of the rectangle.
     pub color: Color,
+    /// The border color of the rectangle (optional).
+    pub border_color: Option<Color>,
+    /// The border thickness of the rectangle (optional).
+    pub border_thickness: Option<f32>,
 }
 
 impl Rectangle {
-    /// Creates a new `Rectangle` with the specified position, size, and color.
+    /// Creates a new `Rectangle` with the specified position, size, color, and optional border properties.
     ///
     /// # Arguments
     ///
@@ -37,8 +41,26 @@ impl Rectangle {
     /// * `width` - The width of the rectangle.
     /// * `height` - The height of the rectangle.
     /// * `color` - The `Color` to fill the rectangle with.
-    pub fn new(x: f32, y: f32, width: f32, height: f32, color: Color) -> Self {
-        Self { x, y, width, height, color }
+    /// * `border_color` - The `Color` of the border (optional).
+    /// * `border_thickness` - The thickness of the border (optional).
+    pub fn new(
+        x: f32,
+        y: f32,
+        width: f32,
+        height: f32,
+        color: Color,
+        border_color: Option<Color>,
+        border_thickness: Option<f32>,
+    ) -> Self {
+        Self {
+            x,
+            y,
+            width,
+            height,
+            color,
+            border_color,
+            border_thickness,
+        }
     }
 }
 
@@ -57,7 +79,11 @@ impl Drawable for Rectangle {
     /// This function will return an error if the renderer's `draw_rectangle`
     /// method fails.
     fn draw(&mut self, renderer: &mut dyn Renderer) -> anyhow::Result<()> {
-        renderer.draw_rectangle(self)
+        renderer.draw_rectangle(self)?;
+        if self.border_color.is_some() && self.border_thickness.is_some() {
+            renderer.draw_rectangle_border(self)?;
+        }
+        Ok(())
     }
 
     fn as_any_mut(&mut self) -> &mut dyn std::any::Any {

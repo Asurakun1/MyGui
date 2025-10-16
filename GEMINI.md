@@ -15,8 +15,10 @@ The project uses Cargo, Rust's package manager and build system.
     This will open a new window titled "Hello, World!" with the specified text and styling.
 ## Development Conventions
 *   **Language:** Rust
-*   **Project Structure:** The project is a Cargo workspace with a library (`MyGui`) and examples.
+*   **Project Structure:** The project is a Cargo workspace with a library (`MyGui`), a widgets library (`MyGuiWidgets`), and examples.
     *   `src/lib.rs`: The main library file, which exports the public API.
+    *   `my_gui_widgets/`: Contains reusable UI widgets and layout components.
+        *   `src/layout.rs`: Defines the `Layout` struct for managing Taffy layouts.
     *   `src/core`: Contains the core modules for windowing, event handling, and rendering.
         *   `window/`: Manages window creation (`WindowBuilder`) and configuration (`WindowConfig`).
         *   `event/`: Defines the event handling system, including the `EventHandler` trait and the `Event` enum.
@@ -29,6 +31,7 @@ The project uses Cargo, Rust's package manager and build system.
 *   **Error Handling:** Uses `anyhow::Result` for all fallible operations, providing a consistent and ergonomic error handling mechanism.
 *   **Application Architecture:** The project uses a generic, user-defined state management pattern.
     *   **User-Defined State:** The library is generic over a state type `T`. The user is responsible for defining a struct that holds all their application's state.
+    *   **Layout Management**: The `my_gui_widgets` crate provides a `Layout` struct that integrates with the Taffy layout engine. This allows for flexible and efficient UI layout management.
     *   **`Window` Struct:** This struct is the concrete, platform-specific implementation that encapsulates window creation and the message loop. On Windows, it directly manages the native `HWND` and all associated resources. It owns an instance of the user-defined state `T` and the `RootEventHandler`. The `Window` is configured via `WindowConfig`, which includes a `RendererConfig` to specify the desired rendering backend.
     *   **Event Handling**: A modular, composable event handling system is used.
         *   **`EventHandler` Trait**: Defines the interface for handling window messages. Methods will receive a mutable reference to the user-defined state `T` and a mutable reference to the `Renderer` trait object, allowing them to modify the state and perform drawing operations. The `on_event` method now returns a `bool` indicating whether the event was consumed.
@@ -47,7 +50,7 @@ The project uses Cargo, Rust's package manager and build system.
     *   **`Direct2DRenderer`:** A concrete implementation of the `Renderer` trait for Direct2D.
     *   **`Drawable` Trait:** Defines an interface for any object that can be drawn on the screen. Its `draw` method now accepts a `&mut dyn Renderer`.
     *   **`Scene` Struct:** Manages a collection of `Drawable` objects. It is intended to be part of the user-defined state. Its `draw_all` method accepts a `&mut dyn Renderer`.
-    *   **Drawing Primitives**: The library provides safe, high-level abstractions for drawing basic shapes (e.g., `Rectangle`, `Ellipse`, `Line`) and text (`TextObject`), encapsulating the `unsafe` Direct2D calls within the `Direct2DRenderer`. Primitive shapes now use generic `f32` coordinates instead of `windows_numerics::Vector2`.
+    *   **Drawing Primitives**: The library provides safe, high-level abstractions for drawing basic shapes (e.g., `Rectangle`, `Ellipse`, `Line`) and text (`TextObject`), encapsulating the `unsafe` Direct2D calls within the `Direct2DRenderer`. `Rectangle` now supports optional borders. Primitive shapes now use generic `f32` coordinates instead of `windows_numerics::Vector2`.
     *   `WM_PAINT` is handled by the `on_paint` method of the `EventHandler` trait, which receives a `&mut dyn Renderer`.
 *   **Unsafe Code:** Due to direct interaction with the Windows API, the project utilizes `unsafe` blocks for FFI (Foreign Function Interface) calls. A key goal of the project is to provide safe, high-level abstractions over this `unsafe` code.
     *   **Window Resource Management**: In the `Window::run` method, `std::mem::forget(self)` is intentionally used. This transfers ownership of the `Window` instance to the operating system, allowing the OS to manage the window's lifecycle and associated resources through the `wndproc`. This approach prevents Rust's `Drop` implementation from being called, avoiding potential double-free issues and ensuring proper interaction with the Windows API's ownership model.

@@ -61,7 +61,7 @@ impl App {
                 bottom: LengthPercentage::length(10.0),
             },
             padding: Rect {
-                left: LengthPercentage::length(10.0),
+            left: LengthPercentage::length(10.0),
                 right: LengthPercentage::length(10.0),
                 top: LengthPercentage::length(10.0),
                 bottom: LengthPercentage::length(10.0),

@@ -406,6 +406,46 @@ impl Renderer for Direct2DRenderer {
         Ok(())
     }
 
+    /// Draws the border of a rectangle.
+    ///
+    /// This method sets the color of the reusable solid color brush and then
+    /// issues the `DrawRectangle` command to the render target.
+    ///
+    /// # Arguments
+    ///
+    /// * `rectangle` - A reference to the `Rectangle` to draw.
+    ///
+    /// # Errors
+    ///
+    /// Propagates any errors from the underlying Direct2D calls.
+    fn draw_rectangle_border(&mut self, rectangle: &Rectangle) -> anyhow::Result<()> {
+        if let Some(render_target) = &self.render_target
+            && let Some(brush) = &self.brush
+            && let Some(border_color) = rectangle.border_color
+            && let Some(border_thickness) = rectangle.border_thickness
+        {
+            let rect = D2D_RECT_F {
+                left: rectangle.x,
+                top: rectangle.y,
+                right: rectangle.x + rectangle.width,
+                bottom: rectangle.y + rectangle.height,
+            };
+
+            unsafe {
+                brush.SetColor(&D2D1_COLOR_F {
+                    r: border_color.r,
+                    g: border_color.g,
+                    b: border_color.b,
+                    a: border_color.a,
+                })
+            };
+            unsafe {
+                render_target.DrawRectangle(&rect, brush, border_thickness, None);
+            }
+        }
+        Ok(())
+    }
+
     /// Draws a filled ellipse.
     ///
     /// Sets the brush color and issues the `FillEllipse` command.

@@ -107,6 +107,13 @@ pub trait Renderer {
     /// * `rectangle` - A reference to the `Rectangle` struct containing the position, size, and color.
     fn draw_rectangle(&mut self, rectangle: &Rectangle) -> anyhow::Result<()>;
 
+    /// Draws the border of a rectangle.
+    ///
+    /// # Arguments
+    ///
+    /// * `rectangle` - A reference to the `Rectangle` struct containing the position, size, border color, and border thickness.
+    fn draw_rectangle_border(&mut self, rectangle: &Rectangle) -> anyhow::Result<()>;
+
     /// Draws an ellipse using the properties defined in the provided `Ellipse` struct.
     ///
     /// # Arguments

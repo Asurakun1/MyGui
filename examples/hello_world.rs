@@ -49,7 +49,15 @@ impl App {
             10.0,
             Color::GREEN,
         ));
-        scene.add_object(Rectangle::new(10.0, 50.0, 200.0, 100.0, Color::WHITE));
+        scene.add_object(Rectangle::new(
+            10.0,
+            50.0,
+            200.0,
+            100.0,
+            Color::WHITE,
+            None,
+            None,
+        ));
         // Add a circle
         scene.add_object(Ellipse::new(300.0, 100.0, 50.0, 50.0, Color::WHITE));
         // Add a stretched ellipse
@@ -59,7 +67,15 @@ impl App {
 
         // Create a canvas
         let mut canvas = Canvas::new(250.0, 250.0, 300.0, 200.0);
-        canvas.add_object(Rectangle::new(10.0, 10.0, 100.0, 50.0, Color::RED));
+        canvas.add_object(Rectangle::new(
+            10.0,
+            10.0,
+            100.0,
+            50.0,
+            Color::RED,
+            None,
+            None,
+        ));
         canvas.add_object(Ellipse::new(150.0, 100.0, 50.0, 50.0, Color::BLUE));
         scene.add_object(canvas);
 
