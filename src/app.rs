@@ -26,7 +26,7 @@ impl Application {
     pub fn new() -> Result<Self> {
         #[cfg(target_os = "windows")]
         {
-            use crate::core::platform::win32::com::ComInitializer;
+            use my_gui_core::core::platform::win32::com::ComInitializer;
             // On Windows, we create and hold a `ComInitializer`.
             // When `Application` is dropped at the end of `main`, the `ComInitializer`
             // will also be dropped, ensuring `CoUninitialize` is called.

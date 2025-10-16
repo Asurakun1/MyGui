@@ -3,7 +3,8 @@
 //! This is a simple example of how to use the `my_gui` framework to create a
 //! "Hello, World!" application.
 use env_logger;
-use my_gui::{core::render::objects::text_object::TextObject, prelude::*};
+use my_gui::prelude::*;
+use my_gui_core::core::render::objects::text_object::TextObject;
 
 // 1. Define the application state.
 pub struct App {

@@ -104,10 +104,9 @@
 //! ```
 //!
 pub mod app;
-pub mod core;
 
 /// A prelude for conveniently importing the most common types and traits.
 pub mod prelude {
     pub use crate::app::Application;
-    pub use crate::core::prelude::*;
+    pub use my_gui_core::prelude::*;
 }

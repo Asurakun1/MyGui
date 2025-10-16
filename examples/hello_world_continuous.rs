@@ -3,10 +3,8 @@
 //! This example demonstrates how to use the `Continuous` run mode to create
 //! an application with a fixed-timestep game loop.
 
-use my_gui::{
-    core::{render::objects::text_object::TextObject, window::config::RunMode},
-    prelude::*,
-};
+use my_gui::prelude::*;
+use my_gui_core::core::{render::objects::text_object::TextObject, window::config::RunMode};
 use std::time::Duration;
 
 // 1. Define the application state.

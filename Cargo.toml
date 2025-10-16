@@ -1,3 +1,16 @@
+[workspace]
+members = [
+    "my_gui_core",
+]
+[workspace.dependencies]
+glam = "0.24.0"
+windows = { version = "0.62.0", features = ["Win32_Foundation", "Win32_Graphics_Gdi", "Win32_System_LibraryLoader", "Win32_UI_WindowsAndMessaging", "Win32_Graphics_Direct2D", "Win32_Graphics_DirectWrite", "Win32_Graphics_Dxgi_Common", "Win32_System_Com", "Win32_Graphics_Direct2D_Common", "Win32_System_SystemServices", "Win32_UI_Input", "Win32_UI_Input_KeyboardAndMouse", "Win32_UI_HiDpi"] }
+anyhow = "1.0.100"
+windows-numerics = "0.3.0"
+thiserror = "2.0.16"
+log = "0.4"
+env_logger = "0.10"
+
 [package]
 name = "my_gui"
 version = "0.1.1"
@@ -8,13 +21,14 @@ repository = "https://github.com/Asurakun1/MyGui"
 homepage = "https://github.com/Asurakun1/MyGui"
 
 [dependencies]
-glam = "0.24.0"
-thiserror = "2.0.16"
-windows-numerics = "0.3.0"
-windows = { version = "0.62.0", features = ["Win32_Foundation", "Win32_Graphics_Gdi", "Win32_System_LibraryLoader", "Win32_UI_WindowsAndMessaging", "Win32_Graphics_Direct2D", "Win32_Graphics_DirectWrite", "Win32_Graphics_Dxgi_Common", "Win32_System_Com", "Win32_Graphics_Direct2D_Common", "Win32_System_SystemServices", "Win32_UI_Input", "Win32_UI_Input_KeyboardAndMouse", "Win32_UI_HiDpi"] }
-anyhow = "1.0.100"
-log = "0.4"
-env_logger = "0.10"
+my_gui_core = { path = "./my_gui_core" }
+glam = { workspace = true }
+thiserror = {workspace = true}
+windows-numerics = {workspace = true}
+windows = { workspace = true }
+anyhow = { workspace = true }
+log = { workspace = true }
+env_logger = { workspace = true }
 taffy = "0.9.1"
 
 [package.metadata.docs.rs]
