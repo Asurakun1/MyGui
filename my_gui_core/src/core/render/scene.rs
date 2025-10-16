@@ -121,3 +121,9 @@ impl Default for Scene {
         Self::new()
     }
 }
+
+impl HasDrawableCollection for Scene {
+    fn draw_all_drawables(&mut self, renderer: &mut dyn Renderer) -> anyhow::Result<()> {
+        self.draw_all(renderer)
+    }
+}

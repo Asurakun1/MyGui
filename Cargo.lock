@@ -113,6 +113,7 @@ dependencies = [
  "env_logger",
  "glam",
  "log",
+ "taffy",
  "thiserror",
  "windows",
  "windows-numerics",
@@ -122,6 +123,8 @@ dependencies = [
 name = "my_gui_widgets"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
+ "log",
  "my_gui_core",
  "taffy",
 ]

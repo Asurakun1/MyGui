@@ -47,5 +47,9 @@ impl Layout {
         self.widget_nodes.get(&widget_id).and_then(|&node_id| self.taffy.layout(node_id).ok())
     }
 
+    pub fn get_layout_for_node(&self, node_id: NodeId) -> Option<&taffy::Layout> {
+        self.taffy.layout(node_id).ok()
+    }
+
     // ... other methods for updating styles, etc.
 }

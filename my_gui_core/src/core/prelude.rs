@@ -36,7 +36,12 @@ pub use crate::core::{
         WindowBuilder,
         config::{KeyboardInputMode, WindowConfig, DpiAwareness},
     },
+    widget::{BaseWidget, Widget},
 };
+
+pub trait HasDrawableCollection {
+    fn draw_all_drawables(&mut self, renderer: &mut dyn Renderer) -> anyhow::Result<()>;
+}
 
 // Specific event handler implementations can be imported directly if needed:
 // pub use crate::core::event::handlers::{

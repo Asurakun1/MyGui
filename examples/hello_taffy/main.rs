@@ -6,7 +6,6 @@ use env_logger;
 use my_gui::prelude::*;
 
 mod app_state;
-mod draw_objects;
 use app_state::App;
 
 fn main() -> Result<()> {

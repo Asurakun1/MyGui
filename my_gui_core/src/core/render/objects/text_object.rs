@@ -25,6 +25,12 @@ pub struct TextObject {
     pub x: f32,
     /// The y-coordinate of the top-left corner of the text's layout box.
     pub y: f32,
+    /// The width of the text's layout box.
+    pub width: f32,
+    /// The height of the text's layout box.
+    pub height: f32,
+    /// The font size of the text.
+    pub font_size: f32,
     /// The color of the text.
     pub color: Color,
     /// A cached, backend-specific text layout object.
@@ -32,16 +38,19 @@ pub struct TextObject {
 }
 
 impl TextObject {
-    /// Creates a new `TextObject` with the specified text, position, and color.
+    /// Creates a new `TextObject` with the specified text, position, size, font size, and color.
     ///
     /// # Arguments
     ///
     /// * `text` - The `String` to be rendered.
     /// * `x` - The x-coordinate where the text rendering will begin.
     /// * `y` - The y-coordinate where the text rendering will begin.
+    /// * `width` - The width of the text's layout box.
+    /// * `height` - The height of the text's layout box.
+    /// * `font_size` - The font size of the text.
     /// * `color` - The `Color` of the text.
-    pub fn new(text: String, x: f32, y: f32, color: Color) -> Self {
-        Self { text, x, y, color, layout: None }
+    pub fn new(text: String, x: f32, y: f32, width: f32, height: f32, font_size: f32, color: Color) -> Self {
+        Self { text, x, y, width, height, font_size, color, layout: None }
     }
 
     /// Sets the text content of the `TextObject`.

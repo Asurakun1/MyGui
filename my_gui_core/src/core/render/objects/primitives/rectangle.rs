@@ -4,7 +4,6 @@
 //! a solid-color rectangle.
 
 use crate::core::prelude::*;
-use crate::core::render::drawable::Drawable;
 
 /// A `Drawable` struct that represents a filled rectangle.
 ///
@@ -14,6 +13,7 @@ use crate::core::render::drawable::Drawable;
 ///
 /// The `Rectangle` is a simple data container; it delegates the actual rendering
 /// logic to the `draw_rectangle` method of a [`Renderer`].
+#[derive(Clone)]
 pub struct Rectangle {
     /// The x-coordinate of the top-left corner of the rectangle.
     pub x: f32,
@@ -61,36 +61,5 @@ impl Rectangle {
             border_color,
             border_thickness,
         }
-    }
-}
-
-impl Drawable for Rectangle {
-    /// Draws the rectangle by delegating to the active `Renderer`.
-    ///
-    /// This method calls the `draw_rectangle` method on the provided `Renderer`,
-    /// passing a reference to itself.
-    ///
-    /// # Arguments
-    ///
-    /// * `renderer` - The `Renderer` that will perform the drawing operation.
-    ///
-    /// # Errors
-    ///
-    /// This function will return an error if the renderer's `draw_rectangle`
-    /// method fails.
-    fn draw(&mut self, renderer: &mut dyn Renderer) -> anyhow::Result<()> {
-        renderer.draw_rectangle(self)?;
-        if self.border_color.is_some() && self.border_thickness.is_some() {
-            renderer.draw_rectangle_border(self)?;
-        }
-        Ok(())
-    }
-
-    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
-        self
-    }
-
-    fn as_any(&self) -> &dyn std::any::Any {
-        self
     }
 }

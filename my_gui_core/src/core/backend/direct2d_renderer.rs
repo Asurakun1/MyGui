@@ -538,15 +538,28 @@ impl Renderer for Direct2DRenderer {
     ///
     /// A `Box<dyn Any>` containing the backend-specific layout object.
     fn create_text_layout(&self, text: &TextObject) -> anyhow::Result<Box<dyn Any>> {
-        let text_utf16: Vec<u16> = text.text.encode_utf16().collect();
-        let render_target_size = self.get_render_target_size().unwrap_or_default();
+        let text_utf16: Vec<u16> = text.text.encode_utf16().collect(); // Re-add this line
+
+        let text_format = unsafe {
+            self.dwrite_factory
+                .CreateTextFormat(
+                    &HSTRING::from("Arial"), // Use a default font face name
+                    None, // Font collection, `None` for system fonts.
+                    DWRITE_FONT_WEIGHT_NORMAL,
+                    DWRITE_FONT_STYLE_NORMAL,
+                    DWRITE_FONT_STRETCH_NORMAL,
+                    text.font_size, // Use TextObject's font_size
+                    &HSTRING::from("en-us"), // Locale name
+                )
+                .context("Failed to create IDWriteTextFormat for TextObject")?
+        };
 
         let text_layout = unsafe {
             self.dwrite_factory.CreateTextLayout(
                 &text_utf16,
-                &self.text_format,
-                render_target_size.x as f32,
-                render_target_size.y as f32,
+                &text_format, // Use the new text format
+                text.width,
+                text.height,
             )?
         };
 

@@ -5,4 +5,6 @@ edition = "2024"
 
 [dependencies]
 taffy={workspace=true}
-my_gui_core={workspace=true} 
+my_gui_core={workspace=true}
+anyhow = { workspace = true }
+log = { workspace = true } 

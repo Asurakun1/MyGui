@@ -43,7 +43,7 @@ impl<T> Default for RenderEventHandler<T> {
     }
 }
 
-impl<T: HasScene> EventHandler<T> for RenderEventHandler<T> {
+impl<T: HasDrawableCollection> EventHandler<T> for RenderEventHandler<T> {
     /// Handles the `Paint` event by clearing the render target and drawing the scene.
     ///
     /// This method is called for every event, but it only takes action if the
@@ -51,7 +51,7 @@ impl<T: HasScene> EventHandler<T> for RenderEventHandler<T> {
     ///
     /// # Parameters
     ///
-    /// - `app`: A mutable reference to the application state, which must implement `HasScene`.
+    /// - `app`: A mutable reference to the application state, which must implement `HasDrawableCollection`.
     /// - `event`: The event being processed.
     /// - `renderer`: The renderer used to perform drawing operations.
     fn on_event(&mut self, app: &mut T, event: &Event, renderer: &mut dyn Renderer) -> EventResult {
@@ -61,10 +61,10 @@ impl<T: HasScene> EventHandler<T> for RenderEventHandler<T> {
             // Clear the background to a default color.
             renderer.clear(&Color::BLACK);
 
-            // Draw all objects in the scene graph.
-            if let Err(e) = app.scene_mut().draw_all(renderer) {
+            // Draw all objects in the drawable collection.
+            if let Err(e) = app.draw_all_drawables(renderer) {
                 // In a real application, this should be logged more robustly.
-                log::error!("Failed to draw scene: {:?}", e);
+                log::error!("Failed to draw drawable collection: {:?}", e);
             }
 
             // Finalize and present the frame.

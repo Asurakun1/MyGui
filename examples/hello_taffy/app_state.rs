@@ -1,20 +1,19 @@
 use my_gui::prelude::*;
-use taffy::prelude::*;
+use my_gui_widgets::layout::Layout as MyGuiLayout; // Re-add this line
+use my_gui_widgets::rectangle_widget::RectangleWidget;
+use my_gui_widgets::widget_scene::WidgetScene;
+use taffy::prelude::*; // Re-add this line
 
 // 1. Define the application state.
 pub struct App {
-    pub scene: Scene,
+    pub widget_scene: my_gui_widgets::widget_scene::WidgetScene,
     pub input_context: InputContext,
     pub layout: my_gui_widgets::layout::Layout,
 }
 
-impl HasScene for App {
-    fn scene(&self) -> &Scene {
-        &self.scene
-    }
-
-    fn scene_mut(&mut self) -> &mut Scene {
-        &mut self.scene
+impl my_gui_core::prelude::HasDrawableCollection for App {
+    fn draw_all_drawables(&mut self, renderer: &mut dyn Renderer) -> anyhow::Result<()> {
+        self.widget_scene.draw_all_drawables(renderer)
     }
 }
 
@@ -36,10 +35,7 @@ impl Default for App {
 
 impl App {
     pub fn new() -> Self {
-        use my_gui_widgets::layout::Layout as MyGuiLayout;
-        use taffy::prelude::*;
-
-        let root_style = Style {
+        let mut layout = MyGuiLayout::new(Style {
             size: Size {
                 width: Dimension::percent(1.0),
                 height: Dimension::percent(1.0),
@@ -47,48 +43,57 @@ impl App {
             justify_content: Some(JustifyContent::Center), // Center children horizontally
             align_items: Some(AlignItems::Center),         // Center children vertically
             ..Default::default()
-        };
+        });
+        let mut widget_scene = WidgetScene::new();
 
-        let child_style = Style {
-            size: Size {
-                width: Dimension::percent(0.6),
-                height: Dimension::percent(0.6),
-            },
-            border: Rect {
-                left: LengthPercentage::length(10.0),
-                right: LengthPercentage::length(10.0),
-                top: LengthPercentage::length(10.0),
-                bottom: LengthPercentage::length(10.0),
-            },
-            padding: Rect {
-            left: LengthPercentage::length(10.0),
-                right: LengthPercentage::length(10.0),
-                top: LengthPercentage::length(10.0),
-                bottom: LengthPercentage::length(10.0),
-            },
-            ..Default::default()
-        };
+        for i in 0..4 {
+            let rect_widget = RectangleWidget::new(
+                i,
+                Style {
+                    size: Size {
+                        width: Dimension::percent(0.2),
+                        height: Dimension::percent(0.2),
+                    },
+                    border: Rect {
+                        left: LengthPercentage::length(10.0),
+                        right: LengthPercentage::length(10.0),
+                        top: LengthPercentage::length(10.0),
+                        bottom: LengthPercentage::length(10.0),
+                    },
+                    padding: Rect {
+                        left: LengthPercentage::length(10.0),
+                        right: LengthPercentage::length(10.0),
+                        top: LengthPercentage::length(10.0),
+                        bottom: LengthPercentage::length(10.0),
+                    },
+                    ..Default::default()
+                },
+                match i {
+                    0 => Color::RED,
+                    1 => Color::GREEN,
+                    2 => Color::BLUE,
+                    3 => Color::YELLOW,
+                    _ => Color::BLACK,
+                },
+                Some(Color::WHITE),
+                Some(10.0),
+            );
 
-        let mut layout = MyGuiLayout::new(root_style);
-        let child_style_for_first_widget = child_style.clone();
-        let _child_node_id = layout.add_widget(0, child_style_for_first_widget, &[]); // Assuming widget_id 0 for the child
-        layout.add_widget(1, child_style.clone(), &[]); // Another child
-        layout.add_widget(2, child_style.clone(), &[]); // Another child
+            let node_id = layout.add_widget(i, rect_widget.get_style().clone(), &[]);
+            let mut boxed_widget = Box::new(rect_widget);
+            boxed_widget.set_layout_node(node_id);
+            widget_scene.add_widget(boxed_widget);
+        }
 
         layout.compute_layout(Size {
             width: AvailableSpace::Definite(900.0),
             height: AvailableSpace::Definite(600.0),
         });
 
-        let mut child_layouts = Vec::new();
-        for i in 0..3 {
-            child_layouts.push(layout.get_layout(i).unwrap());
-        }
-
-        let scene = crate::draw_objects::create_scene_objects(&child_layouts);
+        widget_scene.update_widget_layouts(&layout);
 
         Self {
-            scene,
+            widget_scene,
             input_context: InputContext::default(),
             layout,
         }
