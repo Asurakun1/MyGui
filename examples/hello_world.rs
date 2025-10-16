@@ -39,7 +39,7 @@ impl Default for App {
 
 impl App {
     pub fn new() -> Self {
-        use my_gui_widgets::rectangle_widget::RectangleWidget;
+        use my_gui_widgets::rectangle_widget::RectangleWidgetBuilder;
         use my_gui_widgets::widget_scene::WidgetScene;
         use taffy::prelude::*;
         use taffy::style::Position;
@@ -49,7 +49,7 @@ impl App {
                 width: Dimension::percent(1.0),
                 height: Dimension::percent(1.0),
             },
-            justify_content: Some(JustifyContent::Center), // Center children horizontally
+            justify_content: Some(JustifyContent::Stretch), // Center children horizontally
             align_items: Some(AlignItems::Center),          // Center children vertically
             ..Default::default()
         });
@@ -61,8 +61,8 @@ impl App {
         let mut text_widget = TextWidgetBuilder::new(0, display_text.clone())
             .with_style(Style {
                 size: Size {
-                    width: Dimension::length(10.0),
-                    height: Dimension::length(10.0),
+                    width: Dimension::length(200.0),
+                    height: Dimension::length(20.0),
                 },
                 position: Position::Absolute,
                 ..Default::default()
@@ -72,26 +72,25 @@ impl App {
             .build();
         let text_node_id = layout.add_widget(0, text_widget.get_style().clone(), &[]);
         text_widget.set_layout_node(text_node_id);
+        widget_scene.add_widget(Box::new(text_widget));
 
         // Add a rectangle widget
-        let mut rect_widget = RectangleWidget::new(
-            1,
-            Style {
+        let mut rect_widget = RectangleWidgetBuilder::new(1) // Changed widget_id to 1
+            .with_style(Style {
                 size: Size {
                     width: Dimension::length(200.0),
                     height: Dimension::length(100.0),
                 },
-                position: Position::Relative,
+                position: Position::Absolute,
                 ..Default::default()
-            },
-            Color::WHITE,
-            Some(Color::BLUE),
-            Some(2.0),
-        );
+            })
+            .with_color(Color::WHITE)
+            .with_border_color(Color::BLUE)
+            .with_border_thickness(2.0)
+            .build();
         let rect_node_id = layout.add_widget(1, rect_widget.get_style().clone(), &[]); // Changed widget_id to 1
         rect_widget.set_layout_node(rect_node_id);
         widget_scene.add_widget(Box::new(rect_widget));
-        widget_scene.add_widget(Box::new(text_widget));
 
         // Commenting out Ellipse, Line, and Canvas for now as they are not yet widgets
         // scene.add_object(Ellipse::new(300.0, 100.0, 50.0, 50.0, Color::WHITE));

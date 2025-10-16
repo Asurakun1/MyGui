@@ -77,3 +77,53 @@ impl Drawable for RectangleWidget {
         self
     }
 }
+
+pub struct RectangleWidgetBuilder {
+    id: usize,
+    style: Style,
+    color: Color,
+    border_color: Option<Color>,
+    border_thickness: Option<f32>,
+}
+
+impl RectangleWidgetBuilder {
+    pub fn new(id: usize) -> Self {
+        Self {
+            id,
+            style: Style::default(),
+            color: Color::BLACK,
+            border_color: None,
+            border_thickness: None,
+        }
+    }
+
+    pub fn with_style(mut self, style: Style) -> Self {
+        self.style = style;
+        self
+    }
+
+    pub fn with_color(mut self, color: Color) -> Self {
+        self.color = color;
+        self
+    }
+
+    pub fn with_border_color(mut self, border_color: Color) -> Self {
+        self.border_color = Some(border_color);
+        self
+    }
+
+    pub fn with_border_thickness(mut self, border_thickness: f32) -> Self {
+        self.border_thickness = Some(border_thickness);
+        self
+    }
+
+    pub fn build(self) -> RectangleWidget {
+        RectangleWidget::new(
+            self.id,
+            self.style,
+            self.color,
+            self.border_color,
+            self.border_thickness,
+        )
+    }
+}

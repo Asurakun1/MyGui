@@ -1,8 +1,8 @@
 use my_gui::prelude::*;
 use my_gui_widgets::layout::Layout as MyGuiLayout; // Re-add this line
-use my_gui_widgets::rectangle_widget::RectangleWidget;
 use my_gui_widgets::widget_scene::WidgetScene;
 use taffy::prelude::*; // Re-add this line
+use my_gui_widgets::rectangle_widget::RectangleWidgetBuilder;
 
 // 1. Define the application state.
 pub struct App {
@@ -47,9 +47,8 @@ impl App {
         let mut widget_scene = WidgetScene::new();
 
         for i in 0..4 {
-            let rect_widget = RectangleWidget::new(
-                i,
-                Style {
+            let rect_widget = RectangleWidgetBuilder::new(i)
+                .with_style(Style {
                     size: Size {
                         width: Dimension::percent(0.2),
                         height: Dimension::percent(0.2),
@@ -67,17 +66,17 @@ impl App {
                         bottom: LengthPercentage::length(10.0),
                     },
                     ..Default::default()
-                },
-                match i {
+                })
+                .with_color(match i {
                     0 => Color::RED,
                     1 => Color::GREEN,
                     2 => Color::BLUE,
                     3 => Color::YELLOW,
                     _ => Color::BLACK,
-                },
-                Some(Color::WHITE),
-                Some(10.0),
-            );
+                })
+                .with_border_color(Color::WHITE)
+                .with_border_thickness(10.0)
+                .build();
 
             let node_id = layout.add_widget(i, rect_widget.get_style().clone(), &[]);
             let mut boxed_widget = Box::new(rect_widget);
